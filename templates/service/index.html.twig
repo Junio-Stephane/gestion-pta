@@ -1,0 +1,3516 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Gestion des Services{% endblock %}
+
+{% block stylesheets %}
+<style>
+/* Styles pour Select2 - Version harmonisée */
+/* Styles Select2 pour les filtres (version compacte) */
+.filters-container .select2-container--bootstrap-5 .select2-selection {
+    min-height: 36px !important;
+    height: 36px !important;
+    padding: 0.375rem !important;
+    font-size: 0.85rem !important;
+}
+
+.filters-container .select2-container--bootstrap-5 .select2-selection--single {
+    height: 36px !important;
+}
+
+.filters-container .select2-container--bootstrap-5 .select2-selection--single .select2-selection__rendered {
+    line-height: 20px !important;
+    padding-left: 0.5rem !important;
+    font-size: 0.85rem !important;
+}
+
+.filters-container .select2-container--bootstrap-5 .select2-selection--single .select2-selection__arrow {
+    height: 34px !important;
+    right: 0.5rem !important;
+}
+
+.filters-container .select2-container--bootstrap-5 .select2-dropdown {
+    font-size: 0.85rem !important;
+}
+
+.filters-container .select2-container--bootstrap-5 .select2-results__option {
+    padding: 0.4rem 0.6rem !important;
+    font-size: 0.85rem !important;
+    min-height: 34px !important;
+}
+
+/* Style spécifique pour le filtre de direction */
+#directionFilter + .select2 .select2-selection {
+    min-height: 36px !important;
+    height: 36px !important;
+}
+
+/* Style pour les selects dans les modaux (garder la taille normale) */
+.modal .select2-container--bootstrap-5 .select2-selection {
+    min-height: 45px !important;
+    height: 45px !important;
+}
+
+.select2-container--bootstrap-5 .select2-selection {
+    min-height: 45px !important;
+    height: 45px !important;
+    padding: 0.575rem !important;
+    border: 1px solid #d1d5db !important;
+    border-radius: 6px !important;
+    font-size: 0.9rem !important;
+    line-height: 1.5 !important;
+    background-color: white !important;
+    transition: all 0.3s ease !important;
+}
+
+.select2-container--bootstrap-5 .select2-selection--single {
+    height: 38px !important;
+}
+
+.select2-container--bootstrap-5 .select2-selection--single .select2-selection__rendered {
+    line-height: 24px !important;
+    padding-left: 0.75rem !important;
+    padding-right: 2.5rem !important;
+    color: #374151 !important;
+}
+
+.select2-container--bootstrap-5 .select2-selection--single .select2-selection__arrow {
+    height: 36px !important;
+    right: 0.5rem !important;
+}
+
+/* Style au survol (hover) */
+.select2-container--bootstrap-5 .select2-selection:hover {
+    border-color: #964ee3 !important;
+    box-shadow: 0 0 0 3px rgba(150, 78, 227, 0.1) !important;
+}
+
+/* Style au focus */
+.select2-container--bootstrap-5.select2-container--focus .select2-selection,
+.select2-container--bootstrap-5.select2-container--open .select2-selection {
+    border-color: #964ee3 !important;
+    box-shadow: 0 0 0 3px rgba(150, 78, 227, 0.1) !important;
+    outline: none !important;
+}
+
+/* Style pour le dropdown */
+.select2-container--bootstrap-5 .select2-dropdown {
+    border: 1px solid #d1d5db !important;
+    border-radius: 6px !important;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1) !important;
+    background-color: white !important;
+}
+
+/* Champ de recherche dans le dropdown */
+.select2-container--bootstrap-5 .select2-search--dropdown .select2-search__field {
+    border: 1px solid #d1d5db !important;
+    border-radius: 4px !important;
+    padding: 0.375rem 0.75rem !important;
+    font-size: 0.9rem !important;
+    height: 38px !important;
+}
+
+.select2-container--bootstrap-5 .select2-search--dropdown .select2-search__field:focus {
+    border-color: #964ee3 !important;
+    box-shadow: 0 0 0 3px rgba(150, 78, 227, 0.1) !important;
+    outline: none !important;
+}
+
+/* Options dans le dropdown */
+.select2-container--bootstrap-5 .select2-results__option {
+    padding: 0.5rem 0.75rem !important;
+    font-size: 0.9rem !important;
+    min-height: 38px !important;
+    display: flex !important;
+    align-items: center !important;
+}
+
+/* Option sélectionnée */
+.select2-container--bootstrap-5 .select2-results__option--selected {
+    background-color: #f3f4f6 !important;
+    color: #374151 !important;
+}
+
+/* Option au survol/surbrillance */
+.select2-container--bootstrap-5 .select2-results__option--highlighted.select2-results__option--selectable {
+    background-color: #3f7ee3 !important;
+    color: white !important;
+}
+
+/* Options désactivées */
+.select2-container--bootstrap-5 .select2-results__option.option-desactive {
+    color: #6b7280 !important;
+    font-style: italic !important;
+    background-color: #f9fafb !important;
+}
+
+.select2-container--bootstrap-5 .select2-results__option.option-desactive.select2-results__option--highlighted {
+    background-color: #f3f4f6 !important;
+    color: #6b7280 !important;
+}
+
+/* Style pour les sélects dans les modaux (z-index corrigé) */
+.modal .select2-container {
+    z-index: 1060 !important;
+}
+
+.modal .select2-dropdown {
+    z-index: 1061 !important;
+}
+
+/* Style pour le placeholder */
+.select2-container--bootstrap-5 .select2-selection--single .select2-selection__placeholder {
+    color: #6b7280 !important;
+    font-size: 0.9rem !important;
+}
+
+/* Style pour les sélects désactivés */
+.select2-container--bootstrap-5 .select2-selection--single[aria-disabled="true"] {
+    background-color: #f1f3f6 !important;
+    border-color: #ced1d6 !important;
+    color: #626771 !important;
+    cursor: default !important;
+}
+
+/* Style pour le clear button */
+.select2-container--bootstrap-5 .select2-selection--single .select2-selection__clear {
+    height: 36px !important;
+    padding: 0 0.5rem !important;
+    color: #6b7280 !important;
+    font-size: 1.2rem !important;
+}
+
+.select2-container--bootstrap-5 .select2-selection--single .select2-selection__clear:hover {
+    color: #ef4444 !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .select2-container--bootstrap-5 .select2-selection {
+        min-height: 36px !important;
+        height: 36px !important;
+        font-size: 0.85rem !important;
+    }
+    
+    .select2-container--bootstrap-5 .select2-selection--single {
+        height: 36px !important;
+    }
+    
+    .select2-container--bootstrap-5 .select2-selection--single .select2-selection__rendered {
+        padding-left: 0.5rem !important;
+        font-size: 0.85rem !important;
+    }
+    
+    .select2-container--bootstrap-5 .select2-results__option {
+        font-size: 0.85rem !important;
+        min-height: 36px !important;
+    }
+}
+
+.services-container {
+    background: #fdfdffff;
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: rgba(0, 0, 0, 0.13) 0px 3px 8px;
+    margin-bottom: 2rem;
+}
+
+.table-services {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+}
+
+.table-services th,
+.table-services td {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.table-services th {
+    background: #eaeafaff;
+    font-weight: 600;
+    color: #1f2937;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+}
+
+.table-services td {
+    font-size: 14px;
+}
+
+.table-services tr:hover {
+    background: #f8fafc;
+}
+
+/* Ligne désactivée */
+.table-services tr.service-desactive {
+    background-color: #f9fafb;
+    color: #6b7280;
+}
+
+.table-services tr.service-desactive:hover {
+    background-color: #f3f4f6;
+}
+
+.table-services tr.service-desactive td {
+    opacity: 0.7;
+}
+
+.status-badge {
+    padding: 0.4rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.65rem;
+    font-weight: 600;
+}
+
+.status-active {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.status-waiting {
+    background: #fef3c7;
+    color: #d97706;
+}
+
+.status-desactive {
+    background: #e5e7eb;
+    color: #374151;
+}
+
+.role-badge {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+.role-badge-desactive {
+    background: #e5e7eb;
+    color: #6b7280;
+}
+
+.actions-container {
+    display: flex;
+    gap: 0.2rem;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: center;
+    min-height: 38px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* Style pour le dropdown des services */
+.dropdown .btn {
+    min-width: 80px;
+    max-width: 80px;
+    padding: 0.1rem 0.3rem;
+}
+
+.dropdown-menu {
+    min-width: 180px;
+    border-radius: 6px;
+    padding: 0.3rem;
+}
+
+.dropdown-item {
+    padding: 0.4rem 0.6rem;
+    font-size: 0.7rem;
+    gap: 0.3rem;
+}
+
+.dropdown {
+    display: inline-flex;
+    color: #ffff;
+}
+
+
+
+/* Dropdown responsive */
+.dropdown {
+    display: inline-flex;
+    position: relative;
+}
+
+.dropdown-menu {
+    min-width: 200px;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    background: #fffdf5ff;
+    position: absolute;
+    z-index: 1000;
+}
+
+.dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 0.8rem;
+    font-size: 0.75rem;
+    color: #374151;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.dropdown-item:hover {
+    background: #f5ebc0ff;
+    color: #374151;
+}
+
+/* Responsive pour mobile - Priorité au dropdown */
+@media (max-width: 768px) {
+    .actions-container {
+        flex-direction: row;
+        gap: 0.3rem;
+        min-height: auto;
+        width: 100%;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+    
+    .btn {
+        min-width: 70px;
+        padding: 0.2rem 0.4rem;
+        font-size: 0.65rem;
+    }
+    
+    /* Dropdown spécifique pour mobile */
+    .dropdown {
+        position: static; /* Important pour le responsive */
+    }
+    
+    .dropdown .btn {
+        min-width: 70px;
+        font-size: 0.65rem;
+        padding: 0.2rem 0.4rem;
+    }
+    
+    .dropdown-menu {
+        position: absolute;
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+        min-width: 180px;
+        z-index: 1050;
+    }
+    
+    /* Ajustement spécifique pour la colonne Actions */
+    .table-services th:nth-child(9),
+    .table-services td:nth-child(9) {
+        width: 200px;
+        min-width: 200px;
+        max-width: 200px;
+    }
+    
+    /* Pour les très petits écrans */
+    @media (max-width: 576px) {
+        .actions-container {
+            flex-direction: column;
+            gap: 0.2rem;
+        }
+        
+        .dropdown-menu {
+            position: fixed;
+            top: 50% !important;
+            left: 50% !important;
+            transform: translate(-50%, -50%) !important;
+            width: 90%;
+            max-width: 250px;
+        }
+        
+        .table-services th:nth-child(9),
+        .table-services td:nth-child(9) {
+            width: 180px;
+            min-width: 180px;
+            max-width: 180px;
+        }
+    }
+}
+
+/* Pour les tableaux - Assurer la visibilité du dropdown */
+.table-responsive {
+    position: relative;
+    overflow-x: auto;
+}
+
+/* Empêcher le overflow-x de cacher le dropdown */
+.table-services {
+    position: relative;
+}
+
+/* Z-index pour s'assurer que le dropdown soit au-dessus */
+.dropdown-menu {
+    z-index: 1060;
+}
+
+.dropdown-item:hover {
+    background: #f5ebc0ff;
+}
+
+.btnG {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 16px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-height: 38px;
+    line-height: 1;
+    white-space: nowrap;
+    box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.12) 0px 1px 3px 1px;
+}
+
+.btnG:hover {
+    transform: translateY(-1px);
+    opacity: 0.9;
+}
+
+/* Styles des boutons - Version compacte */
+.btn {
+    padding: 0.1rem 0.3rem;
+    border: none;
+    border-radius: 10px;
+    font-size: 0.7rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.2rem;
+    white-space: nowrap;
+    min-height: 28px;
+    line-height: 1;
+    box-shadow: rgba(60, 64, 67, 0.2) 0px 1px 2px 0px;
+    flex-shrink: 0;
+}
+
+/* Styles des boutons */
+.btn-warning {
+    background: linear-gradient(135deg, #f5bf62ff 0%, #df9618ff 100%);
+    color: #ffff;
+    border: 1px solid #df9618ff;
+    min-width: 80px; /* Réduit de 120px à 80px */
+    max-width: 80px;
+}
+
+.btn-success {
+    background: linear-gradient(135deg, #1fbe89ff 0%, #04704cff 100%);
+    color: #ffff;
+    border: 1px solid #087d56ff;
+    min-width: 80px; /* Réduit de 120px à 80px */
+    max-width: 80px;
+}
+
+.btn-danger {
+    background: linear-gradient(135deg, #fa6565ff 0%, #e13636ff 100%);
+    color: #ffff;
+    border: 1px solid #e13636ff;
+    min-width: 80px; /* Réduit de 120px à 80px */
+    max-width: 80px;
+}
+
+.btn-dangerG {
+    background: linear-gradient(135deg, #fa6565ff 0%, #e13636ff 100%);
+    color: #ffff;
+    border: 1px solid #e13636ff;
+    min-width: 200px; /* Réduit de 120px à 80px */
+    max-width: 200px;
+}
+
+.btn-warningG {
+    background: linear-gradient(135deg, #f5bf62ff 0%, #df9618ff 100%);
+    color: #ffff;
+    border: 1px solid #df9618ff;
+    min-width: 120px; /* Réduit de 120px à 80px */
+    max-width: 120px;
+}
+
+.btn-successG {
+    background: linear-gradient(135deg, #1fbe89ff 0%, #04704cff 100%);
+    color: #ffff;
+    border: 1px solid #087d56ff;
+    min-width: 190px; /* Réduit de 120px à 80px */
+    max-width: 190px;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #3f7ee3ff 0%, #2b6ed8ff 100%);
+    color: white;
+    border: 1px solid #3f7ee3ff;
+}
+
+.btn-secondary {
+    background: #6b7280;
+    color: white;
+    border: 1px solid #6b7280;
+}
+
+
+/* Hover states */
+.btn:hover:not(:disabled) {
+    transform: translateY(-1px);
+    color: #ffff;
+}
+
+.btn-warning:hover:not(:disabled) {
+    background: #f59e0b linear-gradient(135deg, #d68d0eff 0%, #895b09ff 100%);
+    border-color: #d68d0eff;
+}
+
+.btn-success:hover:not(:disabled) {
+    background: linear-gradient(135deg, #0f9d6eff 0%, #036343ff 100%);
+}
+
+.btn-danger:hover:not(:disabled) {
+    background: linear-gradient(135deg, #e14242ff 0%, #b01818ff 100%);
+}
+
+.btn-primary:hover:not(:disabled) {
+    background: linear-gradient(135deg, #4a6897ff 0%, #1c488fff 100%);
+    border-color: #1c488fff;
+}
+
+.btn-secondary:hover:not(:disabled) {
+    background: #4b5563;
+    border-color: #4b5563;
+}
+
+.btn-warning:hover,
+.btn-warningG:hover {
+    background: #f59e0b linear-gradient(135deg, #d68d0eff 0%, #895b09ff 100%);
+    border-color: #d68d0eff;
+}
+
+.btn-success:hover,
+.btn-successG:hover {
+    background: linear-gradient(135deg, #0f9d6eff 0%, #036343ff 100%);
+
+}
+
+.btn-danger:hover,
+.btn-dangerG:hover {
+    background: linear-gradient(135deg, #e14242ff 0%, #b01818ff 100%);
+}
+
+/* Boutons désactivés */
+.btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none !important;
+}
+
+.btn-desactive {
+    background: #9ca3af;
+    color: white;
+    border: 1px solid #9ca3af;
+}
+
+/* Modal styles */
+.modal-content {
+    border-radius: 12px;
+    border: none;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+}
+
+.modal-header {
+    background: linear-gradient(135deg, #964ee3 0%, #75165f 100%);
+    color: white;
+    border-radius: 12px 12px 0 0;
+    border: none;
+    padding: 1.5rem;
+}
+
+.btn-close-custom {
+    background: none;
+    border: none;
+    font-size: 2rem;
+    color: white;
+    opacity: 0.8;
+    transition: all 0.3s ease;
+    padding: 0.5rem;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    margin: -0.5rem -0.5rem -0.5rem auto;
+}
+
+.btn-close-custom:hover {
+    opacity: 1;
+    background: rgba(255, 255, 255, 0.2);
+}
+
+
+.modal-title {
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0;
+}
+
+.modal-body {
+    padding: 1.5rem;
+}
+
+.modal-footer {
+    border-top: 1px solid #e5e7eb;
+    padding: 1rem 1.5rem;
+}
+
+.changerDirectionForm {
+    margin: 8px 0;
+    padding: 12px;
+    background: #f6effeff;
+    border-radius: 8px;
+    border: 1px solid #cb9dfdff;
+}
+
+.btn-close-white {
+    filter: invert(1);
+}
+
+.form-group {
+    margin-bottom: 1.25rem;
+}
+
+.form-label {
+    font-weight: 500;
+    color: #374151;
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+.form-control, .form-select {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    background: white;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
+
+.form-control[readonly]{
+    background-color: #f1f3f6ff;
+    border-color: #ced1d6ff;
+    color: #626771ff;
+    cursor: default;
+}
+
+.form-control:focus, .form-select:focus {
+    outline: none;
+    border-color: #964ee3;
+    box-shadow: 0 0 0 3px rgba(150, 78, 227, 0.1);
+}
+
+.form-text {
+    font-size: 0.8rem;
+    color: #6b7280;
+    margin-top: 0.29rem;
+}
+
+.is-invalid {
+    border-color: #dc3545 !important;
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
+}
+
+.invalid-feedback {
+    display: block;
+    width: 100%;
+    margin-top: 0.25rem;
+    font-size: 0.875em;
+    color: #dc3545;
+}
+
+.consigne {
+    background: #f0f9ff;
+    border-left: 4px solid #3b82f6;
+    padding: 1rem;
+    margin: 1rem 0;
+    border-radius: 6px;
+}
+
+.consigne h5 {
+    margin: 0 0 0.5rem 0;
+    color: #1e40af;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.consigne p {
+    margin: 0;
+    font-size: 0.8rem;
+    color: #4b5563;
+    line-height: 1.4;
+}
+
+.consigneD {
+    background: #f0f9ff;
+    border-left: 4px solid #3b82f6;
+    padding: 1rem;
+    margin: 1rem 0;
+    border-radius: 6px;
+}
+
+.consigneD h5 {
+    margin: 0 0 0.5rem 0;
+    color: #1e40af;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.consigneD p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: #4b5563;
+    line-height: 1.4;
+}
+
+.consigne-warning {
+    background: #fef7e6ff;
+    border-left: 4px solid #f6ae3bff;
+    padding: 1rem;
+    margin: 1rem 0;
+    border-radius: 6px;
+}
+
+.consigne-warning h5 {
+    color: #d97706;
+}
+
+.consigne-danger {
+    background: #fef2f2;
+    border-left: 4px solid #ef4444;
+}
+
+.consigne-danger h5 {
+    color: #dc2626;
+}
+
+.consigne-success {
+    background: #f0fdf4;
+    border-left: 4px solid #22c55e;
+}
+
+.consigne-success h5 {
+    color: #16a34a;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 3rem;
+    color: #6b7280;
+}
+
+.empty-state i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #f1f5f9;
+}
+
+.section-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1f2937;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.loading-spinner {
+    display: inline-block;
+    width: 1rem;
+    height: 1rem;
+    border: 2px solid #f3f3f3;
+    border-top: 2px solid #964ee3;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.user-avatar {
+    width: 32px;
+    height: 32px;
+    background: linear-gradient(135deg, #964ee3 0%, #75165f 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 600;
+    font-size: 0.75rem;
+}
+
+.user-info-cell {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.option-desactive {
+    color: #63676dff;
+    font-style: italic;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .services-container {
+        padding: 1rem;
+    }
+    
+    .table-services {
+        font-size: 0.875rem;
+    }
+    
+    .table-services th,
+    .table-services td {
+        padding: 0.75rem 0.5rem;
+    }
+    
+    .actions-container {
+        flex-direction: column;
+        gap: 0.25rem;
+        min-height: auto;
+        width: 100%;
+    }
+    
+    .btn {
+        width: 100%;
+        justify-content: center;
+        min-width: auto;
+    }
+    
+    .modal-content {
+        margin: 10% auto;
+        width: 95%;
+    }
+    
+    .section-header {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: flex-start;
+    }
+}
+
+/* Pour la colonne Actions */
+.table-services th:nth-child(9),
+.table-services td:nth-child(9) {
+    width: 220px;
+    min-width: 220px;
+    max-width: 220px;
+}
+
+/* Style spécifique pour les badges */
+.attribution-badge {
+    display: inline-block;
+    text-align: center;
+    padding: 0.4rem 0.6rem;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    line-height: 1.2;
+    white-space: normal;
+    word-break: break-word;
+    max-width: 100%;
+}
+
+/* Styles pour les filtres et la recherche */
+.filters-container {
+    background: #f3f3fbff;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    border: 1px solid #e5e7eb;
+    box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.13) 0px 1px 2px;
+}
+
+.filter-row {
+    display: flex;
+    gap: 1rem;
+    align-items: end;
+    flex-wrap: wrap;
+}
+
+.filter-group {
+    flex: 1;
+    min-width: 200px;
+}
+
+.search-group {
+    flex: 2;
+    min-width: 300px;
+}
+
+.filter-group label,
+.search-group label {
+    font-weight: 500;
+    color: #374151;
+    margin-bottom: 0.5rem;
+    display: block;
+    font-size: 0.875rem;
+}
+
+.filter-group .form-control,
+.filter-group .form-select,
+.search-group .form-control {
+    padding: 0.4rem 0.75rem;
+    height: 38px;
+    font-size: 0.85rem;
+    line-height: 1.3;
+}
+
+.filter-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+/* Pagination compacte */
+.pagination-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1rem;
+    padding: 0.75rem 0;
+    border-top: 1px solid #e5e7eb;
+}
+
+.pagination-info {
+    color: #6b7280;
+    font-size: 0.8rem;
+}
+
+.pagination {
+    margin: 0;
+    gap: 0.25rem;
+}
+
+.page-item .page-link {
+    padding: 0.3rem 0.5rem;
+    border: 1px solid #d1d5db;
+    color: #374151;
+    background: white;
+    font-size: 0.8rem;
+    min-width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    border-radius: 6px;
+}
+
+/* Réduire encore plus pour les boutons précédent/suivant */
+.page-item .page-link i {
+    font-size: 0.7rem;
+}
+
+/* États */
+.page-item.active .page-link {
+    background: linear-gradient(135deg, #964ee3 0%, #8b1970ff 100%);    border-color: #964ee3;
+    color: white;
+}
+
+.page-item.disabled .page-link {
+    color: #9ca3af;
+    background: #f9fafb;
+    cursor: not-allowed;
+}
+
+.page-link:hover:not(.disabled) {
+    background: #f3f4f6;
+    color: #1f2937;
+}
+
+/* Badge spécifique pour "Non défini" */
+.attribution-badge-non-defini {
+    background: #6b7280 !important;
+    color: white !important;
+}
+
+/* Ajoutez ceci dans votre section CSS */
+#nouveauServiceMutation:disabled {
+    background-color: #f8f9fa;
+    color: #6c757d;
+    cursor: default;
+}
+
+#nouveauServiceMutation option:disabled {
+    color: #6c757d;
+    font-style: italic;
+}
+
+/* Style pour le bouton désactivé */
+#submitMutationChef:disabled {
+    background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+    color: #d1d5db;
+    border-color: #6b7280;
+    cursor: default;
+}
+
+/* Style pour l'option "Aucun service disponible" */
+#nouveauServiceMutation option[value=""] {
+    font-style: italic;
+    color: #6c757d;
+}
+
+/* Style de la consigne quand pas de service disponible */
+.no-services-message {
+    background: #f8f9fa;
+    border-left: 4px solid #6c757d;
+    padding: 0.75rem;
+    margin: 0.5rem 0;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    color: #6c757d;
+}
+
+.no-services-message i {
+    margin-right: 0.5rem;
+}
+
+/* Position fixe pour les alertes - AJOUTEZ CETTE SECTION DANS VOTRE STYLESHEETS */
+.fixed-alert-container {
+    position: fixed;
+    top: 100px;
+    right: 20px;
+    z-index: 9999;
+    max-width: 400px;
+    animation: slideInRight 0.3s ease-out;
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+.alert-success-fixed {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 1rem 1.25rem;
+    box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);
+    border-left: 4px solid #047857;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    animation: fadeIn 0.3s ease-out;
+}
+
+.alert-danger-fixed {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 1rem 1.25rem;
+    box-shadow: 0 8px 25px rgba(239, 68, 68, 0.3);
+    border-left: 4px solid #b91c1c;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    animation: fadeIn 0.3s ease-out;
+}
+
+.alert-success-fixed i,
+.alert-danger-fixed i {
+    font-size: 1.2rem;
+}
+
+.alert-close-btn {
+    background: none;
+    border: none;
+    color: white;
+    opacity: 0.8;
+    padding: 0.25rem;
+    margin-left: auto;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+}
+
+.alert-close-btn:hover {
+    opacity: 1;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+}
+/* Responsive adjustments pour les alertes */
+@media (max-width: 768px) {
+    .fixed-alert-container {
+        top: 80px;
+        right: 10px;
+        left: 10px;
+        max-width: none;
+    }
+    
+    .alert-success-fixed,
+    .alert-danger-fixed {
+        padding: 0.75rem 1rem;
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .fixed-alert-container {
+        top: 70px;
+    }
+    
+    .alert-success-fixed,
+    .alert-danger-fixed {
+        padding: 0.5rem 0.75rem;
+    }
+    
+    .alert-success-fixed i,
+    .alert-danger-fixed i {
+        font-size: 1rem;
+    }
+}
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="container-fluid py-4">
+    <div id="fixedAlertContainer" class="fixed-alert-container"></div>
+    <!-- En-tête -->
+    <div class="services-container">
+        <div class="section-header">
+            <div>
+                <h1 class="section-title">
+                    <i class="bi bi-diagram-3"></i>
+                    Liste des Services
+                </h1>
+                <p class="text-muted mb-0">Gérez les services et leurs chefs de service</p>
+            </div>
+            <button class="btnG btn-primary btn-lg" data-bs-toggle="modal" data-bs-target="#addServiceModal">
+                <i class="bi bi-plus-circle me-2"></i>
+                Ajouter un service
+            </button>
+        </div>
+
+        <!-- Filtres et recherche -->
+        <div class="filters-container">
+            <div class="filter-row">
+                <div class="filter-group">
+                    <label for="statutFilter">Filtrer par statut</label>
+                    <select class="form-select" id="statutFilter">
+                        <option value="">Tous les statuts</option>
+                        <option value="ACTIF">Actif</option>
+                        <option value="EN_ATTENTE">En attente</option>
+                        <option value="DESACTIVE">Désactivé</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label for="attributionFilter">Filtrer par attribution</label>
+                    <select class="form-select" id="attributionFilter">
+                        <option value="">Toutes les attributions</option>
+                        <option value="AVEC_CHEF">Avec chef de service</option>
+                        <option value="SANS_CHEF">Sans chef de service</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+    <label for="directionFilter">Filtrer par direction</label>
+    <select class="form-select search-select" id="directionFilter">
+        <option value="">Toutes les directions</option>
+    </select>
+</div>
+
+                
+                <div class="search-group">
+                    <label for="searchInput">Recherche</label>
+                    <input type="text" class="form-control" id="searchInput" 
+                           placeholder="Rechercher par nom, email, matricule ou code service...">
+                </div>
+                
+                <div class="filter-actions">
+                    <button type="button" class="btnG btn-secondary btn-sm" id="resetFilters">
+                        <i class="bi bi-arrow-clockwise"></i>
+                        Réinitialiser
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tableau des services -->
+        <div class="table-responsive">
+            <table class="table-services">
+                <thead>
+                    <tr>
+                        <th>CODE</th>
+                        <th>NOM DU SERVICE</th>
+                        <th>DIRECTION</th>
+                        <th>CHEF DE SERVICE</th>
+                        <th>IMMATRICULE</th>
+                        <th>EMAIL</th>
+                        <th>ATTRIBUTION</th>
+                        <th>STATUT</th>
+                        <th style="text-align: center;">ACTIONS</th>
+                    </tr>
+                </thead>
+                <tbody id="servicesTableBody">
+                    <!-- Les données seront chargées via JavaScript -->
+                    <tr>
+                        <td colspan="9" class="text-center py-4">
+                            <div class="loading-spinner me-2"></div>
+                            Chargement des services...
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination-container">
+            <div class="pagination-info" id="paginationInfo">
+                Affichage de 0 à 0 sur 0 services
+            </div>
+            <nav>
+                <ul class="pagination" id="pagination">
+                    <!-- La pagination sera générée via JavaScript -->
+                </ul>
+            </nav>
+        </div>
+
+    </div>
+</div>
+
+<!-- Modal Ajouter Service -->
+<div class="modal fade" id="addServiceModal" tabindex="-1" aria-labelledby="addServiceModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-gear-add"></i>
+                    Nouveau Service
+                </h5>
+                <button type="button" class="btn-close-custom" data-bs-dismiss="modal" aria-label="Close">
+                    <i class="bi bi-x"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="addServiceForm">
+                    <div class="consigne">
+                        <h5><i class="bi bi-info-circle"></i> Information</h5>
+                        <p>Les champs marqués d'un * sont obligatoires. Vous pourrez assigner un chef de service plus tard si nécessaire.</p>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="codeService" class="form-label">Code Service *</label>
+                        <input type="text" class="form-control" id="codeService" name="codeService" required
+                               placeholder="Ex: SRH001" maxlength="20">
+                        <div class="invalid-feedback" id="codeServiceError"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="nomService" class="form-label">Nom du Service *</label>
+                        <input type="text" class="form-control" id="nomService" name="nomService" required
+                               placeholder="Ex: Service des Ressources Humaines" maxlength="50">
+                        <div class="invalid-feedback" id="nomServiceError"></div>
+                    </div>
+
+                    <!-- Dans le modal Ajouter Service -->
+<div class="form-group">
+    <label for="direction" class="form-label">Direction *</label>
+    <select class="form-select search-select" id="direction" name="direction" required>
+        <option value="">Sélectionnez une direction</option>
+    </select>
+    <div class="invalid-feedback" id="directionError"></div>
+</div>
+
+<div class="form-group">
+    <label for="chefService" class="form-label">Chef de Service</label>
+    <select class="form-select search-select" id="chefService" name="chefService">
+        <option value="">Sélectionnez un chef de service</option>
+    </select>
+    <div class="invalid-feedback" id="chefServiceError"></div>
+</div>
+                    
+                    <div class="modal-footer">
+                        <button type="button" class="btnG btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                        <button type="submit" class="btnG btn-primary" id="submitAddService">
+                            <i class="bi bi-check-circle me-2"></i>
+                            Créer le service
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Modifier Service -->
+<div class="modal fade" id="modifierServiceModal" tabindex="-1" aria-labelledby="modifierServiceModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-pencil-square"></i>
+                    Modifier le Service
+                </h5>
+                <button type="button" class="btn-close-custom" data-bs-dismiss="modal" aria-label="Close">
+                    <i class="bi bi-x"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="modifierServiceForm">
+                    <div class="consigne">
+                        <h5><i class="bi bi-info-circle"></i> Information</h5>
+                        <p>Modifiez les informations du service. Le code service ne peut pas être modifié.</p>
+                    </div>
+
+                    <input type="hidden" id="modifierServiceCode" name="codeService">
+                    
+                    <div class="form-group">
+                        <label for="modifierCodeService" class="form-label">Code Service</label>
+                        <input type="text" class="form-control" id="modifierCodeService" readonly>
+                        {# <div class="form-text">Le code service ne peut pas être modifié</div> #}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="modifierNomService" class="form-label">Nom du Service *</label>
+                        <input type="text" class="form-control" id="modifierNomService" name="nomService" required
+                               placeholder="Ex: Service des Ressources Humaines" maxlength="50">
+                        <div class="invalid-feedback" id="modifierNomServiceError"></div>
+                    </div>
+
+                    <!-- Dans le modal Modifier Service -->
+<div class="form-group">
+    <label for="modifierDirection" class="form-label">Direction *</label>
+    <select class="form-select search-select" id="modifierDirection" name="direction" required>
+        <option value="">Sélectionnez une direction</option>
+    </select>
+    <div class="invalid-feedback" id="modifierDirectionError"></div>
+</div>
+
+<div class="form-group">
+    <label for="modifierChefService" class="form-label">Chef de Service</label>
+    <select class="form-select search-select" id="modifierChefService" name="chefService">
+        <option value="">Aucun chef de service</option>
+    </select>
+    <div class="invalid-feedback" id="modifierChefServiceError"></div>
+</div>
+                    
+                    <div class="modal-footer">
+                        <button type="button" class="btnG btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                        <button type="submit" class="btnG btn-primary" id="submitModifierService">
+                            <i class="bi bi-check-circle me-2"></i>
+                            Enregistrer les modifications
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Mutation Chef de Service -->
+<div class="modal fade" id="mutationChefModal" tabindex="-1" aria-labelledby="mutationChefModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-people"></i>
+                    Mutation de Chef de Service
+                </h5>
+                <button type="button" class="btn-close-custom" data-bs-dismiss="modal" aria-label="Close">
+                    <i class="bi bi-x"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="mutationChefForm">
+                    <div class="consigne consigne-warning">
+                        <h5><i class="bi bi-exclamation-triangle"></i> Attention</h5>
+                        <p>Cette action va réaffecter le chef de service vers le nouveau service sélectionné et mettre son ancien service en attente de nouveau chef.</p>
+                    </div>
+                    
+                    <input type="hidden" id="chefServiceImMutation" name="chefService">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="chefServiceMutation" class="form-label">Chef de service à muter *</label>
+                                <input type="text" class="form-control" id="chefServiceMutation" readonly>
+                                {# <small class="form-text text-muted">Chef de service sélectionné</small> #}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <!-- Dans le modal Mutation Chef -->
+<div class="form-group">
+    <label for="nouveauServiceMutation" class="form-label">Nouveau Service *</label>
+    <select class="form-select search-select" id="nouveauServiceMutation" name="nouveauService" required>
+        <option value="">Chargement des services...</option>
+    </select>
+</div>
+                        </div>
+                    </div>
+                    
+                    <div class="modal-footer">
+                        <button type="button" class="btnG btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                        <button type="submit" class="btnG btn-primary" id="submitMutationChef">
+                            <i class="bi bi-check-circle me-2"></i>
+                            Confirmer la réaffectation
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Confirmation Désactivation -->
+<div class="modal fade" id="confirmationDesactivationServiceModal" tabindex="-1" aria-labelledby="confirmationDesactivationServiceModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-exclamation-triangle"></i>
+                    Confirmation de désactivation
+                </h5>
+                <button type="button" class="btn-close-custom" data-bs-dismiss="modal" aria-label="Close">
+                    <i class="bi bi-x"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="consigneD consigne-danger">
+                    <h5><i class="bi bi-x-circle"></i> Désactivation</h5>
+                    <p id="confirmationDesactivationServiceMessage">
+                        Êtes-vous sûr de vouloir désactiver ce service ? Cette action désactivera également le chef de service et tous les personnels associés.
+                    </p>
+                </div>
+                <div class="mt-3">
+                    <small class="text-muted">Service concerné :</small>
+                    <span id="serviceNomDesactivation" class="fw-bold mb-1"></span>
+                </div>
+                <div>
+                    <small class="text-muted">Code :</small>
+                    <span id="serviceCodeDesactivation" class="fw-bold mb-1"></span>
+                </div>
+                {# <div id="desactivationServiceDetails" class="mt-3">
+                    <small class="text-muted">
+                        <i class="bi bi-info-circle"></i>
+                        Cette action est réversible. Le service pourra être réactivé ultérieurement.
+                    </small>
+                </div> #}
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btnG btn-secondary" data-bs-dismiss="modal">
+                    Annuler
+                </button>
+                <button type="button" class="btnG btn-dangerG" id="confirmDesactiverService">
+                    <i class="bi bi-x-circle me-2"></i>
+                    Confirmer la désactivation
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Activation Service -->
+<div class="modal fade" id="activationServiceModal" tabindex="-1" aria-labelledby="activationServiceModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-check-circle"></i>
+                    Activation de Service
+                </h5>
+                <button type="button" class="btn-close-custom" data-bs-dismiss="modal" aria-label="Close">
+                    <i class="bi bi-x"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="activationServiceForm">
+                    <div class="consigne consigne-success">
+                        <h5><i class="bi bi-check-circle"></i> Activation</h5>
+                        <p>Vous allez réactiver ce service. Choisissez comment gérer le chef de service.</p>
+                    </div>
+
+                    <input type="hidden" id="activationServiceCode" name="codeService">
+                    
+                    <div class="form-group">
+                        <label class="form-label">Service</label>
+                        <input type="text" class="form-control" id="activationServiceNom" readonly>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Ancien chef de service</label>
+                        <input type="text" class="form-control" id="activationAncienChef" readonly>
+                        <div class="form-text" id="activationChefInfo"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Options d'activation</label>
+                        <div class="mt-2">
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="radio" name="activationOption" id="garderChef" value="garder" checked>
+                                <label class="form-check-label" for="garderChef">
+                                    Garder l'ancien chef de service
+                                </label>
+                                <div class="form-text">Réactiver l'ancien chef et le réassigner à ce service</div>
+                            </div>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="radio" name="activationOption" id="choisirChef" value="choisir">
+                                <label class="form-check-label" for="choisirChef">
+                                    Choisir un nouveau chef de service
+                                </label>
+                                <div class="form-text">Sélectionner un nouveau chef parmi les personnels disponibles</div>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="activationOption" id="aucunChef" value="aucun">
+                                <label class="form-check-label" for="aucunChef">
+                                    Aucun chef de service pour le moment
+                                </label>
+                                <div class="form-text">Activer le service sans chef de service</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Dans le modal Activation Service -->
+<div class="form-group" id="nouveauChefGroup" style="display: none;">
+    <label for="activationNouveauChef" class="form-label">Nouveau Chef de Service</label>
+    <select class="form-select search-select" id="activationNouveauChef" name="nouveauChef">
+        <option value="">Sélectionnez un chef de service</option>
+    </select>
+</div>
+                    
+                    <div class="modal-footer">
+                        <button type="button" class="btnG btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                        <button type="submit" class="btnG btn-successG" id="submitActivationService">
+                            <i class="bi bi-check-circle me-2"></i>
+                            Activer le service
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block javascripts %}
+<script>
+class ServiceManager {
+    constructor() {
+        this.currentPage = 1;
+        this.itemsPerPage = 5;
+        this.totalItems = 0;
+        this.allServices = [];
+        this.filteredServices = [];
+        this.currentFilters = {
+            statut: '',
+            attribution: '',
+            direction: '',
+            search: ''
+        };
+        this.init();
+        this.currentServiceCode = null;
+        this.currentModificationData = null;
+    }
+
+initSelect2() {
+    // Options par défaut pour les modaux (style normal)
+    const defaultModalOptions = {
+        theme: 'bootstrap-5',
+        width: '100%',
+        placeholder: 'Rechercher...',
+        allowClear: true,
+        dropdownParent: null,
+        language: {
+            noResults: () => "Aucun résultat trouvé",
+            searching: () => "Recherche en cours..."
+        }
+    };
+
+    // Options spécifiques pour les filtres (style compact)
+    const filterOptions = {
+        ...defaultModalOptions,
+        dropdownParent: $(document.body),
+        minimumResultsForSearch: 5 // Afficher la recherche seulement si + de 5 résultats
+    };
+
+    // Initialiser chaque select avec ses options spécifiques
+    this.selects = {
+        // MODAUX - Style normal
+        direction: this.initSelectWithOptions('#direction', {
+            ...defaultModalOptions,
+            dropdownParent: $('#addServiceModal')
+        }),
+        
+        chefService: this.initSelectWithOptions('#chefService', {
+            ...defaultModalOptions,
+            dropdownParent: $('#addServiceModal')
+        }),
+        
+        modifierDirection: this.initSelectWithOptions('#modifierDirection', {
+            ...defaultModalOptions,
+            dropdownParent: $('#modifierServiceModal')
+        }),
+        
+        modifierChefService: this.initSelectWithOptions('#modifierChefService', {
+            ...defaultModalOptions,
+            dropdownParent: $('#modifierServiceModal')
+        }),
+        
+        nouveauServiceMutation: this.initSelectWithOptions('#nouveauServiceMutation', {
+            ...defaultModalOptions,
+            placeholder: 'Rechercher un service...',
+            dropdownParent: $('#mutationChefModal')
+        }),
+        
+        activationNouveauChef: this.initSelectWithOptions('#activationNouveauChef', {
+            ...defaultModalOptions,
+            placeholder: 'Rechercher un chef de service...',
+            dropdownParent: $('#activationServiceModal')
+        }),
+        
+        // FILTRES - Style compact
+        directionFilter: this.initSelectWithOptions('#directionFilter', {
+            ...filterOptions,
+            placeholder: 'Toutes les directions',
+            minimumResultsForSearch: 5
+        }),
+
+        nouvelleDirection: this.initSelectWithOptions('#nouvelleDirection', {
+    ...defaultModalOptions,
+    placeholder: 'Sélectionnez une direction active',
+    dropdownParent: $('#directionInactiveModal')
+})
+    };
+
+    // Gérer la fermeture des modaux
+    $('.modal').on('hidden.bs.modal', () => {
+        Object.values(this.selects).forEach(select => {
+            if (select && $.fn.select2) {
+                select.select2('close');
+            }
+        });
+    });
+
+    console.log('✅ Select2 initialisé avec styles différents pour modaux et filtres');
+}
+
+initSelectWithOptions(selector, options) {
+    const $select = $(selector);
+    if ($select.length) {
+        return $select.select2(options);
+    }
+    return null;
+}
+
+// Modifiez la méthode init() pour inclure initSelect2
+init() {
+    this.loadServices();
+    this.setupModalResetListeners();
+    this.initSelect2();
+    
+    // PRÉCHARGER les données pour tous les modaux
+    this.preloadModalData();
+    
+    this.setupEventListeners();
+    this.loadDirectionsPourFiltre();
+}
+
+async preloadModalData() {
+    try {
+        // Charger les directions actives pour tous les modaux
+        await this.loadDirectionsActives();
+        
+        // Charger les personnels pour chef de service
+        await this.loadPersonnelsPourChefService();
+        
+        console.log('✅ Données des modaux préchargées');
+    } catch (error) {
+        console.error('Erreur préchargement données:', error);
+    }
+}
+
+    async loadServices() {
+        try {
+            const response = await fetch('/admin/services/api/list');
+            const data = await response.json();
+            
+            if (data.success) {
+                this.allServices = data.services;
+                this.applyFilters();
+            } else {
+                this.showError(data.message);
+            }
+        } catch (error) {
+            console.error('Erreur chargement services:', error);
+            this.showError('Erreur lors du chargement des services');
+        }
+    }
+
+    applyFilters() {
+        let filtered = [...this.allServices];
+
+        // Filtre par statut
+        if (this.currentFilters.statut) {
+            filtered = filtered.filter(service => 
+                service.statutService === this.currentFilters.statut
+            );
+        }
+
+        // Filtre par attribution
+        if (this.currentFilters.attribution) {
+            if (this.currentFilters.attribution === 'AVEC_CHEF') {
+                filtered = filtered.filter(service => service.chefService !== null);
+            } else if (this.currentFilters.attribution === 'SANS_CHEF') {
+                filtered = filtered.filter(service => service.chefService === null);
+            }
+        }
+
+        // Filtre par direction
+        if (this.currentFilters.direction) {
+            filtered = filtered.filter(service => 
+                service.direction && service.direction.CodeDirection === this.currentFilters.direction
+            );
+        }
+
+        // Filtre par recherche
+        if (this.currentFilters.search) {
+            const searchTerm = this.currentFilters.search.toLowerCase();
+            filtered = filtered.filter(service => {
+                const chefService = service.chefService;
+                const direction = service.direction;
+                return (
+                    service.CodeService.toLowerCase().includes(searchTerm) ||
+                    service.nomService.toLowerCase().includes(searchTerm) ||
+                    (direction && direction.nomDirection.toLowerCase().includes(searchTerm)) ||
+                    (chefService && (
+                        chefService.NomPer.toLowerCase().includes(searchTerm) ||
+                        chefService.PrenomPer.toLowerCase().includes(searchTerm) ||
+                        (chefService.EmailPer && chefService.EmailPer.toLowerCase().includes(searchTerm)) ||
+                        (chefService.ImPer && chefService.ImPer.toLowerCase().includes(searchTerm))
+                    ))
+                );
+            });
+        }
+
+        this.filteredServices = filtered;
+        this.totalItems = filtered.length;
+        this.currentPage = 1;
+        this.renderServices();
+        this.renderPagination();
+    }
+
+    getPaginatedServices() {
+        const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+        const endIndex = startIndex + this.itemsPerPage;
+        return this.filteredServices.slice(startIndex, endIndex);
+    }
+
+    renderServices() {
+        const services = this.getPaginatedServices();
+        const tbody = document.getElementById('servicesTableBody');
+        
+        if (!services || services.length === 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="9" class="text-center py-4 text-muted">
+                        <i class="bi bi-gear" style="font-size: 2rem;"></i>
+                        <p class="mt-2">Aucun service trouvé</p>
+                        ${this.hasActiveFilters() ? 
+                            '<p class="text-sm">Essayez de modifier vos critères de recherche</p>' : 
+                            ''
+                        }
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+
+        tbody.innerHTML = services.map(service => {
+            const direction = service.direction;
+            const chefService = service.chefService;
+            const nomChefService = chefService ? 
+                `${this.escapeHtml(chefService.NomPer)} ${this.escapeHtml(chefService.PrenomPer)}` : 
+                'Aucun chef';
+
+            const fonctionChef = chefService ? chefService.FonctionPer : null;
+            const estDesactive = service.statutService === 'DESACTIVE';
+            const estEnAttente = service.statutService === 'EN_ATTENTE';
+            const chefDesactive = chefService && chefService.StatutPer === 'DESACTIVE';
+            const rowClass = estDesactive ? 'service-desactive' : '';
+            
+            let statutBadge;
+            if (estDesactive) {
+                statutBadge = '<span class="status-badge status-desactive">Désactivé</span>';
+            } else if (estEnAttente) {
+                statutBadge = '<span class="status-badge status-waiting">En attente</span>';
+            } else {
+                statutBadge = '<span class="status-badge status-active">Actif</span>';
+            }
+            
+            const fonctionBadge = chefService ? 
+                `<span class="status-badge ${chefDesactive ? 'role-badge-desactive' : 'role-badge'}">
+                    ${this.capitalizeFirstLetter(fonctionChef)}${chefDesactive ? '' : ''}
+                </span>` : 
+                '<span class="status-badge attribution-badge-non-defini">Non défini</span>';
+
+            return `
+                <tr class="service-item ${rowClass}" id="service-${service.CodeService}">
+                    <td><strong>${service.CodeService}</strong></td>
+                    <td>${this.escapeHtml(service.nomService)}</td>
+                    <td>${direction ? this.escapeHtml(direction.nomDirection) : '-'}</td>
+                    <td>
+                        ${chefService ? 
+                            `<div class="user-info-cell">
+                                <div>${nomChefService}</div>
+                            </div>` : 
+                            '<span class="text-muted">Aucun chef</span>'
+                        }
+                    </td>
+                    <td>${chefService ? (chefService.ImPer || 'Aucun') : 'Aucun'}</td>
+                    <td>${chefService ? (chefService.EmailPer || 'Aucun') : 'Aucun'}</td>
+                    <td>
+                        ${fonctionBadge}
+                    </td>
+                    <td>
+                        ${statutBadge}
+                    </td>
+                    <td>
+    <div class="actions-container">
+        ${!estDesactive ? 
+            (chefService ? 
+                `<div class="dropdown">
+                    <button class="btn btn-warning dropdown-toggle" type="button" 
+                        data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-pencil"></i>
+                        Modifier
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <a class="dropdown-item" href="#" 
+                               onclick="serviceManager.openModifierServiceModal(
+                                   '${service.CodeService}', 
+                                   '${this.escapeHtml(service.nomService)}', 
+                                   '${direction ? direction.CodeDirection : ''}', 
+                                   '${direction ? this.escapeHtml(direction.nomDirection) : ''}',
+                                   '${chefService ? chefService.ImPer : ''}', 
+                                   '${this.escapeHtml(nomChefService)}'
+                               )">
+                                <i class="bi bi-pencil-square me-2"></i>
+                                Modifier le service
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="#" 
+                               onclick="serviceManager.openMutationChefModal(
+                                   '${service.CodeService}', 
+                                   '${this.escapeHtml(service.nomService)}', 
+                                   '${chefService.ImPer}', 
+                                   '${this.escapeHtml(nomChefService)}'
+                               )">
+                                <i class="bi bi-people me-2"></i>
+                                Réaffecter le chef
+                            </a>
+                        </li>
+                    </ul>
+                </div>` :
+                `<button type="button" class="btn btn-warning"
+                    onclick="serviceManager.openModifierServiceModal(
+                        '${service.CodeService}', 
+                        '${this.escapeHtml(service.nomService)}', 
+                        '${direction ? direction.CodeDirection : ''}', 
+                        '${direction ? this.escapeHtml(direction.nomDirection) : ''}',
+                        null, 
+                        'Aucun chef'
+                    )">
+                    <i class="bi bi-pencil"></i>
+                    Modifier
+                </button>`
+            ) :
+            `<button type="button" class="btn btn-warning" disabled>
+                <i class="bi bi-pencil"></i>
+                Modifier
+            </button>`
+        }
+        
+        ${estDesactive ? 
+            `<button type="button" class="btn btn-success"
+                onclick="serviceManager.openActivationModal(
+                    '${service.CodeService}', 
+                    '${this.escapeHtml(service.nomService)}',
+                    '${chefService ? this.escapeHtml(nomChefService) : 'Aucun chef'}',
+                    '${chefService ? chefService.ImPer : ''}'
+                )">
+                <i class="bi bi-check-circle"></i>
+                Activer
+            </button>` :
+            `<button type="button" class="btn btn-danger" 
+                onclick="serviceManager.openConfirmationDesactivationModal(
+                    '${service.CodeService}', 
+                    '${this.escapeHtml(service.nomService)}'
+                )">
+                <i class="bi bi-x-circle"></i>
+                Désactiver
+            </button>`
+        }
+    </div>
+</td>
+                </tr>
+            `;
+        }).join('');
+    }
+
+    renderPagination() {
+        const totalPages = Math.ceil(this.totalItems / this.itemsPerPage);
+        const paginationElement = document.getElementById('pagination');
+        const paginationInfoElement = document.getElementById('paginationInfo');
+
+        const startItem = (this.currentPage - 1) * this.itemsPerPage + 1;
+        const endItem = Math.min(this.currentPage * this.itemsPerPage, this.totalItems);
+        
+        paginationInfoElement.textContent = 
+            `Affichage de ${startItem} à ${endItem} sur ${this.totalItems} service${this.totalItems !== 1 ? 's' : ''}`;
+
+        let paginationHTML = '';
+
+        paginationHTML += `
+            <li class="page-item ${this.currentPage === 1 ? 'disabled' : ''}">
+                <a class="page-link" href="#" onclick="serviceManager.changePage(${this.currentPage - 1}); return false;">
+                    <i class="bi bi-chevron-left"></i>
+                </a>
+            </li>
+        `;
+
+        const maxVisiblePages = 5;
+        let startPage = Math.max(1, this.currentPage - Math.floor(maxVisiblePages / 2));
+        let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+        if (endPage - startPage + 1 < maxVisiblePages) {
+            startPage = Math.max(1, endPage - maxVisiblePages + 1);
+        }
+
+        if (startPage > 1) {
+            paginationHTML += `
+                <li class="page-item">
+                    <a class="page-link" href="#" onclick="serviceManager.changePage(1); return false;">1</a>
+                </li>
+            `;
+            if (startPage > 2) {
+                paginationHTML += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
+            }
+        }
+
+        for (let i = startPage; i <= endPage; i++) {
+            paginationHTML += `
+                <li class="page-item ${i === this.currentPage ? 'active' : ''}">
+                    <a class="page-link" href="#" onclick="serviceManager.changePage(${i}); return false;">${i}</a>
+                </li>
+            `;
+        }
+
+        if (endPage < totalPages) {
+            if (endPage < totalPages - 1) {
+                paginationHTML += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
+            }
+            paginationHTML += `
+                <li class="page-item">
+                    <a class="page-link" href="#" onclick="serviceManager.changePage(${totalPages}); return false;">${totalPages}</a>
+                </li>
+            `;
+        }
+
+        paginationHTML += `
+            <li class="page-item ${this.currentPage === totalPages ? 'disabled' : ''}">
+                <a class="page-link" href="#" onclick="serviceManager.changePage(${this.currentPage + 1}); return false;">
+                    <i class="bi bi-chevron-right"></i>
+                </a>
+            </li>
+        `;
+
+        paginationElement.innerHTML = paginationHTML;
+    }
+
+    changePage(page) {
+        if (page < 1 || page > Math.ceil(this.totalItems / this.itemsPerPage)) {
+            return;
+        }
+        this.currentPage = page;
+        this.renderServices();
+        this.renderPagination();
+        
+        document.querySelector('.table-responsive').scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'start' 
+        });
+    }
+
+    hasActiveFilters() {
+        return this.currentFilters.statut || this.currentFilters.attribution || 
+               this.currentFilters.direction || this.currentFilters.search;
+    }
+
+    capitalizeFirstLetter(string) {
+        if (!string) return '';
+        return string.charAt(0).toUpperCase() + string.slice(1);
+    }
+
+    escapeHtml(unsafe) {
+        if (!unsafe) return '';
+        return unsafe
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
+
+    setupEventListeners() {
+        document.getElementById('addServiceForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            this.ajouterService();
+        });
+
+        document.getElementById('statutFilter').addEventListener('change', (e) => {
+            this.currentFilters.statut = e.target.value;
+            this.applyFilters();
+        });
+
+        document.getElementById('attributionFilter').addEventListener('change', (e) => {
+            this.currentFilters.attribution = e.target.value;
+            this.applyFilters();
+        });
+
+        if (this.selects.directionFilter) {
+        this.selects.directionFilter.on('change', (e) => {
+            console.log('Direction filter changed:', {
+                value: e.target.value,
+                data: e.target.selectedOptions[0]?.text
+            });
+            this.currentFilters.direction = e.target.value;
+            this.applyFilters();
+        });
+    }
+
+        // document.getElementById('directionFilter').addEventListener('change', (e) => {
+        //     this.currentFilters.direction = e.target.value;
+        //     this.applyFilters();
+        // });
+
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            this.currentFilters.search = e.target.value;
+            clearTimeout(this.searchTimeout);
+            this.searchTimeout = setTimeout(() => {
+                this.applyFilters();
+            }, 300);
+        });
+
+        document.getElementById('resetFilters').addEventListener('click', () => {
+            this.resetFilters();
+        });
+
+        document.getElementById('modifierServiceForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            this.modifierService();
+        });
+
+        document.getElementById('mutationChefForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            this.effectuerMutationChef();
+        });
+
+        document.getElementById('activationServiceForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            this.activerService();
+        });
+
+        document.getElementById('confirmDesactiverService').addEventListener('click', () => {
+            this.confirmDesactiverService();
+        });
+
+        document.querySelectorAll('input[name="activationOption"]').forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                this.toggleNouveauChefGroup(e.target.value);
+            });
+        });
+
+        document.getElementById('addServiceModal').addEventListener('show.bs.modal', () => {
+            this.clearModalErrors('add');
+            this.loadDirectionsActives();
+            this.loadPersonnelsPourChefService();
+        });
+        
+        document.getElementById('modifierServiceModal').addEventListener('show.bs.modal', () => {
+            this.clearModalErrors('modify');
+            // Le chargement des données se fait dans openModifierServiceModal
+        });
+
+        document.getElementById('activationServiceModal').addEventListener('show.bs.modal', () => {
+            this.loadPersonnelsPourActivationService();
+        });
+
+        ['codeService', 'nomService', 'direction', 'chefService'].forEach(field => {
+            document.getElementById(field)?.addEventListener('input', () => {
+                this.clearFieldError(field);
+            });
+        });
+
+        ['modifierNomService', 'modifierDirection', 'modifierChefService'].forEach(field => {
+            document.getElementById(field)?.addEventListener('input', () => {
+                this.clearFieldError(field);
+            });
+        });
+    }
+
+setupModalResetListeners() {
+    // Modal d'ajout de service
+    document.getElementById('addServiceModal').addEventListener('hidden.bs.modal', () => {
+        const form = document.getElementById('addServiceForm');
+        form.reset();
+        this.clearModalErrors('add');
+        
+        // Réinitialiser Select2
+        this.selects.direction.val('').trigger('change.select2');
+        this.selects.chefService.val('').trigger('change.select2');
+        
+        // Réinitialiser l'état du bouton
+        const submitBtn = document.getElementById('submitAddService');
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="bi bi-check-circle me-2"></i> Créer le service';
+    });
+    
+    // Modal de modification de service
+    document.getElementById('modifierServiceModal').addEventListener('hidden.bs.modal', () => {
+        const form = document.getElementById('modifierServiceForm');
+        form.reset();
+        this.clearModalErrors('modify');
+        
+        // Réinitialiser Select2 proprement
+        if (this.selects.modifierDirection) {
+            this.selects.modifierDirection.val('').trigger('change.select2');
+        }
+        if (this.selects.modifierChefService) {
+            this.selects.modifierChefService.val('').trigger('change.select2');
+        }
+        
+        // Réinitialiser l'état du bouton
+        const submitBtn = document.getElementById('submitModifierService');
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="bi bi-check-circle me-2"></i> Enregistrer les modifications';
+        
+        this.currentModificationData = null;
+    });
+    
+    // Modal de mutation chef
+    document.getElementById('mutationChefModal').addEventListener('hidden.bs.modal', () => {
+        const form = document.getElementById('mutationChefForm');
+        form.reset();
+        
+        // Réinitialiser Select2
+        this.selects.nouveauServiceMutation.val('').trigger('change.select2');
+        this.selects.nouveauServiceMutation.prop('disabled', false);
+        
+        // Réactiver le bouton
+        const submitBtn = document.getElementById('submitMutationChef');
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="bi bi-check-circle me-2"></i> Confirmer la réaffectation';
+    });
+    
+    // Modal d'activation
+    document.getElementById('activationServiceModal').addEventListener('hidden.bs.modal', () => {
+        const form = document.getElementById('activationServiceForm');
+        form.reset();
+        
+        // Réinitialiser les options
+        document.getElementById('garderChef').checked = true;
+        document.getElementById('garderChef').disabled = false;
+        document.querySelector('label[for="garderChef"]').innerHTML = 'Garder l\'ancien chef de service';
+        
+        document.getElementById('choisirChef').disabled = false;
+        document.querySelector('label[for="choisirChef"]').innerHTML = 'Choisir un nouveau chef de service';
+        
+        this.toggleNouveauChefGroup('garder');
+        
+        // Réinitialiser Select2
+        this.selects.activationNouveauChef.val('').trigger('change.select2');
+        this.selects.activationNouveauChef.prop('disabled', false);
+        
+        // Réinitialiser l'état du bouton
+        const submitBtn = document.getElementById('submitActivationService');
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="bi bi-check-circle me-2"></i> Activer le service';
+    });
+}
+
+    resetFilters() {
+    // Réinitialiser les filtres standards
+    document.getElementById('statutFilter').value = '';
+    document.getElementById('attributionFilter').value = '';
+    document.getElementById('searchInput').value = '';
+
+    // Réinitialiser le Select2 pour la direction
+    if (this.selects.directionFilter) {
+        this.selects.directionFilter.val('').trigger('change.select2');
+    } else {
+        // Fallback si Select2 n'est pas initialisé
+        document.getElementById('directionFilter').value = '';
+    }
+
+    // Réinitialiser les filtres internes
+    this.currentFilters = {
+        statut: '',
+        attribution: '',
+        direction: '',
+        search: ''
+    };
+    
+    // Appliquer les filtres (tout sera affiché)
+    this.applyFilters();
+    
+    // Animation du bouton
+    const resetBtn = document.getElementById('resetFilters');
+    const originalText = resetBtn.innerHTML;
+    const originalColor = resetBtn.style.background;
+    
+    resetBtn.innerHTML = '<i class="bi bi-check"></i> Réinitialisé !';
+    resetBtn.style.background = '#10b981';
+    resetBtn.style.color = 'white';
+    
+    setTimeout(() => {
+        resetBtn.innerHTML = originalText;
+        resetBtn.style.background = originalColor;
+        resetBtn.style.color = '';
+    }, 1500);
+}
+
+    async loadDirectionsPourFiltre() {
+    try {
+        const response = await fetch('/admin/directions/api/list');
+        const data = await response.json();
+        
+        if (data.success) {
+            const select = this.selects.directionFilter;
+            if (!select) return;
+            
+            select.empty();
+            select.append('<option value=""></option>');
+            
+            data.directions.forEach(direction => {
+                const optionText = `${direction.nomDirection}`;
+                const option = new Option(optionText, direction.CodeDirection, false, false);
+                select.append(option);
+            });
+            
+            select.trigger('change.select2');
+        }
+    } catch (error) {
+        console.error('Erreur chargement directions pour filtre:', error);
+    }
+}
+
+    async loadDirectionsActives() {
+    try {
+        const response = await fetch('/admin/services/api/directions-actives');
+        const data = await response.json();
+        
+        if (data.success) {
+            const selectAdd = this.selects.direction;
+            const selectModify = this.selects.modifierDirection;
+            
+            if (!selectAdd || !selectModify) return;
+            
+            // Vider et réinitialiser
+            selectAdd.empty();
+            selectAdd.append('<option value=""></option>');
+            
+            selectModify.empty();
+            selectModify.append('<option value=""></option>');
+            
+            data.directions.forEach(direction => {
+                const optionText = `${direction.nomDirection} (${direction.CodeDirection})`;
+                const option = new Option(optionText, direction.CodeDirection, false, false);
+                selectAdd.append(option);
+                selectModify.append(option.cloneNode(true));
+            });
+            
+            // Mettre à jour Select2
+            selectAdd.trigger('change.select2');
+            selectModify.trigger('change.select2');
+        }
+    } catch (error) {
+        console.error('Erreur chargement directions actives:', error);
+    }
+}
+
+async loadPersonnelsPourChefService() {
+    try {
+        const response = await fetch('/admin/services/api/personnels-pour-chef-service');
+        const data = await response.json();
+        
+        if (data.success) {
+            const selectAdd = this.selects.chefService;
+            const selectModify = this.selects.modifierChefService;
+            
+            if (!selectAdd || !selectModify) return;
+            
+            // Modal AJOUT
+            selectAdd.empty();
+            selectAdd.append('<option value="">Sélectionnez un chef de service</option>');
+            selectAdd.append('<option value="AUCUN">Aucun chef de service</option>');
+            
+            // Modal MODIFICATION
+            selectModify.empty();
+            selectModify.append('<option value="">Sélectionnez un chef de service</option>');
+            selectModify.append('<option value="AUCUN">Aucun chef de service</option>');
+            
+            data.personnels.forEach(personnel => {
+                const desactive = personnel.StatutPer === 'DESACTIVE';
+                let suffix = '';
+                
+                if (desactive) {
+                    if (personnel.FonctionPer === 'Directeur') {
+                        suffix = ' (Directeur désactivé)';
+                    } else if (personnel.FonctionPer === 'Chef_service') {
+                        suffix = ' (Chef désactivé)';
+                    } else {
+                        suffix = ' (Agent désactivé)';
+                    }
+                }
+                
+                const optionText = `${personnel.NomPer} ${personnel.PrenomPer} - ${personnel.EmailPer}${suffix}`;
+                const option = new Option(optionText, personnel.ImPer, false, false);
+                
+                if (desactive) {
+                    $(option).addClass('option-desactive');
+                }
+                
+                selectAdd.append(option.cloneNode(true));
+                selectModify.append(option.cloneNode(true));
+            });
+            
+            selectAdd.trigger('change.select2');
+            selectModify.trigger('change.select2');
+            
+            // Si on a un chef actuel à pré-sélectionner dans le modal de modification
+            if (this.currentModificationData && this.currentModificationData.chefIm) {
+                const chefIm = this.currentModificationData.chefIm;
+                const chefNom = this.currentModificationData.chefNom;
+                
+                // Si aucun chef, sélectionner "AUCUN"
+                if (chefIm === 'null' || !chefIm || chefIm === '') {
+                    selectModify.val('AUCUN').trigger('change.select2');
+                    console.log('Aucun chef sélectionné - option AUCUN');
+                } else {
+                    // Vérifier si le chef existe déjà dans la liste
+                    const exists = Array.from(selectModify[0].options).some(option => 
+                        option.value === chefIm
+                    );
+                    
+                    if (!exists) {
+                        const optionText = `${chefNom}`;
+                        const option = new Option(optionText, chefIm, false, false);
+                        selectModify.append(option);
+                    }
+                    selectModify.val(chefIm).trigger('change.select2');
+                    console.log('Chef sélectionné:', chefIm);
+                }
+            }
+        } else {
+            console.error('Erreur API personnels:', data.message);
+            throw new Error(data.message);
+        }
+    } catch (error) {
+        console.error('Erreur chargement personnels pour chef service:', error);
+        throw error;
+    }
+}
+
+async loadPersonnelsPourActivationService() {
+    try {
+        const serviceCode = document.getElementById('activationServiceCode').value;
+        const response = await fetch(`/admin/services/api/personnels-pour-activation-service?serviceCode=${serviceCode}`);
+        const data = await response.json();
+        
+        if (data.success) {
+            const select = this.selects.activationNouveauChef;
+            if (!select) return;
+            
+            const ancienChefIm = data.ancienChefIm;
+            
+            select.empty();
+            select.append('<option value=""></option>');
+            
+            if (data.personnels && data.personnels.length > 0) {
+                let hasAvailablePersonnels = false;
+                
+                data.personnels.forEach(personnel => {
+                    const desactive = personnel.StatutPer === 'DESACTIVE';
+                    let suffix = '';
+                    
+                    if (desactive) {
+                        if (personnel.FonctionPer === 'Directeur') {
+                            suffix = ' (Directeur désactivé)';
+                        } else if (personnel.FonctionPer === 'Chef_service') {
+                            suffix = ' (Chef désactivé)';
+                        } else {
+                            suffix = ' (Agent désactivé)';
+                        }
+                    }
+                    
+                    // Exclure l'ancien chef de la liste des nouveaux chefs
+                    if (personnel.ImPer === ancienChefIm) return;
+                    
+                    const optionText = `${personnel.NomPer} ${personnel.PrenomPer} - ${personnel.EmailPer}${suffix}`;
+                    const option = new Option(optionText, personnel.ImPer, false, false);
+                    
+                    if (desactive) {
+                        $(option).addClass('option-desactive');
+                    }
+                    
+                    select.append(option);
+                    hasAvailablePersonnels = true;
+                });
+                
+                if (!hasAvailablePersonnels) {
+                    select.empty();
+                    select.append('<option value="">Aucun chef de service disponible</option>');
+                    select.prop('disabled', true);
+                    
+                    document.getElementById('choisirChef').disabled = true;
+                    document.querySelector('label[for="choisirChef"]').innerHTML = 
+                        'Choisir un nouveau chef de service <span class="text-muted">(non disponible)</span>';
+                    
+                    if (document.getElementById('garderChef').disabled) {
+                        document.getElementById('aucunChef').checked = true;
+                        this.toggleNouveauChefGroup('aucun');
+                    }
+                } else {
+                    select.prop('disabled', false);
+                    document.getElementById('choisirChef').disabled = false;
+                }
+            } else {
+                select.empty();
+                select.append('<option value="">Aucun chef de service disponible</option>');
+                select.prop('disabled', true);
+                
+                document.getElementById('choisirChef').disabled = true;
+                document.querySelector('label[for="choisirChef"]').innerHTML = 
+                    'Choisir un nouveau chef de service <span class="text-muted">(non disponible)</span>';
+                
+                document.getElementById('aucunChef').checked = true;
+                this.toggleNouveauChefGroup('aucun');
+            }
+            
+            select.trigger('change.select2');
+        }
+    } catch (error) {
+        console.error('Erreur chargement personnels pour activation:', error);
+    }
+}
+
+    showMultipleErrors(errors) {
+        Object.keys(errors).forEach(fieldKey => {
+            const errorMessage = errors[fieldKey];
+            
+            const fieldMapping = {
+                'codeService': 'codeService',
+                'nomService': 'nomService',
+                'direction': 'direction',
+                'chefService': 'chefService'
+            };
+            
+            const modifierFieldMapping = {
+                'nomService': 'modifierNomService',
+                'direction': 'modifierDirection',
+                'chefService': 'modifierChefService'
+            };
+            
+            const addModal = document.getElementById('addServiceModal');
+            const modifyModal = document.getElementById('modifierServiceModal');
+            
+            if (addModal && addModal.classList.contains('show')) {
+                if (fieldMapping[fieldKey]) {
+                    this.showFieldError(fieldMapping[fieldKey], errorMessage);
+                }
+            } else if (modifyModal && modifyModal.classList.contains('show')) {
+                if (modifierFieldMapping[fieldKey]) {
+                    this.showFieldError(modifierFieldMapping[fieldKey], errorMessage);
+                }
+            }
+        });
+    }
+
+    showFieldError(fieldId, errorMessage) {
+        const field = document.getElementById(fieldId);
+        const errorElement = document.getElementById(fieldId + 'Error');
+        
+        if (field && errorElement) {
+            field.classList.add('is-invalid');
+            errorElement.textContent = errorMessage;
+            errorElement.style.display = 'block';
+        }
+    }
+
+    clearFieldError(fieldId) {
+        const field = document.getElementById(fieldId);
+        const errorElement = document.getElementById(fieldId + 'Error');
+        
+        if (field) {
+            field.classList.remove('is-invalid');
+        }
+        if (errorElement) {
+            errorElement.textContent = '';
+            errorElement.style.display = 'none';
+        }
+    }
+
+    clearModalErrors(modalType) {
+    if (modalType === 'add') {
+        ['codeService', 'nomService', 'direction', 'chefService'].forEach(field => {
+            this.clearFieldError(field);
+        });
+    } else if (modalType === 'modify') {
+        ['modifierNomService', 'modifierDirection', 'modifierChefService'].forEach(field => {
+            this.clearFieldError(field);
+        });
+    } else if (modalType === 'directionInactive') {
+        this.clearFieldError('nouvelleDirection');
+    }
+}
+
+    async ajouterService() {
+        const form = document.getElementById('addServiceForm');
+        const submitBtn = document.getElementById('submitAddService');
+        const originalText = submitBtn.innerHTML;
+
+        try {
+            this.clearModalErrors('add');
+            
+            submitBtn.innerHTML = '<div class="loading-spinner me-2"></div> Création...';
+            submitBtn.disabled = true;
+
+            const formData = new FormData(form);
+            const data = {
+                codeService: formData.get('codeService'),
+                nomService: formData.get('nomService'),
+                direction: formData.get('direction'),
+                chefService: formData.get('chefService') || null
+            };
+
+            const response = await fetch('/admin/services/api/create', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                this.showSuccess(result.message);
+                bootstrap.Modal.getInstance(document.getElementById('addServiceModal')).hide();
+                form.reset();
+                this.loadServices();
+            } else {
+                if (result.errors) {
+                    this.showMultipleErrors(result.errors);
+                } else {
+                    this.showError(result.message);
+                }
+            }
+        } catch (error) {
+            console.error('Erreur création service:', error);
+            this.showError('Erreur lors de la création du service');
+        } finally {
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
+        }
+    }
+
+    async modifierService() {
+        const form = document.getElementById('modifierServiceForm');
+        const submitBtn = document.getElementById('submitModifierService');
+        const originalText = submitBtn.innerHTML;
+
+        try {
+            this.clearModalErrors('modify');
+            
+            submitBtn.innerHTML = '<div class="loading-spinner me-2"></div> Modification...';
+            submitBtn.disabled = true;
+
+            const formData = new FormData(form);
+            const data = {
+                nomService: formData.get('nomService'),
+                direction: formData.get('direction'),
+                chefService: formData.get('chefService') || null
+            };
+
+            const serviceCode = formData.get('codeService');
+            const response = await fetch(`/admin/services/api/${serviceCode}/modifier`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                this.showSuccess(result.message);
+                bootstrap.Modal.getInstance(document.getElementById('modifierServiceModal')).hide();
+                this.loadServices();
+            } else {
+                if (result.errors) {
+                    this.showMultipleErrors(result.errors);
+                } else {
+                    this.showError(result.message);
+                }
+            }
+        } catch (error) {
+            console.error('Erreur modification service:', error);
+            this.showError('Erreur lors de la modification du service');
+        } finally {
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
+        }
+    }
+
+openModifierServiceModal(codeService, nomService, directionCode, directionNom, chefIm, chefNom) {
+    console.log('Données reçues pour modification:', { 
+        codeService, 
+        nomService, 
+        directionCode, 
+        directionNom, 
+        chefIm, 
+        chefNom 
+    });
+    
+    // Stocker les informations
+    this.currentModificationData = {
+        codeService,
+        nomService,
+        directionCode,
+        directionNom,
+        chefIm,
+        chefNom
+    };
+    
+    // Remplir les champs simples immédiatement
+    document.getElementById('modifierServiceCode').value = codeService;
+    document.getElementById('modifierCodeService').value = codeService;
+    document.getElementById('modifierNomService').value = nomService;
+    
+    const modalElement = document.getElementById('modifierServiceModal');
+    
+    // Vider les selects avant de recharger
+    const directionSelect = this.selects.modifierDirection;
+    const chefSelect = this.selects.modifierChefService;
+    
+    if (directionSelect) {
+        directionSelect.empty();
+        directionSelect.append('<option value="">Sélectionnez une direction</option>');
+        directionSelect.val('').trigger('change.select2');
+    }
+    
+    if (chefSelect) {
+        chefSelect.empty();
+        chefSelect.append('<option value="">Aucun chef de service</option>');
+        chefSelect.val('').trigger('change.select2');
+    }
+    
+    // Créer le modal mais NE PAS l'afficher tout de suite
+    const modal = new bootstrap.Modal(modalElement);
+    
+    // Charger les données AVANT d'afficher le modal
+    this.loadModificationData().then(() => {
+        // Appliquer les sélections après le chargement
+        this.applyModificationSelections();
+        
+        // Maintenant afficher le modal
+        modal.show();
+    }).catch(error => {
+        console.error('Erreur lors du chargement des données:', error);
+        this.showError('Erreur lors du chargement des données');
+        
+        // Afficher quand même le modal même en cas d'erreur
+        modal.show();
+    });
+}
+
+async loadModificationData() {
+    return new Promise(async (resolve, reject) => {
+        try {
+            // Charger les directions d'abord
+            await this.loadDirectionsActivesPourModification();
+            
+            // Charger les personnels ensuite
+            await this.loadPersonnelsPourChefService();
+            
+            resolve();
+        } catch (error) {
+            reject(error);
+        }
+    });
+}
+
+async loadServicesEnAttente() {
+    try {
+        const response = await fetch('/admin/services/api/services-en-attente');
+        const data = await response.json();
+
+        if (data.success) {
+            const select = this.selects.nouveauServiceMutation;
+            if (!select) return;
+            
+            select.empty();
+            
+            if (data.services && data.services.length > 0) {
+                select.append('<option value=""></option>');
+                
+                data.services.forEach(service => {
+                    const optionText = `${service.nomService} (${service.CodeService})`;
+                    const option = new Option(optionText, service.CodeService, false, false);
+                    select.append(option);
+                });
+                
+                select.prop('disabled', false);
+            } else {
+                select.append('<option value="">Aucun service disponible</option>');
+                select.prop('disabled', true);
+            }
+            
+            select.trigger('change.select2');
+        }
+    } catch (error) {
+        console.error('Erreur chargement services en attente:', error);
+        
+        const select = this.selects.nouveauServiceMutation;
+        if (select) {
+            select.empty();
+            select.append('<option value="">Aucun service disponible</option>');
+            select.prop('disabled', true);
+            select.trigger('change.select2');
+        }
+    }
+}
+
+openMutationChefModal(serviceCode, serviceNom, chefIm, chefNom) {
+    try {
+        document.getElementById('chefServiceImMutation').value = chefIm;
+        document.getElementById('chefServiceMutation').value = chefNom;
+        
+        this.loadServicesEnAttente().then(() => {
+            const servicesSelect = document.getElementById('nouveauServiceMutation');
+            const submitBtn = document.getElementById('submitMutationChef');
+            const noServicesMessage = document.getElementById('noServicesMessage');
+            
+            // Si le select est désactivé (pas de services disponibles)
+            if (servicesSelect.disabled) {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="bi bi-exclamation-circle me-2"></i> Aucun service disponible';
+                if (noServicesMessage) noServicesMessage.style.display = 'block';
+            } else {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="bi bi-check-circle me-2"></i> Confirmer la réaffectation';
+                if (noServicesMessage) noServicesMessage.style.display = 'none';
+            }
+            
+            const modal = new bootstrap.Modal(document.getElementById('mutationChefModal'));
+            modal.show();
+        });
+        
+    } catch (error) {
+        console.error('Erreur ouverture modal mutation chef:', error);
+        this.showError('Erreur lors de l\'ouverture du modal');
+    }
+}
+
+async effectuerMutationChef() {
+    const form = document.getElementById('mutationChefForm');
+    const submitBtn = document.getElementById('submitMutationChef');
+    const originalText = submitBtn.innerHTML;
+    
+    const nouveauServiceSelect = document.getElementById('nouveauServiceMutation');
+    
+    // Vérifier si le select est désactivé ou vide
+    if (nouveauServiceSelect.disabled || !nouveauServiceSelect.value) {
+        this.showError('Aucun service disponible pour la mutation');
+        return;
+    }
+
+    try {
+        submitBtn.innerHTML = '<div class="loading-spinner me-2"></div> Mutation...';
+        submitBtn.disabled = true;
+
+        const formData = new FormData(form);
+        const data = {
+            chefService: document.getElementById('chefServiceImMutation').value,
+            nouveauService: formData.get('nouveauService')
+        };
+
+        const response = await fetch('/admin/services/api/mutation-chef-service', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data)
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            this.showSuccess(result.message);
+            bootstrap.Modal.getInstance(document.getElementById('mutationChefModal')).hide();
+            this.loadServices();
+        } else {
+            this.showError(result.message);
+        }
+    } catch (error) {
+        console.error('Erreur mutation chef:', error);
+        this.showError('Erreur lors de la mutation');
+    } finally {
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+    }
+}
+
+    // Nouvelle méthode pour appliquer toutes les sélections
+applyModificationSelections() {
+    if (!this.currentModificationData) return;
+    
+    const { directionCode, chefIm } = this.currentModificationData;
+    
+    console.log('Application des sélections:', { directionCode, chefIm });
+    
+    // Utiliser un délai court pour s'assurer que Select2 est prêt
+    setTimeout(() => {
+        // SÉLECTIONNER LA DIRECTION
+        if (directionCode && directionCode !== '') {
+            const directionSelect = this.selects.modifierDirection;
+            if (directionSelect && directionSelect.find('option[value="' + directionCode + '"]').length) {
+                directionSelect.val(directionCode).trigger('change.select2');
+                console.log('Direction sélectionnée:', directionCode);
+            }
+        }
+        
+        // SÉLECTIONNER LE CHEF DE SERVICE (avec option "AUCUN")
+        const chefSelect = this.selects.modifierChefService;
+        if (chefSelect) {
+            setTimeout(() => {
+                if (chefIm && chefIm !== '' && chefIm !== 'null') {
+                    if (chefSelect.find('option[value="' + chefIm + '"]').length) {
+                        chefSelect.val(chefIm).trigger('change.select2');
+                        console.log('Chef sélectionné:', chefIm);
+                    } else {
+                        console.warn('Chef non trouvé dans la liste:', chefIm);
+                    }
+                } else {
+                    // Aucun chef - sélectionner l'option "AUCUN"
+                    chefSelect.val('AUCUN').trigger('change.select2');
+                    console.log('Aucun chef - option AUCUN sélectionnée');
+                }
+            }, 200);
+        }
+    }, 100);
+}
+
+    async loadDirectionsActivesPourModification() {
+    try {
+        console.log('Chargement des directions actives pour modification...');
+        const response = await fetch('/admin/services/api/directions-actives');
+        const data = await response.json();
+        
+        if (data.success) {
+            const select = this.selects.modifierDirection;
+            if (!select) return;
+            
+            // Vider et réinitialiser
+            select.empty();
+            select.append('<option value="">Sélectionnez une direction</option>');
+            
+            console.log('Directions chargées:', data.directions);
+            
+            data.directions.forEach(direction => {
+                const optionText = `${direction.nomDirection} (${direction.CodeDirection})`;
+                const option = new Option(optionText, direction.CodeDirection, false, false);
+                select.append(option);
+            });
+            
+            // Mettre à jour Select2
+            select.trigger('change.select2');
+            console.log('Select rempli avec', data.directions.length, 'directions');
+        } else {
+            console.error('Erreur API directions:', data.message);
+            throw new Error(data.message);
+        }
+    } catch (error) {
+        console.error('Erreur chargement directions actives:', error);
+        throw error;
+    }
+}
+
+    openConfirmationDesactivationModal(codeService, nomService) {
+    this.currentServiceCode = codeService;
+    
+    document.getElementById('serviceNomDesactivation').textContent = nomService;
+    document.getElementById('serviceCodeDesactivation').textContent = codeService;
+    
+    // Réinitialiser le bouton de confirmation
+    const confirmBtn = document.getElementById('confirmDesactiverService');
+    confirmBtn.innerHTML = '<i class="bi bi-x-circle me-2"></i> Confirmer la désactivation';
+    confirmBtn.disabled = false;
+    
+    const modal = new bootstrap.Modal(document.getElementById('confirmationDesactivationServiceModal'));
+    modal.show();
+}
+
+    async confirmDesactiverService() {
+    if (!this.currentServiceCode) return;
+
+    try {
+        const modal = bootstrap.Modal.getInstance(document.getElementById('confirmationDesactivationServiceModal'));
+        
+        // Mettre le spinner sur le bouton de confirmation du modal
+        const confirmBtn = document.getElementById('confirmDesactiverService');
+        const originalBtnText = confirmBtn.innerHTML;
+        confirmBtn.innerHTML = '<div class="loading-spinner me-2"></div> Désactivation...';
+        confirmBtn.disabled = true;
+
+        const response = await fetch(`/admin/services/api/${this.currentServiceCode}/desactiver`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            modal.hide();
+            this.showSuccess(result.message);
+            this.loadServices();
+        } else {
+            this.showError(result.message);
+            // Réinitialiser le bouton en cas d'erreur
+            confirmBtn.innerHTML = originalBtnText;
+            confirmBtn.disabled = false;
+        }
+    } catch (error) {
+        console.error('Erreur désactivation:', error);
+        this.showError('Erreur lors de la désactivation');
+        // Réinitialiser le bouton en cas d'erreur
+        const confirmBtn = document.getElementById('confirmDesactiverService');
+        confirmBtn.innerHTML = '<i class="bi bi-x-circle me-2"></i> Confirmer la désactivation';
+        confirmBtn.disabled = false;
+    } finally {
+        this.currentServiceCode = null;
+    }
+}
+
+    openActivationModal(codeService, nomService, ancienChefNom, ancienChefIm) {
+        this.currentServiceCode = codeService;
+        
+        // VÉRIFIER D'ABORD L'ÉTAT DE LA DIRECTION
+        this.verifierEtatDirectionAvantActivation(codeService, nomService, ancienChefNom, ancienChefIm);
+    }
+
+    async verifierEtatDirectionAvantActivation(codeService, nomService, ancienChefNom, ancienChefIm) {
+        try {
+            // Récupérer les données du service pour vérifier la direction
+            const service = this.allServices.find(s => s.CodeService === codeService);
+            
+            if (!service) {
+                this.showError('Service non trouvé');
+                return;
+            }
+
+            const direction = service.direction;
+            
+            // Vérifier si la direction existe et est active
+            if (!direction || direction.statutDirection !== 'ACTIVE') {
+                // Afficher le modal de direction inactive
+                this.showDirectionInactiveModal({
+                    codeService: codeService,
+                    nomService: nomService,
+                    direction: direction ? {
+                        codeDirection: direction.CodeDirection,
+                        nomDirection: direction.nomDirection,
+                        statutDirection: direction.statutDirection
+                    } : null
+                });
+            } else {
+                // La direction est active, afficher le modal d'activation normal
+                this.afficherModalActivationNormal(codeService, nomService, ancienChefNom, ancienChefIm);
+            }
+        } catch (error) {
+            console.error('Erreur vérification direction:', error);
+            this.showError('Erreur lors de la vérification de la direction');
+        }
+    }
+
+    afficherModalActivationNormal(codeService, nomService, ancienChefNom, ancienChefIm) {
+    // Remplir les champs du modal d'activation normal
+    document.getElementById('activationServiceCode').value = codeService;
+    document.getElementById('activationServiceNom').value = nomService;
+    document.getElementById('activationAncienChef').value = ancienChefNom;
+    
+    const chefInfo = document.getElementById('activationChefInfo');
+    const garderChefRadio = document.getElementById('garderChef');
+    const garderChefLabel = document.querySelector('label[for="garderChef"]');
+    const choisirChefRadio = document.getElementById('choisirChef');
+
+    if (ancienChefIm && ancienChefIm !== '') {
+        chefInfo.textContent = 'Cet ancien chef de service sera réactivé si vous choisissez de le garder.';
+        chefInfo.className = 'form-text text-primary';
+        garderChefRadio.disabled = false;
+        garderChefLabel.innerHTML = 'Garder l\'ancien chef de service';
+        garderChefRadio.checked = true; // Option par défaut quand disponible
+    } else {
+        chefInfo.textContent = 'Aucun ancien chef de service trouvé pour ce service.';
+        chefInfo.className = 'form-text text-primary';
+        garderChefLabel.innerHTML = 'Garder l\'ancien chef de service <span class="text-muted">(non disponible)</span>';
+        garderChefRadio.disabled = true;
+        garderChefRadio.checked = false;
+        
+        // Passer à l'option suivante disponible
+        if (!choisirChefRadio.disabled) {
+            choisirChefRadio.checked = true;
+        } else {
+            document.getElementById('aucunChef').checked = true;
+        }
+    }
+
+    // Charger les personnels après avoir configuré les options
+    this.loadPersonnelsPourActivationService().then(() => {
+        this.toggleNouveauChefGroup(document.querySelector('input[name="activationOption"]:checked').value);
+    });
+    
+    // Afficher le modal d'activation normal (VOTRE MODAL EXISTANT)
+    const modal = new bootstrap.Modal(document.getElementById('activationServiceModal'));
+    modal.show();
+}
+
+showDirectionInactiveModal(service) {
+    // Créer un modal personnalisé pour la direction inactive avec Select2 intégré
+    const modalHtml = `
+        <div class="modal fade" id="directionInactiveModal" tabindex="-1" aria-labelledby="directionInactiveModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">
+                            <i class="bi bi-exclamation-triangle me-2"></i>
+                            Direction Inactive
+                        </h5>
+                        <button type="button" class="btn-close-custom" data-bs-dismiss="modal" aria-label="Close">
+                            <i class="bi bi-x"></i>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="consigne-warning">
+                            <h6 class="alert-heading">
+                                <i class="bi bi-exclamation-triangle me-2 text-warning"></i>
+                                <span class="text-muted"> Impossible d'activer le service :</span> 
+                                <span id="directionInactiveServiceCode" class="fw-bold mb-1">
+                                    ${this.escapeHtml(service.nomService)} - ${service.codeService}
+                                </span>
+                            </h6>
+                            <p class="mb-0">La direction associée à ce service n'est pas active.</p>
+                        </div>
+                        
+                        <form id="changerDirectionForm" class="changerDirectionForm">
+                            <input type="hidden" id="changerDirectionServiceCode" value="${service.codeService}">
+                            
+                            <div class="form-group">
+                                <label for="nouvelleDirection" class="form-label">
+                                    <i class="bi bi-building-gear me-1"></i>
+                                    Choisir une nouvelle direction active
+                                </label>
+                                <select class="form-select search-select" id="nouvelleDirection" name="nouvelleDirection" required>
+                                    <option value="">Sélectionnez une direction active</option>
+                                </select>
+                                <div class="form-text">
+                                    <i class="bi bi-info-circle me-1 text-primary"></i>
+                                    Sélectionnez une direction active pour pouvoir activer ce service
+                                </div>
+                                <div class="invalid-feedback" id="nouvelleDirectionError"></div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btnG btn-secondary" data-bs-dismiss="modal">
+                            Annuler
+                        </button>
+                        <button type="button" class="btnG btn-successG" id="btnConfirmerChangementDirection">
+                            <i class="bi bi-check-circle me-2"></i>
+                            Changer la direction
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+    const modalElement = document.getElementById('directionInactiveModal');
+    
+    // Ajouter l'écouteur pour le reset quand le modal est fermé
+    modalElement.addEventListener('hidden.bs.modal', function() {
+        const select2Instance = $(this).find('#nouvelleDirection');
+        if (select2Instance.length && $.fn.select2) {
+            select2Instance.select2('destroy');
+        }
+        
+        const form = document.getElementById('changerDirectionForm');
+        if (form) form.reset();
+        
+        // Nettoyer le modal du DOM après fermeture
+        setTimeout(() => {
+            if (document.body.contains(this)) {
+                this.remove();
+            }
+        }, 300);
+    });
+    
+    // Charger les directions actives
+    this.chargerDirectionsActivesPourSelect().then(() => {
+        this.configurerEvenementsModalDirection(modalElement, service);
+    });
+
+    // Afficher le modal
+    const modal = new bootstrap.Modal(modalElement);
+    modal.show();
+}
+
+async chargerDirectionsActivesPourSelect() {
+    try {
+        const response = await fetch('/admin/services/api/directions-actives');
+        const data = await response.json();
+        
+        if (data.success) {
+            const modalElement = document.getElementById('directionInactiveModal');
+            
+            // Attendre que le modal soit dans le DOM
+            setTimeout(() => {
+                const select = document.getElementById('nouvelleDirection');
+                if (select && modalElement) {
+                    // Initialiser Select2
+                    $(select).select2({
+                        theme: 'bootstrap-5',
+                        width: '100%',
+                        placeholder: 'Sélectionnez une direction active',
+                        allowClear: false,
+                        dropdownParent: $(modalElement), // Important pour le modal
+                        language: {
+                            noResults: () => "Aucune direction active trouvée",
+                            searching: () => "Recherche en cours..."
+                        }
+                    });
+                    
+                    // Vider et remplir les options
+                    $(select).empty();
+                    $(select).append('<option value=""></option>');
+                    
+                    data.directions.forEach(direction => {
+                        const optionText = `${direction.nomDirection} (${direction.CodeDirection})`;
+                        const option = new Option(optionText, direction.CodeDirection, false, false);
+                        $(select).append(option);
+                    });
+                    
+                    $(select).trigger('change.select2');
+                }
+            }, 100); // Petit délai pour s'assurer que le DOM est prêt
+        }
+    } catch (error) {
+        console.error('Erreur chargement directions actives:', error);
+    }
+}
+
+    configurerEvenementsModalDirection(modalElement, service) {
+        const btnConfirmer = document.getElementById('btnConfirmerChangementDirection');
+        const form = document.getElementById('changerDirectionForm');
+        const selectDirection = document.getElementById('nouvelleDirection');
+
+        if (btnConfirmer) {
+            btnConfirmer.onclick = () => {
+                this.confirmerChangementDirection(service);
+            };
+        }
+
+        if (selectDirection) {
+            selectDirection.addEventListener('change', () => {
+                // Effacer les erreurs quand l'utilisateur sélectionne une direction
+                this.clearFieldError('nouvelleDirection');
+            });
+        }
+
+        if (form) {
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                this.confirmerChangementDirection(service);
+            });
+        }
+    }
+
+    async confirmerChangementDirection(service) {
+        const selectDirection = document.getElementById('nouvelleDirection');
+        const serviceCode = document.getElementById('changerDirectionServiceCode').value;
+
+        if (!selectDirection || !selectDirection.value) {
+            this.showFieldError('nouvelleDirection', 'Veuillez sélectionner une direction active');
+            return;
+        }
+
+        const nouvelleDirectionCode = selectDirection.value;
+
+        try {
+            // Afficher le loading
+            const btnConfirmer = document.getElementById('btnConfirmerChangementDirection');
+            const originalText = btnConfirmer.innerHTML;
+            btnConfirmer.innerHTML = '<div class="loading-spinner me-2"></div> Changement...';
+            btnConfirmer.disabled = true;
+
+            // RÉCUPÉRER LE CHEF DE SERVICE ACTUEL POUR LE CONSERVER
+            const serviceActuel = this.allServices.find(s => s.CodeService === serviceCode);
+            const chefServiceActuel = serviceActuel && serviceActuel.chefService ? serviceActuel.chefService.ImPer : null;
+
+            // Préparer les données pour la modification - CONSERVER LE CHEF DE SERVICE
+            const data = {
+                nomService: service.nomService,
+                direction: nouvelleDirectionCode,
+                chefService: chefServiceActuel // CONSERVER le chef de service actuel
+            };
+
+            const response = await fetch(`/admin/services/api/${serviceCode}/modifier`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                this.showSuccess('Direction changée avec succès - Le chef de service a été conservé');
+                
+                // Fermer le modal
+                const modalElement = document.getElementById('directionInactiveModal');
+                if (modalElement) {
+                    bootstrap.Modal.getInstance(modalElement).hide();
+                }
+                
+                // Recharger les services
+                this.loadServices();
+                
+            } else {
+                if (result.errors) {
+                    this.showMultipleErrors(result.errors);
+                } else {
+                    this.showError(result.message || 'Erreur lors du changement de direction');
+                }
+                
+                // Réactiver le bouton
+                btnConfirmer.innerHTML = originalText;
+                btnConfirmer.disabled = false;
+            }
+        } catch (error) {
+            console.error('Erreur changement direction:', error);
+            this.showError('Erreur lors du changement de direction');
+            
+            const btnConfirmer = document.getElementById('btnConfirmerChangementDirection');
+            if (btnConfirmer) {
+                btnConfirmer.innerHTML = '<i class="bi bi-check-circle me-2"></i> Changer la direction';
+                btnConfirmer.disabled = false;
+            }
+        }
+    }
+
+    toggleNouveauChefGroup(option) {
+        const nouveauChefGroup = document.getElementById('nouveauChefGroup');
+        if (option === 'choisir') {
+            nouveauChefGroup.style.display = 'block';
+        } else {
+            nouveauChefGroup.style.display = 'none';
+        }
+    }
+
+    async activerService() {
+    const form = document.getElementById('activationServiceForm');
+    const submitBtn = document.getElementById('submitActivationService');
+    const originalText = submitBtn.innerHTML;
+
+    try {
+        submitBtn.innerHTML = '<div class="loading-spinner me-2"></div> Activation...';
+        submitBtn.disabled = true;
+
+        const activationOption = document.querySelector('input[name="activationOption"]:checked').value;
+        const nouveauChefSelect = document.getElementById('activationNouveauChef');
+        
+        let data = {
+            garderChef: activationOption === 'garder',
+            nouveauChef: null
+        };
+
+        // Seulement récupérer la valeur si l'option "choisir" est sélectionnée ET un chef est choisi
+        if (activationOption === 'choisir' && nouveauChefSelect.value && nouveauChefSelect.value !== "") {
+            data.nouveauChef = nouveauChefSelect.value;
+        }
+
+        const serviceCode = document.getElementById('activationServiceCode').value;
+        const response = await fetch(`/admin/services/api/${serviceCode}/activer`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data)
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            this.showSuccess(result.message);
+            bootstrap.Modal.getInstance(document.getElementById('activationServiceModal')).hide();
+            this.loadServices();
+        } else {
+            // GESTION DE LA DIRECTION INACTIVE (double vérification côté serveur)
+            if (result.message === 'direction_inactive') {
+                this.showDirectionInactiveModal(result.service);
+            } else {
+                this.showError(result.message);
+            }
+        }
+    } catch (error) {
+        console.error('Erreur activation:', error);
+        this.showError('Erreur lors de l\'activation du service');
+    } finally {
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+    }
+}
+
+    
+
+    showSuccess(message) {
+    const alertContainer = document.getElementById('fixedAlertContainer');
+    const alert = document.createElement('div');
+    alert.className = 'alert-success-fixed mb-3';
+    alert.innerHTML = `
+        <i class="bi bi-check-circle-fill"></i>
+        <span>${message}</span>
+        <button type="button" class="alert-close-btn" onclick="this.parentElement.remove()">
+            <i class="bi bi-x"></i>
+        </button>
+    `;
+    
+    // Supprimer les anciennes alertes
+    while (alertContainer.firstChild) {
+        alertContainer.removeChild(alertContainer.firstChild);
+    }
+    
+    // Ajouter la nouvelle alerte
+    alertContainer.appendChild(alert);
+    
+    // Auto-suppression après 5 secondes
+    setTimeout(() => {
+        if (alert.parentElement) {
+            alert.style.animation = 'fadeOut 0.3s ease-out';
+            setTimeout(() => {
+                if (alert.parentElement) {
+                    alert.remove();
+                }
+            }, 300);
+        }
+    }, 5000);
+}
+
+showError(message) {
+    const alertContainer = document.getElementById('fixedAlertContainer');
+    const alert = document.createElement('div');
+    alert.className = 'alert-danger-fixed mb-3';
+    alert.innerHTML = `
+        <i class="bi bi-exclamation-triangle-fill"></i>
+        <span>${message}</span>
+        <button type="button" class="alert-close-btn" onclick="this.parentElement.remove()">
+            <i class="bi bi-x"></i>
+        </button>
+    `;
+    
+    // Supprimer les anciennes alertes
+    while (alertContainer.firstChild) {
+        alertContainer.removeChild(alertContainer.firstChild);
+    }
+    
+    // Ajouter la nouvelle alerte
+    alertContainer.appendChild(alert);
+    
+    // Auto-suppression après 5 secondes
+    setTimeout(() => {
+        if (alert.parentElement) {
+            alert.style.animation = 'fadeOut 0.3s ease-out';
+            setTimeout(() => {
+                if (alert.parentElement) {
+                    alert.remove();
+                }
+            }, 300);
+        }
+    }, 5000);
+}
+}
+
+// Initialisation
+document.addEventListener('DOMContentLoaded', function() {
+    window.serviceManager = new ServiceManager();
+});
+</script>
+{% endblock %}

@@ -2,16 +2,2711 @@
 <html>
     <head>
         <meta charset="UTF-8">
-        <title>{% block title %}Welcome!{% endblock %}</title>
-        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
-        {% block stylesheets %}
-        {% endblock %}
+        <title>{% block title %}MIC - PTA{% endblock %}</title>
+        <link rel="icon" type="image/png" sizes="48x48" href="{{ asset('images/logo.png') }}">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-        {% block javascripts %}
-            {% block importmap %}{{ importmap('app') }}{% endblock %}
-        {% endblock %}
+        <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
+        
+        {% set current_route = app.request.get('_route') %}
+
+        {% if app.user and current_route not in ['app_login', 'app_register', 'app_register_submit'] %}  
+        <style>
+            /* Reset et styles de base */
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            body {
+                margin: 0;
+                min-height: 100vh;
+                background: white;
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            }
+
+            body.role-admin .notification-container {
+                display: block !important;
+            }
+
+            body.role-createur .notification-container,
+            body.role-utilisateur .notification-container {
+                display: none !important;
+            }
+
+            body.role-admin #globalNotifications {
+                display: block !important;
+            }
+
+            body.role-createur #globalNotifications,
+            body.role-utilisateur #globalNotifications {
+                display: none !important;
+            }
+
+            .flash-messages-container {
+                position: fixed;
+                top: 80px;
+                right: 20px; /* ← Changé de left: 80% à right: 20px */
+                z-index: 9999;
+                width: auto;
+                min-width: 350px;
+                max-width: 500px;
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .alert {
+                border-radius: 8px;
+                border: none;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                margin-bottom: 1rem;
+                padding: 1rem 1.5rem;
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+                animation: slideInDown 0.3s ease;
+            }
+
+            .alert-success {
+                background: #10b981;
+                color: white;
+                border-left: 4px solid #059669;
+            }
+
+            .alert-danger {
+                background: #ef4444;
+                color: white;
+                border-left: 4px solid #dc2626;
+            }
+
+            .alert-warning {
+                background: #f59e0b;
+                color: white;
+                border-left: 4px solid #d97706;
+            }
+
+            .alert-info {
+                background: #3b82f6;
+                color: white;
+                border-left: 4px solid #1d4ed8;
+            }
+
+            .alert i {
+                font-size: 1.2rem;
+                flex-shrink: 0;
+            }
+
+            .btn-close {
+                filter: invert(1);
+                opacity: 0.8;
+                margin-left: auto;
+                background: none;
+                border: none;
+                font-size: 1.2rem;
+                cursor: pointer;
+            }
+
+            .btn-close:hover {
+                opacity: 1;
+            }
+
+            @keyframes slideInDown {
+                from {
+                    opacity: 0;
+                    transform: translateY(-20px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            /* Navigation */
+            .navbarP {
+                background: linear-gradient(135deg, #964ee3 0%, #75165f 100%);
+                padding: 0;
+                box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+                position: sticky;
+                top: 0;
+                z-index: 1000;
+            }
+
+            .nav-container {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: 0 2rem;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                height: 70px;
+                position: relative;
+            }
+
+            /* Logo avec texte en dessous */
+            .nav-brand {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                gap: 0.3rem;
+                text-decoration: none;
+                color: white;
+                text-align: center;
+                flex-shrink: 0;
+            }
+
+            .nav-logo {
+                height: 40px;
+                width: auto;
+                object-fit: contain;
+            }
+
+            .nav-brand p {
+                margin: 0;
+                font-size: 0.65rem;
+                font-weight: 400;
+                line-height: 1.1;
+                white-space: nowrap;
+                color: white;
+            }
+
+            .nav-menu {
+                display: flex;
+                align-items: center;
+                gap: 1.5rem;
+                list-style: none;
+                margin: 0;
+                flex: 1;
+                justify-content: center;
+            }
+
+            .nav-item {
+                position: relative;
+            }
+
+            .nav-link {
+                color: white;
+                text-decoration: none;
+                padding: 0.5rem 1rem;
+                border-radius: 20px;
+                transition: all 0.3s ease;
+                font-weight: 500;
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                font-size: 0.9rem;
+                white-space: nowrap;
+            }
+
+            .nav-link:hover {
+                background: rgba(255, 255, 255, 0.18);
+                transform: translateY(-1px);
+                color: #ffff;
+            }
+
+            .nav-link.active {
+                background: rgba(255,255,255,0.2);
+                font-weight: 600;
+            }
+
+            .nav-link i {
+                font-size: 1.1rem;
+                flex-shrink: 0;
+            }
+
+            .user-menu {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                flex-shrink: 0;
+                margin-left: auto; 
+            }
+
+            .user-info {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        color: white;
+        padding: 0.5rem 0.75rem;
+        background: rgba(255,255,255,0.1);
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        min-width: 160px;
+        max-width: 220px;
+        height: 56px; /* Hauteur fixe */
+    }
+
+            .user-info:hover {
+                background: rgba(255,255,255,0.15);
+            }
+
+            .user-avatar {
+                width: 40px;
+                height: 40px;
+                background: linear-gradient(135deg, #eada70 0%, #fd8617 100%) !important;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: white;
+                font-weight: 600;
+                font-size: 1rem;
+                border: 2px solid rgba(255,255,255,0.3);
+            }
+
+            .user-details {
+        display: flex;
+        flex-direction: column;
+        min-width: 0; /* Important pour le text-overflow */
+        flex: 1;
+    }
+
+    .user-name {
+        font-weight: 600;
+        font-size: 0.9rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 120px; /* Largeur maximum avant les pointillés */
+    }
+
+    .user-role {
+        font-size: 0.75rem;
+        opacity: 0.8;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 120px;
+    }
+
+            /* Version pour mobile */
+            .user-compact {
+                display: none;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+            }
+
+            .user-compact .user-avatar {
+                width: 35px;
+                height: 35px;
+                font-size: 0.9rem;
+            }
+
+            /* Menu déroulant utilisateur */
+            .user-dropdown {
+                position: relative;
+            }
+
+            .dropdown-menu {
+                position: absolute;
+                top: 100%;
+                right: 0;
+                background: white;
+                min-width: 200px;
+                border-radius: 8px;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+                padding: 0.5rem 0;
+                display: none;
+                z-index: 1000;
+            }
+
+            .dropdown-menu.active {
+                display: block;
+                animation: slideDown 0.3s ease;
+            }
+
+            .dropdown-item.full-name {
+        font-size: 0.85rem;
+        color: #6c757d;
+        padding: 0.5rem 1rem;
+        margin-top: -0.25rem;
+        border-bottom: 1px solid #f1f5f9;
+        cursor: default;
+    }
+
+    .dropdown-item.full-name:hover {
+        background: transparent;
+    }
+
+    /* Version pour mobile */
+    .user-compact {
+        display: none;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        min-width: 40px;
+    }
+
+    /* Responsive */
+    @media (max-width: 1200px) {
+        .user-name {
+            max-width: 100px;
+        }
+        
+        .user-role {
+            max-width: 100px;
+        }
+    }
+
+    @media (max-width: 968px) {
+        .user-info {
+            display: none;
+        }
+        
+        .user-compact {
+            display: flex;
+        }
+        
+        .user-details {
+            display: none;
+        }
+    }
+
+            @keyframes slideDown {
+                from {
+                    opacity: 0;
+                    transform: translateY(-10px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            .dropdown-item {
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+                padding: 0.75rem 1rem;
+                color: #333;
+                text-decoration: none;
+                transition: background-color 0.3s ease;
+                border: none;
+                background: none;
+                width: 100%;
+                text-align: left;
+                font-size: 0.9rem;
+            }
+
+            .dropdown-item:hover {
+                background: #f8f9fa;
+            }
+
+            .dropdown-item i {
+                color: #6c757d;
+                width: 16px;
+            }
+
+            .dropdown-divider {
+                height: 1px;
+                background: #e9ecef;
+                margin: 0.5rem 0;
+            }
+
+            /* Container des notifications */
+            .notification-container {
+                position: relative;
+            }
+
+            .notification-bell {
+                position: relative;
+                cursor: pointer;
+                padding: 0.75rem;
+                border-radius: 50%;
+                transition: background-color 0.3s ease;
+                color: white;
+                font-size: 1.2rem;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .notification-bell:hover {
+                background: rgba(255,255,255,0.15);
+            }
+
+            .notification-badge {
+                position: absolute;
+                top: 5px;
+                right: 5px;
+                background: #ef4444;
+                color: white;
+                border-radius: 50%;
+                width: 20px;
+                height: 20px;
+                font-size: 0.7rem;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-weight: bold;
+                border: 2px solid #964ee3;
+                z-index: 1001;
+            }
+
+            /* Nouveau style avec icône + */
+            .notification-badge.with-plus::before {
+                content: '+';
+                font-size: 0.6rem;
+                margin-right: 1px;
+            }
+
+            /* Panneau de notifications */
+            .notification-panel {
+                position: fixed;
+                top: 80px;
+                right: 20px;
+                width: 400px;
+                background: white;
+                border-radius: 10px;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+                z-index: 1000;
+                display: none;
+                max-height: 500px;
+                overflow-y: auto;
+            }
+
+            .notification-panel.active {
+                display: block;
+                animation: slideIn 0.3s ease;
+            }
+
+            @keyframes slideIn {
+                from {
+                    opacity: 0;
+                    transform: translateY(-10px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            .notification-header {
+                padding: 1rem;
+                border-bottom: 1px solid #e5e7eb;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                background: #f8fafc;
+                border-radius: 10px 10px 0 0;
+            }
+
+            .notification-header h3 {
+                margin: 0;
+                font-size: 1.1rem;
+                color: #1f2937;
+            }
+
+            .notification-list {
+                padding: 0;
+            }
+
+            .notification-item {
+                padding: 1rem;
+                border-bottom: 1px solid #f1f5f9;
+                cursor: pointer;
+                transition: background-color 0.2s ease;
+                display: flex;
+                align-items: flex-start;
+                gap: 0.75rem;
+            }
+
+            .notification-item:hover {
+                background: #f8fafc;
+            }
+
+            .notification-item.unread {
+                background: #f0f9ff;
+                border-left: 3px solid #3b82f6;
+            }
+
+            .notification-icon {
+                width: 32px;
+                height: 32px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                flex-shrink: 0;
+                font-size: 0.9rem;
+            }
+
+            .notification-icon.info { background: #dbeafe; color: #1d4ed8; }
+            .notification-icon.warning { background: #fef3c7; color: #d97706; }
+            .notification-icon.success { background: #d1fae5; color: #065f46; }
+            .notification-icon.danger { background: #fee2e2; color: #dc2626; }
+
+            .notification-content {
+                flex: 1;
+            }
+
+            .notification-message {
+                margin: 0 0 0.25rem 0;
+                font-size: 0.9rem;
+                color: #374151;
+                line-height: 1.4;
+            }
+
+            .notification-time {
+                font-size: 0.75rem;
+                color: #6b7280;
+            }
+
+            /* Animation pour le badge de notification */
+            @keyframes pulse {
+                0% { transform: scale(1); }
+                50% { transform: scale(1.1); }
+                100% { transform: scale(1); }
+            }
+
+            .notification-meta {
+                display: flex;
+                gap: 0.5rem;
+                align-items: center;
+                margin-top: 0.25rem;
+            }
+
+            .notification-user {
+                font-size: 0.7rem;
+                color: #6b7280;
+                background: #f3f4f6;
+                padding: 0.2rem 0.5rem;
+                border-radius: 10px;
+            }
+
+            .btn-mark-all {
+                background: #3b82f6;
+                color: white;
+                border: none;
+                padding: 0.5rem 1rem;
+                border-radius: 6px;
+                cursor: pointer;
+                font-size: 0.8rem;
+                transition: background-color 0.3s ease;
+            }
+
+            .btn-mark-all:hover {
+                background: #2563eb;
+            }
+
+            .empty-notifications {
+                padding: 2rem;
+                text-align: center;
+                color: #6b7280;
+            }
+
+            .empty-notifications i {
+                font-size: 2rem;
+                margin-bottom: 0.5rem;
+                opacity: 0.5;
+            }
+
+            /* Notification toast style Messenger GLOBAL */
+            .messenger-notification {
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: white;
+                border-radius: 12px;
+                box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+                z-index: 10000;
+                animation: messengerSlideIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+                max-width: 380px;
+                border-left: 4px solid #f59e0b;
+                overflow: hidden;
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            }
+
+            .messenger-notification.success { border-left-color: #10b981; }
+            .messenger-notification.info { border-left-color: #3b82f6; }
+            .messenger-notification.danger { border-left-color: #ef4444; }
+
+            .messenger-notification-header {
+                background: linear-gradient(135deg, #964ee3 0%, #75165f 100%);
+                color: white;
+                padding: 1rem 1.25rem;
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+            }
+
+            .messenger-notification-icon {
+                width: 32px;
+                height: 32px;
+                background: rgba(255,255,255,0.2);
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 1rem;
+            }
+
+            .messenger-notification-title {
+                font-weight: 600;
+                font-size: 1rem;
+                margin: 0;
+                flex: 1;
+            }
+
+            .messenger-notification-body {
+                padding: 1.25rem;
+                color: #374151;
+            }
+
+            .messenger-notification-message {
+                margin: 0 0 0.5rem 0;
+                font-size: 0.9rem;
+                line-height: 1.4;
+                color: #374151;
+            }
+
+            .messenger-notification-time {
+                font-size: 0.75rem;
+                color: #6b7280;
+                display: flex;
+                align-items: center;
+                gap: 0.25rem;
+            }
+
+            .messenger-notification-actions {
+                padding: 0 1.25rem 1.25rem;
+                display: flex;
+                gap: 0.5rem;
+            }
+
+            .messenger-btn {
+                padding: 0.5rem 1rem;
+                border: none;
+                border-radius: 6px;
+                font-size: 0.8rem;
+                font-weight: 500;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                flex: 1;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 0.5rem;
+            }
+
+            .messenger-btn-primary {
+                background: #964ee3;
+                color: white;
+            }
+
+            .messenger-btn-secondary {
+                background: #f1f5f9;
+                color: #374151;
+            }
+
+            .messenger-btn:hover {
+                transform: translateY(-1px);
+                box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            }
+
+            .messenger-close {
+                position: absolute;
+                top: 12px;
+                right: 12px;
+                background: rgba(255,255,255,0.2);
+                border: none;
+                color: white;
+                width: 24px;
+                height: 24px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+                font-size: 0.8rem;
+                transition: background 0.3s ease;
+            }
+
+            .messenger-close:hover {
+                background: rgba(255,255,255,0.3);
+            }
+
+            @keyframes messengerSlideIn {
+                from {
+                    opacity: 0;
+                    transform: translateX(100%) scale(0.8);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateX(0) scale(1);
+                }
+            }
+
+            @keyframes messengerSlideOut {
+                from {
+                    opacity: 1;
+                    transform: translateX(0) scale(1);
+                }
+                to {
+                    opacity: 0;
+                    transform: translateX(100%) scale(0.8);
+                }
+            }
+
+            /* Ajoutez ces styles dans votre bloc stylesheets */
+.is-valid {
+    border-color: #28a745 !important;
+    background-color: #f8fff9 !important;
+}
+
+.is-invalid {
+    border-color: #dc3545 !important;
+    background-color: #fff9fa !important;
+}
+
+.shake-animation {
+    animation: shake 0.5s ease-in-out;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+}
+
+            /* Toast notifications */
+            .notification-toast {
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: #3b82f6;
+                color: white;
+                padding: 12px 16px;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                z-index: 10000;
+                animation: slideInRight 0.3s ease;
+                max-width: 300px;
+            }
+
+            .notification-toast-success { background: #10b981; }
+            .notification-toast-error { background: #ef4444; }
+            .notification-toast-info { background: #3b82f6; }
+            .notification-toast-warning { background: #f59e0b; }
+
+            .toast-content {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+
+            .toast-content i {
+                font-size: 1.2rem;
+            }
+
+            @keyframes slideInRight {
+                from {
+                    opacity: 0;
+                    transform: translateX(100%);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateX(0);
+                }
+            }
+
+            @keyframes slideOutRight {
+                from {
+                    opacity: 1;
+                    transform: translateX(0);
+                }
+                to {
+                    opacity: 0;
+                    transform: translateX(100%);
+                }
+            }
+
+            /* Main content */
+            .main-content {
+                min-height: calc(100vh - 70px);
+                padding: 2rem;
+                max-width: 1400px;
+                margin: 0 auto;
+                background: white;
+            }
+
+            /* Mobile menu */
+            .menu-toggle {
+                display: none;
+                background: none;
+                border: none;
+                color: white;
+                font-size: 1.5rem;
+                cursor: pointer;
+                padding: 0.5rem;
+                border-radius: 4px;
+                transition: background-color 0.3s ease;
+                flex-shrink: 0;
+                margin-left: 1rem; /* ESPACE AVEC LE USER-MENU */
+            }
+
+            .menu-toggle:hover {
+                background: rgba(255,255,255,0.1);
+            }
+
+            /* CORRECTIONS RESPONSIVE - TOUS LES PROBLÈMES RÉSOLUS */
+
+            /* Styles pour écrans moyens */
+            @media (max-width: 1200px) {
+                .nav-menu {
+                    gap: 1rem;
+                }
+                
+                .nav-link {
+                    padding: 0.5rem 0.8rem;
+                    font-size: 0.85rem;
+                }
+                
+                .nav-link span {
+                    display: none;
+                }
+                
+                .nav-link i {
+                    font-size: 1.2rem;
+                    margin-right: 0;
+                }
+
+                .nav-brand p {
+                    font-size: 0.7rem;
+                }
+
+                .nav-logo {
+                    height: 40px;
+                    width: auto;
+                    object-fit: contain;
+                    margin-bottom: 0.2rem;
+                }
+            }
+
+            /* Styles pour tablettes - CORRECTION POUR GARDER USER-MENU À DROITE */
+            @media (max-width: 968px) {
+                .nav-container {
+                    padding: 0 1rem;
+                    height: auto;
+                    min-height: 70px;
+                    flex-wrap: nowrap; /* EMPÊCHE LE WRAP */
+                    justify-content: space-between; /* FORCE LA RÉPARTITION */
+                }
+
+                .nav-brand {
+                    flex-direction: row;
+                    gap: 0.8rem;
+                    flex: 0 1 auto; /* NE PREND QUE LA PLACE NÉCESSAIRE */
+                }
+
+                .nav-brand p {
+                    font-size: 0.8rem;
+                    white-space: normal;
+                    max-width: 120px;
+                    line-height: 1.2;
+                }
+
+                .nav-logo {
+                    height: 35px;
+                }
+
+                .menu-toggle {
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    order: 3; /* MET LE MENU HAMBURGER À DROITE */
+                    margin-left: auto; /* POUSSE VERS LA DROITE */
+                }
+
+                .user-menu {
+                    order: 2; /* USER-MENU AU MILIEU */
+                    gap: 0.5rem;
+                    margin-left: 0; /* RÉINITIALISE LE MARGIN */
+                }
+
+                .nav-menu {
+                    position: fixed;
+                    top: 70px;
+                    left: -100%;
+                    width: 100%;
+                    height: calc(100vh - 70px);
+                    background: linear-gradient(135deg, #964ee3 0%, #75165f 100%);
+                    flex-direction: column;
+                    justify-content: flex-start;
+                    padding: 2rem;
+                    transition: left 0.3s ease;
+                    gap: 0.5rem;
+                    overflow-y: auto;
+                    order: 4;
+                    flex: 1 0 100%;
+                }
+
+                .nav-menu.active {
+                    left: 0;
+                }
+
+                .nav-item {
+                    width: 100%;
+                }
+
+                .nav-link {
+                    padding: 1rem 1.5rem;
+                    width: 100%;
+                    justify-content: flex-start;
+                    border-radius: 10px;
+                    font-size: 1rem;
+                }
+
+                .nav-link span {
+                    display: inline-block;
+                }
+
+                .nav-link i {
+                    font-size: 1.3rem;
+                    width: 24px;
+                    text-align: center;
+                }
+
+                /* Menu utilisateur responsive - CORRECTION POUR GARDER À DROITE */
+                .user-menu {
+                    flex-direction: row;
+                    width: auto;
+                    gap: 0.5rem;
+                    padding-top: 0;
+                    border-top: none;
+                    margin-left: auto; /* FORCE À DROITE MÊME EN RESPONSIVE */
+                }
+
+                .user-info {
+                    display: none;
+                }
+
+                .user-compact {
+                    display: flex;
+                    width: auto;
+                    justify-content: center;
+                    padding: 0.5rem;
+                }
+
+                .user-compact .user-avatar {
+                    width: 35px;
+                    height: 35px;
+                    font-size: 0.9rem;
+                }
+
+                .dropdown-menu {
+                    position: absolute;
+                    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+                    background: white;
+                    display: none !important;
+                    width: 200px;
+                    right: 0;
+                    top: 100%;
+                }
+
+                .dropdown-menu.active {
+                    display: block !important;
+                }
+
+                .dropdown-item {
+                    color: #333;
+                    padding: 0.8rem 1rem;
+                    width: 100%;
+                }
+
+                .dropdown-item:hover {
+                    background: #f8f9fa;
+                }
+
+                .dropdown-item i {
+                    color: #6c757d;
+                }
+
+                .dropdown-divider {
+                    background: #e9ecef;
+                }
+
+                /* Notifications responsive - CORRECTION */
+                .notification-container {
+                    width: auto;
+                }
+
+                .notification-bell {
+                    width: auto;
+                    justify-content: center;
+                    padding: 0.75rem;
+                    border-radius: 50%;
+                }
+
+                .notification-bell i {
+                    font-size: 1.2rem;
+                }
+
+                .notification-panel {
+                    width: 90vw;
+                    right: 5vw;
+                    left: 5vw;
+                }
+
+                .flash-messages-container {
+                    top: 70px;
+                    width: 95%;
+                }
+            }
+            
+
+            /* Styles pour petits écrans - CORRECTION FINALE */
+            @media (max-width: 768px) {
+                .user-info {
+                    display: none;
+                }
+                
+                .user-compact {
+                    display: flex;
+                }
+
+                .nav-brand p {
+                    font-size: 0.7rem;
+                    max-width: 100px;
+                }
+
+                .user-menu {
+                    gap: 0.25rem;
+                }
+
+                /* GARANTIR QUE USER-MENU RESTE À DROITE */
+                .nav-container {
+                    justify-content: space-between;
+                }
+
+                .nav-brand {
+                    flex: 0 1 auto;
+                }
+
+                .user-menu {
+                    flex: 0 0 auto;
+                    margin-left: auto;
+                }
+
+                .menu-toggle {
+                    flex: 0 0 auto;
+                    margin-left: 0.5rem;
+                }
+            }
+
+            @media (max-width: 480px) {
+                .nav-container {
+                    padding: 0 0.5rem;
+                }
+                
+                .nav-logo {
+                    height: 30px;
+                }
+                
+                .nav-brand p {
+                    font-size: 0.65rem;
+                    max-width: 80px;
+                }
+                
+                .nav-menu {
+                    padding: 1rem;
+                }
+                
+                .nav-link {
+                    padding: 0.8rem 1rem;
+                    font-size: 0.9rem;
+                }
+
+                .user-compact .user-avatar {
+                    width: 32px;
+                    height: 32px;
+                    font-size: 0.8rem;
+                }
+
+                .notification-bell {
+                    padding: 0.6rem;
+                }
+
+                .notification-bell i {
+                    font-size: 1.1rem;
+                }
+
+                .alert {
+                    padding: 0.75rem 1rem;
+                    font-size: 0.9rem;
+                }
+
+                .user-menu {
+                    gap: 0.2rem;
+                }
+            }
+
+            /* Styles pour le modal de chargement */
+    .modal-loading {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, rgba(150, 78, 227, 0.95) 0%, rgba(117, 22, 95, 0.95) 100%);
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        animation: fadeIn 0.3s ease forwards;
+        backdrop-filter: blur(8px);
+    }
+
+    .modal-loading-content {
+        background: white;
+        border-radius: 20px;
+        padding: 3rem;
+        text-align: center;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        max-width: 400px;
+        width: 90%;
+        transform: translateY(20px);
+        animation: slideUp 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+    }
+
+    .modal-loading-spinner {
+        margin-bottom: 2rem;
+    }
+
+    .spinner {
+        width: 80px;
+        height: 80px;
+        margin: 0 auto;
+        border: 6px solid #f3f3f3;
+        border-top: 6px solid #964ee3;
+        border-radius: 50%;
+        animation: spin 1.2s linear infinite;
+        box-shadow: 0 4px 15px rgba(150, 78, 227, 0.3);
+    }
+
+    .modal-loading-message h3 {
+        color: #1f2937;
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+        font-weight: 600;
+        background: linear-gradient(135deg, #964ee3 0%, #75165f 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .modal-loading-message p {
+        color: #6b7280;
+        font-size: 0.95rem;
+        line-height: 1.5;
+        margin: 0;
+    }
+
+    /* Animation du spinner */
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Animation de disparition */
+    @keyframes fadeOut {
+        from { opacity: 1; }
+        to { opacity: 0; }
+    }
+
+    @keyframes slideDown {
+        from {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        to {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .modal-loading-content {
+            padding: 2rem;
+            margin: 1rem;
+        }
+        
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border-width: 5px;
+        }
+        
+        .modal-loading-message h3 {
+            font-size: 1.3rem;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .modal-loading-content {
+            padding: 1.5rem;
+        }
+        
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border-width: 4px;
+        }
+        
+        .modal-loading-message h3 {
+            font-size: 1.2rem;
+        }
+    }
+
+            /* Dans la section <style> de base.html.twig */
+            /* SURBRILLANCE DE L'UTILISATEUR */
+            .highlighted-user {
+                background: linear-gradient(135deg, #c2e0f7ff 0%, #a9d1f4ff 100%) !important;
+                border-left: 4px solid #5caef6ff;
+                animation: highlightPulse 2s ease-in-out;
+                box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
+            }
+
+            .highlighted-user td {
+                border-color: #5caef6ff !important;
+            }
+
+            @keyframes highlightPulse {
+                0% { background: #fff3cd; }
+                50% { background: #ffeaa7; }
+                100% { background: #fff3cd; }
+            }
+
+            /* Animation d'apparition */
+            .inscriptions-table tr {
+                animation: fadeIn 0.5s ease;
+            }
+
+            @keyframes fadeIn {
+                from { opacity: 0; transform: translateY(-10px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+
+            /* Animation pour le menu mobile */
+            @keyframes slideIn {
+                from {
+                    opacity: 0;
+                    transform: translateX(-20px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateX(0);
+                }
+            }
+
+            .nav-menu.active .nav-item {
+                animation: slideIn 0.3s ease forwards;
+            }
+
+            .nav-menu.active .nav-item:nth-child(1) { animation-delay: 0.1s; }
+            .nav-menu.active .nav-item:nth-child(2) { animation-delay: 0.15s; }
+            .nav-menu.active .nav-item:nth-child(3) { animation-delay: 0.2s; }
+            .nav-menu.active .nav-item:nth-child(4) { animation-delay: 0.25s; }
+            .nav-menu.active .nav-item:nth-child(5) { animation-delay: 0.3s; }
+            .nav-menu.active .nav-item:nth-child(6) { animation-delay: 0.35s; }
+        </style>
+        {% endif %}
+        
+        {% block stylesheets %}{% endblock %}
     </head>
-    <body>
-        {% block body %}{% endblock %}
+    <body class="{% if user_role is defined %}role-{{ user_role }}{% endif %}">
+
+        
+        {% if app.user and current_route not in ['app_login', 'app_register'] %}  
+
+            <div id="logoutLoadingModal" class="modal-loading" style="display: none;">
+                <div class="modal-loading-content">
+                    <div class="modal-loading-spinner">
+                        <div class="spinner"></div>
+                    </div>
+                    <div class="modal-loading-message">
+                        <h3>Déconnexion en cours...</h3>
+                        <p>Veuillez patienter pendant que nous sécurisons votre session.</p>
+                    </div>
+                </div>
+            </div>
+            <!-- 🔥 ZONE POUR LES MESSAGES FLASH -->
+            <div class="flash-messages-container">
+                {% for type, messages in app.flashes(['success', 'error', 'warning', 'info']) %}
+                    {% for message in messages %}
+                        <div class="alert alert-{{ type }}">
+                            <i class="bi bi-{{ type == 'success' ? 'check-circle' : type == 'error' ? 'exclamation-triangle' : type == 'warning' ? 'exclamation-triangle' : 'info-circle' }}-fill"></i>
+                            <span>{{ message|raw }}</span>
+                            <button type="button" class="btn-close" onclick="this.parentElement.remove()">×</button>
+                        </div>
+                    {% endfor %}
+                {% endfor %}
+            </div>
+
+            <!-- 🆕 ZONE POUR LES NOTIFICATIONS GLOBALES -->
+            <div id="globalNotifications"></div>
+
+            <nav class="navbarP">
+                <div class="nav-container">
+                    <!-- Logo avec texte en dessous -->
+                    <a href="{{ path('app_dashboard_par_role') }}" class="nav-brand">
+                        <img src="{{ asset('images/logo2.png') }}" alt="MIC Logo" class="nav-logo">
+                        <p>Ministère de l'Industrialisation et du Commerce</p>
+                    </a>
+
+                    <!-- Menu principal -->
+                    <ul class="nav-menu" id="navMenu">
+                        <li class="nav-item">
+                            <a href="{{ path('app_dashboard_par_role') }}" class="nav-link {{ app.request.get('_route') starts with 'app_dashboard' ? 'active' : '' }}">
+                                <i class="bi bi-speedometer2"></i>
+                                <span>Tableau de Bord</span>
+                            </a>
+                        </li>
+                        {% if is_granted('ROLE_ADMIN') %}
+                        <li class="nav-item">
+                            <a href="{{ path('app_direction_index') }}" class="nav-link {{ app.request.get('_route') starts with 'app_direction' ? 'active' : '' }}">
+                                <i class="bi bi-building"></i>
+                                <span>Directions</span>
+                            </a>
+                        </li>       
+                        <li class="nav-item">
+                            <a href="{{ path('app_service_index') }}" class="nav-link {{ app.request.get('_route') starts with 'app_service' ? 'active' : '' }}">
+                                <i class="bi bi-diagram-3"></i>
+                                <span>Services</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ path('app_personnel_index') }}" class="nav-link {{ app.request.get('_route') starts with 'app_personnel' ? 'active' : '' }}">
+                                <i class="bi bi-people"></i>
+                                <span>Agents</span>
+                            </a>
+                        </li>
+                        {% endif %}
+                        <li class="nav-item">
+                            <a href="{{ path('app_projet_index') }}" class="nav-link {{ app.request.get('_route') starts with 'app_projet' ? 'active' : '' }}">
+                                <i class="bi bi-folder"></i>
+                                <span>Projets</span>
+                            </a>
+                        </li>
+                        {% if is_granted('ROLE_CREATEUR_DE_PROJET') %}
+                        <li class="nav-item">
+                            <a href="{{ path('app_rapport_projets') }}" class="nav-link {{ app.request.get('_route') == 'app_rapport_projets' ? 'active' : '' }}">
+                                <i class="bi bi-graph-up"></i>
+                                <span>Rapports</span>
+                            </a>
+                        </li>
+                        {% endif %}
+                        <li class="nav-item">
+                            <a href="{{ path('app_guide_utilisation') }}" class="nav-link {{ app.request.get('_route') == 'app_guide_utilisation' ? 'active' : '' }}">
+                                <i class="bi bi-question-circle"></i>
+                                <span>Aide & Guide</span>
+                            </a>
+                        </li>
+                        
+                    </ul>
+                    
+
+                    <!-- Menu utilisateur avec notifications - TOUJOURS À DROITE -->
+                    <div class="user-menu">
+                        <!-- Notifications -->
+                        <div class="notification-container">
+                            <div class="notification-bell" id="notificationBell">
+                                <i class="bi bi-bell"></i>
+                                <span class="notification-badge with-plus" id="notificationBadge" style="display: none;">0</span>
+                            </div>
+                            <div class="notification-panel" id="notificationPanel">
+                                <div class="notification-header">
+                                    <h3>Notifications</h3>
+                                    <button class="btn-mark-all" id="markAllRead">Tout marquer comme lu</button>
+                                </div>
+                                <div class="notification-list" id="notificationList">
+                                    <div class="empty-notifications">
+                                        <i class="bi bi-bell"></i>
+                                        <p>Chargement des notifications...</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Profil utilisateur -->
+                        <div class="user-dropdown">
+                            <div class="user-info" id="userDropdownToggle">
+                                <div class="user-avatar" data-user-id="{{ app.user.ImPer }}">
+                                    {{ app.user.nomPer|first|upper }}{{ app.user.prenomPer|first|upper }}
+                                </div>
+                                <div class="user-details">
+                                    <div class="user-name">{{ app.user.nomPer }} {{ app.user.prenomPer }}</div>
+                                    <div class="user-role">
+                                        {% if 'ROLE_ADMIN' in app.user.roles %}
+                                            Administrateur
+                                        {% elseif 'ROLE_CREATEUR_DE_PROJET' in app.user.roles %}
+                                            Créateur de projet
+                                        {% else %}
+                                            Simple utilisateur
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <i class="bi bi-chevron-down" style="font-size: 0.8rem;"></i>
+                            </div>
+
+                            <!-- Version compacte pour mobile -->
+                            <div class="user-compact" id="userCompactToggle">
+                                <div class="user-avatar">
+                                    {{ app.user.nomPer|first|upper }}{{ app.user.prenomPer|first|upper }}
+                                </div>
+                            </div>
+                            
+                            <div class="dropdown-menu" id="userDropdownMenu">
+    
+                                <div class="dropdown-item full-name">
+                                    <i class="bi bi-person-badge"></i>
+                                    <span>{{ app.user.nomPer }} {{ app.user.prenomPer }}</span>
+                                </div>
+    
+                                <!-- Divider optionnel -->
+                                <div class="dropdown-divider"></div>
+    
+                                <!-- Autres items du menu -->
+                                <a href="{{ path('app_logout') }}" class="dropdown-item">
+                                    <i class="bi bi-box-arrow-right"></i>
+                                    Déconnexion
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Menu mobile -->
+                    <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">
+                        <i class="bi bi-list" id="menuIcon"></i>
+                    </button>
+                </div>
+            </nav>
+        {% endif %}
+
+        <!-- Contenu principal -->
+        <main class="{% if app.user %}main-content{% endif %}">
+            {% block body %}{% endblock %}
+        </main>
+
+        {% if app.user and current_route not in ['app_login', 'app_register'] %}  
+        <script>
+            // SYSTÈME DE NOTIFICATIONS GLOBALES - ADMIN SEULEMENT
+            class GlobalNotificationSystem {
+                constructor() {
+                    this.currentNotificationCount = 0;
+                    this.isChecking = false;
+                    this.displayedNotificationIds = new Set();
+                    this.isAdmin = false;
+                    
+                    this.init();
+                }
+
+                init() {
+                    console.log('🌍 Initialisation système notifications globales');
+                    
+                    this.checkUserRole();
+                    
+                    if (this.isAdmin) {
+                        this.loadInitialCount();
+                        this.startGlobalPolling();
+                        console.log('✅ Système notifications activé pour ADMIN');
+                    } else {
+                        console.log('🔕 Notifications désactivées - Rôle non admin');
+                        this.hideNotificationElements();
+                    }
+                    
+                    window.globalNotificationSystem = this;
+                }
+
+                checkUserRole() {
+                    // Méthode 1: Vérifier via le texte du rôle
+                    const userRoleElement = document.querySelector('.user-role');
+                    if (userRoleElement) {
+                        const roleText = userRoleElement.textContent.toLowerCase();
+                        this.isAdmin = roleText.includes('administrateur') || roleText.includes('admin');
+                    }
+                    
+                    // Méthode 2: Vérifier via les classes du body
+                    const body = document.body;
+                    this.isAdmin = body.classList.contains('role-admin') || this.isAdmin;
+                    
+                    console.log('👤 Rôle utilisateur détecté:', this.isAdmin ? 'ADMIN' : 'NON-ADMIN');
+                }
+
+                hideNotificationElements() {
+                    const notificationContainer = document.querySelector('.notification-container');
+                    if (notificationContainer) {
+                        notificationContainer.style.display = 'none';
+                    }
+                    
+                    const globalNotifications = document.getElementById('globalNotifications');
+                    if (globalNotifications) {
+                        globalNotifications.style.display = 'none';
+                    }
+                }
+
+                startGlobalPolling() {
+                    if (!this.isAdmin) {
+                        console.log('🔕 Polling désactivé - Rôle non admin');
+                        return;
+                    }
+
+                    const checkNotifications = async () => {
+                        if (this.isChecking || !this.isAdmin) return;
+                        
+                        this.isChecking = true;
+                        try {
+                            const response = await fetch(`/api/notifications/count?_=${Date.now()}`);
+                            
+                            if (!response.ok) throw new Error('Erreur de chargement');
+                            
+                            const data = await response.json();
+                            const newCount = data.count;
+                            
+                            if (newCount > this.currentNotificationCount) {
+                                const newNotificationsCount = newCount - this.currentNotificationCount;
+                                console.log('🆕 Nouvelles notifications détectées:', newNotificationsCount);
+                                
+                                const latestNotifications = await this.getLatestNotifications();
+                                
+                                const newNotifications = latestNotifications.filter(notification => 
+                                    !this.displayedNotificationIds.has(notification.id)
+                                );
+                                
+                                newNotifications.forEach(notification => {
+                                    this.showGlobalNotification(notification);
+                                    this.displayedNotificationIds.add(notification.id);
+                                });
+                            }
+                            
+                            this.updateGlobalBadge(newCount);
+                            this.currentNotificationCount = newCount;
+                            
+                        } catch (error) {
+                            console.error('❌ Erreur polling global:', error);
+                        } finally {
+                            this.isChecking = false;
+                        }
+                    };
+                    
+                    setTimeout(() => {
+                        if (this.isAdmin) {
+                            checkNotifications();
+                            setInterval(checkNotifications, 8000);
+                        }
+                    }, 2000);
+                }
+
+                async loadInitialCount() {
+                    if (!this.isAdmin) return;
+                    
+                    try {
+                        const response = await fetch(`/api/notifications/count?_=${Date.now()}`);
+                        if (response.ok) {
+                            const data = await response.json();
+                            this.currentNotificationCount = data.count;
+                            this.updateGlobalBadge(data.count);
+                            
+                            const existingNotifications = await this.getLatestNotifications();
+                            existingNotifications.forEach(notif => {
+                                this.displayedNotificationIds.add(notif.id);
+                            });
+                        }
+                    } catch (error) {
+                        console.error('❌ Erreur chargement compteur initial:', error);
+                    }
+                }
+
+                async getLatestNotifications() {
+                    if (!this.isAdmin) return [];
+                    
+                    try {
+                        const response = await fetch('/api/notifications/latest?_=' + Date.now());
+                        if (response.ok) {
+                            return await response.json();
+                        }
+                    } catch (error) {
+                        console.error('Erreur récupération dernières notifications:', error);
+                    }
+                    return [];
+                }
+
+                showGlobalNotification(notification) {
+                    if (!this.isAdmin) return;
+
+                    const notificationContainer = document.getElementById('globalNotifications');
+                    if (!notificationContainer) return;
+
+                    if (this.isNotificationDisplayed(notification.id)) {
+                        console.log('📌 Notification déjà affichée:', notification.id);
+                        return;
+                    }
+
+                    // 🆕 RAFRAÎCHIR LA LISTE AVANT D'AFFICHER LA NOTIFICATION
+                    this.handleNewNotification(notification);
+
+                    const toast = document.createElement('div');
+                    toast.className = `messenger-notification ${notification.type || 'warning'}`;
+                    toast.id = `notification-${notification.id}`;
+                    
+                    toast.innerHTML = `
+                        <div class="messenger-notification-header">
+                            <div class="messenger-notification-icon">
+                                <i class="bi bi-${this.getNotificationIcon(notification.type)}"></i>
+                            </div>
+                            <h3 class="messenger-notification-title">${notification.title || 'Nouvelle demande d\'inscription'}</h3>
+                            <button class="messenger-close" onclick="window.globalNotificationSystem.removeNotification('${notification.id}')">×</button>
+                        </div>
+                        <div class="messenger-notification-body">
+                            <p class="messenger-notification-message">
+                                ${notification.message}
+                            </p>
+                            <div class="messenger-notification-time">
+                                <i class="bi bi-clock"></i>
+                                ${notification.timeAgo || 'À l\'instant'}
+                            </div>
+                        </div>
+                        <div class="messenger-notification-actions">
+                            <button class="messenger-btn messenger-btn-secondary" onclick="window.globalNotificationSystem.removeNotification('${notification.id}')">
+                                <i class="bi bi-eye"></i> Ignorer
+                            </button>
+                            <button class="messenger-btn messenger-btn-primary" onclick="window.globalNotificationSystem.handleNotificationAction('${notification.id}', '${notification.relatedUserId}')">
+                                <i class="bi bi-arrow-right"></i> Voir
+                            </button>
+                        </div>
+                    `;
+
+                    notificationContainer.appendChild(toast);
+
+                    this.playNotificationSound();
+
+                    setTimeout(() => {
+                        this.removeNotification(notification.id);
+                    }, 8000);
+                }
+
+                isNotificationDisplayed(notificationId) {
+                    return document.getElementById(`notification-${notificationId}`) !== null || 
+                           this.displayedNotificationIds.has(notificationId);
+                }
+
+                removeNotification(notificationId) {
+                    const toast = document.getElementById(`notification-${notificationId}`);
+                    if (toast && toast.parentNode) {
+                        toast.style.animation = 'messengerSlideOut 0.3s ease';
+                        setTimeout(() => {
+                            if (toast.parentNode) {
+                                toast.parentNode.removeChild(toast);
+                            }
+                        }, 300);
+                    }
+                }
+
+                getNotificationIcon(type) {
+                    const icons = {
+                        'info': 'info-circle',
+                        'warning': 'person-plus-fill',
+                        'success': 'check-circle',
+                        'danger': 'x-circle'
+                    };
+                    return icons[type] || 'bell';
+                }
+
+                updateGlobalBadge(count) {
+                    if (!this.isAdmin) return;
+                    
+                    const badge = document.getElementById('notificationBadge');
+                    if (badge) {
+                        badge.textContent = count;
+                        if (count > 0) {
+                            badge.style.display = 'flex';
+                            if (count > this.currentNotificationCount) {
+                                badge.style.animation = 'pulse 1s ease-in-out';
+                                setTimeout(() => {
+                                    badge.style.animation = '';
+                                }, 1000);
+                            }
+                        } else {
+                            badge.style.display = 'none';
+                        }
+                    }
+                }
+
+                handleNotificationAction(notificationId, userIm) {
+                    if (!this.isAdmin) return;
+                    
+                    console.log('🔔 Action sur notification:', notificationId, userIm);
+                    
+                    this.markAsRead(notificationId);
+                    
+                    const currentPath = window.location.pathname;
+                    if (!currentPath.includes('/dashboard')) {
+                        if (userIm) {
+                            sessionStorage.setItem('highlightUserIm', userIm);
+                            sessionStorage.setItem('highlightTimestamp', Date.now().toString());
+                            window.location.href = '/dashboard';
+                        } else {
+                            window.location.href = '/dashboard';
+                        }
+                    } else {
+                        if (userIm) {
+                            this.highlightUserRow(userIm);
+                        }
+                    }
+                    
+                    this.removeNotification(notificationId);
+                }
+
+                highlightUserRow(userIm) {
+                    if (!this.isAdmin) return;
+                    
+                    const row = document.getElementById(`user-row-${userIm}`);
+                    if (row) {
+                        row.classList.remove('highlighted-user', 'new-request');
+                        void row.offsetWidth;
+                        row.classList.add('highlighted-user');
+                        
+                        console.log('🎯 Mise en surbrillance de l\'utilisateur:', userIm);
+                        
+                        setTimeout(() => {
+                            row.scrollIntoView({ 
+                                behavior: 'smooth', 
+                                block: 'center',
+                                inline: 'nearest'
+                            });
+                        }, 300);
+                        
+                        setTimeout(() => {
+                            if (row.classList.contains('highlighted-user')) {
+                                row.classList.remove('highlighted-user');
+                            }
+                        }, 15000);
+                    }
+                }
+
+                async markAsRead(notificationId) {
+                    if (!this.isAdmin) return;
+                    
+                    try {
+                        await fetch(`/api/notifications/${notificationId}/read`, {
+                            method: 'POST',
+                            headers: { 
+                                'Content-Type': 'application/json',
+                                'X-Requested-With': 'XMLHttpRequest'
+                            }
+                        });
+                    } catch (error) {
+                        console.error('Erreur marquage comme lu:', error);
+                    }
+                }
+
+                playNotificationSound() {
+                    if (!this.isAdmin) return;
+                    
+                    try {
+                        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                        const oscillator = audioContext.createOscillator();
+                        const gainNode = audioContext.createGain();
+                        
+                        oscillator.connect(gainNode);
+                        gainNode.connect(audioContext.destination);
+                        
+                        oscillator.frequency.value = 800;
+                        oscillator.type = 'sine';
+                        
+                        gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+                        
+                        oscillator.start(audioContext.currentTime);
+                        oscillator.stop(audioContext.currentTime + 0.5);
+                    } catch (error) {
+                        console.log('Audio non supporté');
+                    }
+                }
+
+                testNewNotification() {
+                    if (!this.isAdmin) {
+                        console.log('🔕 Test notification désactivé - Rôle non admin');
+                        return;
+                    }
+                    
+                    const testNotification = {
+                        id: 'test-' + Date.now(),
+                        title: 'Test Notification',
+                        message: 'Ceci est une notification de test pour une NOUVELLE demande',
+                        type: 'warning',
+                        timeAgo: 'À l\'instant',
+                        relatedUserId: 'TEST123'
+                    };
+                    this.showGlobalNotification(testNotification);
+                }
+
+                // Dans base.html.twig - Ajoutez à la classe GlobalNotificationSystem
+                async handleNewNotification(notification) {
+                    if (!this.isAdmin) return;
+
+                    console.log('🔄 Nouvelle notification reçue, rafraîchissement de la liste...');
+                    
+                    // Rafraîchir la liste des inscriptions en attente
+                    if (window.dashboardRefreshSystem) {
+                        await window.dashboardRefreshSystem.refreshPendingList();
+                    } else {
+                        // Fallback: rafraîchir manuellement si le système n'est pas disponible
+                        await this.refreshPendingListFallback();
+                    }
+                    
+                    // Mettre à jour le badge du compteur
+                    this.updatePendingCountBadge();
+                }
+
+                // Méthode de fallback pour rafraîchir la liste
+                async refreshPendingListFallback() {
+                    try {
+                        const response = await fetch('{{ path('app_dashboard_admin') }}?partial=pending_list', {
+                            headers: {
+                                'X-Requested-With': 'XMLHttpRequest'
+                            }
+                        });
+                        
+                        if (!response.ok) throw new Error('Erreur rafraîchissement');
+                        
+                        const html = await response.text();
+                        const container = document.getElementById('pendingListContainer');
+                        if (container) {
+                            container.style.opacity = '0.7';
+                            setTimeout(() => {
+                                container.innerHTML = html;
+                                container.style.opacity = '1';
+                                
+                                // Réinitialiser les événements après le rafraîchissement
+                                if (window.pendingListModalSystem) {
+                                    window.pendingListModalSystem.init();
+                                }
+                            }, 300);
+                        }
+                    } catch (error) {
+                        console.error('❌ Erreur rafraîchissement fallback:', error);
+                    }
+                }
+
+                // Mettre à jour le badge du compteur
+                updatePendingCountBadge() {
+                    const badge = document.getElementById('pendingCountBadge');
+                    if (badge) {
+                        // Incrémenter le compteur visuellement
+                        const currentCount = parseInt(badge.textContent) || 0;
+                        badge.textContent = (currentCount + 1) + ' demandes';
+                        
+                        // Animation visuelle
+                        badge.style.animation = 'pulse 0.5s ease-in-out';
+                        setTimeout(() => {
+                            badge.style.animation = '';
+                        }, 500);
+                    }
+                }
+            }
+
+            // SYSTÈME DE NOTIFICATIONS DE LA CLOCHE - ADMIN SEULEMENT
+            class NotificationManager {
+                constructor() {
+                    this.bell = document.getElementById('notificationBell');
+                    this.panel = document.getElementById('notificationPanel');
+                    this.badge = document.getElementById('notificationBadge');
+                    this.list = document.getElementById('notificationList');
+                    this.markAllBtn = document.getElementById('markAllRead');
+                    this.isAdmin = false;
+                    
+                    this.init();
+                }
+
+                init() {
+                    this.checkUserRole();
+                    
+                    if (!this.isAdmin) {
+                        console.log('🔕 NotificationManager désactivé - Rôle non admin');
+                        this.hideNotificationElements();
+                        return;
+                    }
+
+                    if (this.bell) {
+                        this.bell.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            this.togglePanel();
+                        });
+                    }
+                    
+                    if (this.markAllBtn) {
+                        this.markAllBtn.addEventListener('click', () => this.markAllAsRead());
+                    }
+                    
+                    this.syncWithGlobalSystem();
+                    
+                    document.addEventListener('click', (e) => {
+                        if (this.panel && !this.panel.contains(e.target) && this.bell && !this.bell.contains(e.target)) {
+                            this.panel.classList.remove('active');
+                        }
+                    });
+
+                    document.addEventListener('keydown', (e) => {
+                        if (e.key === 'Escape' && this.panel) {
+                            this.panel.classList.remove('active');
+                        }
+                    });
+                }
+
+                checkUserRole() {
+                    const userRoleElement = document.querySelector('.user-role');
+                    if (userRoleElement) {
+                        const roleText = userRoleElement.textContent.toLowerCase();
+                        this.isAdmin = roleText.includes('administrateur') || roleText.includes('admin');
+                    }
+                    
+                    const body = document.body;
+                    this.isAdmin = body.classList.contains('role-admin') || this.isAdmin;
+                    
+                    console.log('👤 NotificationManager - Rôle:', this.isAdmin ? 'ADMIN' : 'NON-ADMIN');
+                }
+
+                hideNotificationElements() {
+                    const notificationContainer = document.querySelector('.notification-container');
+                    if (notificationContainer) {
+                        notificationContainer.style.display = 'none';
+                    }
+                }
+
+                syncWithGlobalSystem() {
+                    if (window.globalNotificationSystem && this.isAdmin) {
+                        console.log('✅ NotificationManager synchronisé avec GlobalNotificationSystem');
+                    } else if (!this.isAdmin) {
+                        this.loadNotificationCount();
+                    }
+                }
+
+                togglePanel() {
+                    if (!this.isAdmin) return;
+                    
+                    if (this.panel) {
+                        this.panel.classList.toggle('active');
+                        if (this.panel.classList.contains('active')) {
+                            this.loadNotifications();
+                        }
+                    }
+                }
+
+                async loadNotificationCount() {
+                    if (!this.isAdmin) return;
+                    
+                    try {
+                        const response = await fetch('/api/notifications/count?_=' + Date.now());
+                        if (!response.ok) throw new Error('Erreur de chargement du compteur');
+                        
+                        const data = await response.json();
+                        this.updateBadge(data.count);
+                    } catch (error) {
+                        console.error('Erreur chargement compteur notifications:', error);
+                    }
+                }
+
+                async loadNotifications() {
+                    if (!this.isAdmin) return;
+                    
+                    try {
+                        const response = await fetch('/api/notifications?_=' + Date.now());
+                        if (!response.ok) throw new Error('Erreur de chargement');
+                        
+                        const notifications = await response.json();
+                        this.renderNotifications(notifications);
+                        
+                    } catch (error) {
+                        console.error('Erreur chargement notifications:', error);
+                        if (this.list) {
+                            this.list.innerHTML = `
+                                <div class="empty-notifications">
+                                    <i class="bi bi-exclamation-triangle"></i>
+                                    <p>Erreur de chargement</p>
+                                </div>
+                            `;
+                        }
+                    }
+                }
+
+                updateBadge(count) {
+                    if (!this.isAdmin) return;
+                    
+                    if (this.badge) {
+                        this.badge.textContent = count;
+                        if (count > 0) {
+                            this.badge.style.display = 'flex';
+                            this.badge.style.animation = 'pulse 1s infinite';
+                            setTimeout(() => {
+                                this.badge.style.animation = '';
+                            }, 1000);
+                        } else {
+                            this.badge.style.display = 'none';
+                        }
+                    }
+                }
+
+                renderNotifications(notifications) {
+                    if (!this.list || !this.isAdmin) return;
+
+                    if (notifications.length === 0) {
+                        this.list.innerHTML = `
+                            <div class="empty-notifications">
+                                <i class="bi bi-check-circle"></i>
+                                <p>Aucune notification</p>
+                                <small>Toutes les demandes ont été traitées</small>
+                            </div>
+                        `;
+                        return;
+                    }
+
+                    this.list.innerHTML = notifications.map(notif => `
+                        <div class="notification-item unread" data-id="${notif.id}" data-user-im="${notif.relatedUserId}">
+                            <div class="notification-icon ${notif.type}">
+                                <i class="bi bi-${this.getIcon(notif.type)}"></i>
+                            </div>
+                            <div class="notification-content">
+                                <p class="notification-message">${this.escapeHtml(notif.message)}</p>
+                                <div class="notification-meta">
+                                    <span class="notification-time">${this.formatDateTime(notif.createdAt)}</span>
+                                    ${notif.relatedUserName ? `<span class="notification-user">• ${this.escapeHtml(notif.relatedUserName)}</span>` : ''}
+                                </div>
+                            </div>
+                        </div>
+                    `).join('');
+
+                    this.list.querySelectorAll('.notification-item').forEach(item => {
+                        item.addEventListener('click', (e) => {
+                            e.preventDefault();
+                            this.handleNotificationClick(item.dataset.id, item.dataset.userIm);
+                        });
+                    });
+                }
+
+                formatDateTime(isoString) {
+                    if (!isoString) return 'Date inconnue';
+                    
+                    try {
+                        const date = new Date(isoString);
+                        
+                        if (isNaN(date.getTime())) {
+                            return 'Date invalide';
+                        }
+                        
+                        const day = date.getDate().toString().padStart(2, '0');
+                        const month = (date.getMonth() + 1).toString().padStart(2, '0');
+                        const year = date.getFullYear();
+                        const hours = date.getHours().toString().padStart(2, '0');
+                        const minutes = date.getMinutes().toString().padStart(2, '0');
+                        
+                        return `${day}/${month}/${year} à ${hours}:${minutes}`;
+                        
+                    } catch (error) {
+                        console.error('Erreur de formatage de date:', error);
+                        return 'Date invalide';
+                    }
+                }
+
+                async handleNotificationClick(notificationId, userIm) {
+                    if (!this.isAdmin) return;
+                    
+                    try {
+                        await this.markAsRead(notificationId);
+                        
+                        if (this.panel) {
+                            this.panel.classList.remove('active');
+                        }
+                        
+                        if (userIm) {
+                            console.log('🔔 Clic notification - Surbrillance:', userIm);
+                            
+                            const currentPath = window.location.pathname;
+                            if (!currentPath.includes('/dashboard')) {
+                                sessionStorage.setItem('highlightUserIm', userIm);
+                                sessionStorage.setItem('highlightTimestamp', Date.now().toString());
+                                window.location.href = '/dashboard';
+                            } else {
+                                if (window.globalNotificationSystem) {
+                                    window.globalNotificationSystem.highlightUserRow(userIm);
+                                }
+                            }
+                        }
+                        
+                    } catch (error) {
+                        console.error('Erreur gestion clic notification:', error);
+                        window.location.href = '/dashboard';
+                    }
+                }
+
+                getIcon(type) {
+                    const icons = {
+                        'info': 'info-circle',
+                        'warning': 'person-plus-fill',
+                        'success': 'check-circle',
+                        'danger': 'x-circle'
+                    };
+                    return icons[type] || 'bell';
+                }
+
+                escapeHtml(unsafe) {
+                    return unsafe
+                        .replace(/&/g, "&amp;")
+                        .replace(/</g, "&lt;")
+                        .replace(/>/g, "&gt;")
+                        .replace(/"/g, "&quot;")
+                        .replace(/'/g, "&#039;");
+                }
+
+                async markAsRead(notificationId) {
+                    if (!this.isAdmin) return;
+                    
+                    try {
+                        const response = await fetch(`/api/notifications/${notificationId}/read`, {
+                            method: 'POST',
+                            headers: { 
+                                'Content-Type': 'application/json',
+                                'X-Requested-With': 'XMLHttpRequest'
+                            }
+                        });
+                        
+                        if (!response.ok) throw new Error('Erreur lors du marquage');
+                        
+                        this.loadNotifications();
+                        this.loadNotificationCount();
+                        
+                    } catch (error) {
+                        console.error('Erreur marquage comme lu:', error);
+                    }
+                }
+
+                async markAllAsRead() {
+                    if (!this.isAdmin) return;
+                    
+                    try {
+                        const response = await fetch('/api/notifications/read-all', {
+                            method: 'POST',
+                            headers: { 
+                                'Content-Type': 'application/json',
+                                'X-Requested-With': 'XMLHttpRequest'
+                            }
+                        });
+                        
+                        if (!response.ok) throw new Error('Erreur lors du marquage global');
+                        
+                        this.loadNotifications();
+                        this.loadNotificationCount();
+                        
+                        this.showToast('Toutes les notifications ont été marquées comme lues', 'success');
+                    } catch (error) {
+                        console.error('Erreur marquage tout comme lu:', error);
+                        this.showToast('Erreur lors du marquage global', 'error');
+                    }
+                }
+
+                showToast(message, type = 'info') {
+                    if (!this.isAdmin) return;
+                    
+                    const toast = document.createElement('div');
+                    toast.className = `notification-toast notification-toast-${type}`;
+                    toast.innerHTML = `
+                        <div class="toast-content">
+                            <i class="bi bi-${this.getToastIcon(type)}"></i>
+                            <span>${message}</span>
+                        </div>
+                    `;
+                    
+                    document.body.appendChild(toast);
+                    
+                    setTimeout(() => {
+                        toast.style.animation = 'slideOutRight 0.3s ease';
+                        setTimeout(() => {
+                            if (toast.parentNode) {
+                                toast.parentNode.removeChild(toast);
+                            }
+                        }, 300);
+                    }, 3000);
+                }
+
+                getToastIcon(type) {
+                    const icons = {
+                        'success': 'check-circle',
+                        'error': 'x-circle',
+                        'info': 'info-circle',
+                        'warning': 'exclamation-triangle'
+                    };
+                    return icons[type] || 'info-circle';
+                }
+            }
+
+            // GESTION DU MENU MOBILE
+            document.addEventListener('DOMContentLoaded', function() {
+                const menuToggle = document.getElementById('menuToggle');
+                const navMenu = document.getElementById('navMenu');
+                const menuIcon = document.getElementById('menuIcon');
+                const userDropdownToggle = document.getElementById('userDropdownToggle');
+                const userCompactToggle = document.getElementById('userCompactToggle');
+                const userDropdownMenu = document.getElementById('userDropdownMenu');
+
+                // Menu principal mobile
+                if (menuToggle && navMenu) {
+                    menuToggle.addEventListener('click', function() {
+                        navMenu.classList.toggle('active');
+                        
+                        if (navMenu.classList.contains('active')) {
+                            menuIcon.classList.remove('bi-list');
+                            menuIcon.classList.add('bi-x');
+                        } else {
+                            menuIcon.classList.remove('bi-x');
+                            menuIcon.classList.add('bi-list');
+                        }
+                    });
+
+                    // Fermer le menu en cliquant sur un lien
+                    const navLinks = document.querySelectorAll('.nav-link');
+                    navLinks.forEach(link => {
+                        link.addEventListener('click', function() {
+                            navMenu.classList.remove('active');
+                            menuIcon.classList.remove('bi-x');
+                            menuIcon.classList.add('bi-list');
+                        });
+                    });
+                }
+
+                // Menu déroulant utilisateur - Desktop
+                if (userDropdownToggle && userDropdownMenu) {
+                    userDropdownToggle.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        userDropdownMenu.classList.toggle('active');
+                    });
+                }
+
+                // Menu déroulant utilisateur - Mobile
+                if (userCompactToggle && userDropdownMenu) {
+                    userCompactToggle.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        userDropdownMenu.classList.toggle('active');
+                    });
+                }
+
+                // Fermer le menu déroulant en cliquant à l'extérieur
+                document.addEventListener('click', function() {
+                    if (userDropdownMenu) {
+                        userDropdownMenu.classList.remove('active');
+                    }
+                });
+
+                // Empêcher la fermeture quand on clique dans le menu
+                if (userDropdownMenu) {
+                    userDropdownMenu.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                    });
+                }
+
+                // Fermer les menus avec la touche Échap
+                document.addEventListener('keydown', function(event) {
+                    if (event.key === 'Escape') {
+                        if (navMenu) navMenu.classList.remove('active');
+                        if (userDropdownMenu) userDropdownMenu.classList.remove('active');
+                        if (menuIcon) {
+                            menuIcon.classList.remove('bi-x');
+                            menuIcon.classList.add('bi-list');
+                        }
+                    }
+                });
+
+                // Fermer automatiquement les messages flash après 5 secondes
+                setTimeout(() => {
+                    const alerts = document.querySelectorAll('.alert');
+                    alerts.forEach(alert => {
+                        alert.style.animation = 'slideInDown 0.3s ease reverse';
+                        setTimeout(() => {
+                            if (alert.parentNode) {
+                                alert.parentNode.removeChild(alert);
+                            }
+                        }, 300);
+                    });
+                }, 5000);
+
+                // GESTION DE LA SURBRILLANCE AU CHARGEMENT DE LA PAGE
+                const urlParams = new URLSearchParams(window.location.search);
+                const highlightUserIm = urlParams.get('highlight');
+                
+                if (highlightUserIm) {
+                    setTimeout(() => {
+                        highlightUserRow(highlightUserIm);
+                        
+                        setTimeout(() => {
+                            scrollToUser(highlightUserIm);
+                        }, 800);
+                        
+                        cleanUrlHighlight();
+                    }, 1000);
+                }
+                
+                // Vérifier aussi la session storage
+                const sessionHighlight = sessionStorage.getItem('highlightUserIm');
+                const sessionTimestamp = sessionStorage.getItem('highlightTimestamp');
+                
+                if (sessionHighlight && sessionTimestamp) {
+                    const now = Date.now();
+                    const timestamp = parseInt(sessionTimestamp);
+                    
+                    if (now - timestamp < 20000) {
+                        setTimeout(() => {
+                            highlightUserRow(sessionHighlight);
+                            setTimeout(() => {
+                                scrollToUser(sessionHighlight);
+                            }, 800);
+                        }, 1000);
+                    }
+                    
+                    sessionStorage.removeItem('highlightUserIm');
+                    sessionStorage.removeItem('highlightTimestamp');
+                }
+            });
+
+            // FONCTIONS GLOBALES POUR LA SURBRILLANCE
+            function highlightUserRow(userIm) {
+                const row = document.getElementById(`user-row-${userIm}`);
+                if (row) {
+                    row.classList.remove('highlighted-user', 'new-request');
+                    
+                    void row.offsetWidth;
+                    
+                    row.classList.add('highlighted-user');
+                    
+                    console.log('🎯 Mise en surbrillance de l\'utilisateur:', userIm);
+                    
+                    setTimeout(() => {
+                        if (row.classList.contains('highlighted-user')) {
+                            row.classList.remove('highlighted-user');
+                            console.log('✅ Fin de la surbrillance pour:', userIm);
+                        }
+                    }, 15000);
+                }
+            }
+
+            function scrollToUser(userIm) {
+                const row = document.getElementById(`user-row-${userIm}`);
+                if (row) {
+                    setTimeout(() => {
+                        row.scrollIntoView({ 
+                            behavior: 'smooth', 
+                            block: 'center',
+                            inline: 'nearest'
+                        });
+                    }, 100);
+                }
+            }
+
+            function cleanUrlHighlight() {
+                const url = new URL(window.location);
+                url.searchParams.delete('highlight');
+                window.history.replaceState({}, document.title, url.toString());
+            }
+
+            // 🚀 DÉMARRAGE DES SYSTÈMES - AVEC VÉRIFICATION DU RÔLE
+            document.addEventListener('DOMContentLoaded', () => {
+                // Déterminer le rôle de l'utilisateur
+                const userRoleElement = document.querySelector('.user-role');
+                let isAdmin = false;
+                
+                if (userRoleElement) {
+                    const roleText = userRoleElement.textContent.toLowerCase();
+                    isAdmin = roleText.includes('administrateur') || roleText.includes('admin');
+                }
+                
+                // Ajouter la classe au body selon le rôle
+                const body = document.body;
+                if (isAdmin) {
+                    body.classList.add('role-admin');
+                    body.classList.remove('role-createur', 'role-utilisateur');
+                    
+                    // Démarrer le système global de notifications
+                    window.globalNotificationSystem = new GlobalNotificationSystem();
+                    
+                    // Démarrer le gestionnaire de la cloche
+                    window.notificationManager = new NotificationManager();
+                    
+                    console.log('🚀 Systèmes de notifications initialisés pour ADMIN');
+                } else {
+                    // Déterminer le type d'utilisateur non-admin
+                    if (userRoleElement) {
+                        const roleText = userRoleElement.textContent.toLowerCase();
+                        if (roleText.includes('createur')) {
+                            body.classList.add('role-createur');
+                            console.log('👤 Utilisateur Créateur de Projet détecté');
+                        } else {
+                            body.classList.add('role-utilisateur');
+                            console.log('👤 Utilisateur standard détecté');
+                        }
+                    }
+                    
+                    body.classList.remove('role-admin');
+                    
+                    console.log('🔕 Systèmes de notifications désactivés - Rôle non admin');
+                    
+                    // Cacher complètement la cloche de notification
+                    const notificationContainer = document.querySelector('.notification-container');
+                    if (notificationContainer) {
+                        notificationContainer.style.display = 'none';
+                    }
+                    
+                    const globalNotifications = document.getElementById('globalNotifications');
+                    if (globalNotifications) {
+                        globalNotifications.style.display = 'none';
+                    }
+                }
+            });
+
+            // Synchronisation entre les systèmes
+            function synchronizeNotificationSystems() {
+                if (window.globalNotificationSystem && window.dashboardRefreshSystem) {
+                    console.log('🔗 Synchronisation des systèmes de notification et dashboard');
+                    
+                    // Créer un canal de communication entre les systèmes
+                    window.globalNotificationSystem.refreshDashboard = function() {
+                        if (window.dashboardRefreshSystem) {
+                            window.dashboardRefreshSystem.refreshPendingList();
+                        }
+                    };
+                    
+                    window.dashboardRefreshSystem.notifyNewRegistration = function() {
+                        if (window.globalNotificationSystem) {
+                            window.globalNotificationSystem.loadInitialCount();
+                        }
+                    };
+                }
+            }
+
+            // Appeler cette fonction après l'initialisation des systèmes
+            document.addEventListener('DOMContentLoaded', () => {
+                setTimeout(() => {
+                    synchronizeNotificationSystems();
+                }, 1000);
+            });
+
+            // 🧪 FONCTION DE TEST - ADMIN SEULEMENT
+            window.testGlobalNotification = function() {
+                if (window.globalNotificationSystem) {
+                    window.globalNotificationSystem.testNewNotification();
+                } else {
+                    console.log('🔕 Système de notifications non disponible');
+                }
+            };
+
+            // Gestion du redimensionnement de la fenêtre
+            window.addEventListener('resize', function() {
+                const navMenu = document.getElementById('navMenu');
+                const menuIcon = document.getElementById('menuIcon');
+                const userDropdownMenu = document.getElementById('userDropdownMenu');
+                
+                if (window.innerWidth > 968) {
+                    if (navMenu) navMenu.classList.remove('active');
+                    if (userDropdownMenu) userDropdownMenu.classList.remove('active');
+                    if (menuIcon) {
+                        menuIcon.classList.remove('bi-x');
+                        menuIcon.classList.add('bi-list');
+                    }
+                }
+            });
+
+            // Gestion du modal de chargement pour la déconnexion
+    document.addEventListener('DOMContentLoaded', function() {
+        const logoutLinks = document.querySelectorAll('a[href*="logout"], a.dropdown-item[href*="logout"]');
+        const modal = document.getElementById('logoutLoadingModal');
+        
+        if (!modal) return;
+        
+        logoutLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+                // Empêcher le comportement par défaut
+                e.preventDefault();
+                
+                // Afficher le modal de chargement
+                modal.style.display = 'flex';
+                
+                // Forcer le reflow pour déclencher l'animation
+                void modal.offsetWidth;
+                
+                // Désactiver tous les liens pendant la déconnexion
+                const allLinks = document.querySelectorAll('a');
+                allLinks.forEach(l => {
+                    l.style.pointerEvents = 'none';
+                });
+                
+                // Désactiver les boutons
+                const allButtons = document.querySelectorAll('button');
+                allButtons.forEach(btn => {
+                    btn.disabled = true;
+                });
+                
+                // Désactiver les formulaires
+                const allForms = document.querySelectorAll('form');
+                allForms.forEach(form => {
+                    form.style.pointerEvents = 'none';
+                    form.style.opacity = '0.5';
+                });
+                
+                console.log('🔒 Déconnexion en cours...');
+                
+                // Récupérer l'URL de déconnexion
+                const logoutUrl = this.getAttribute('href');
+                
+                // Attendre un peu pour que l'animation du modal soit visible
+                setTimeout(() => {
+                    // Rediriger vers l'URL de déconnexion
+                    window.location.href = logoutUrl;
+                }, 500);
+            });
+        });
+        
+        // Animation de sortie si l'utilisateur annule (avec la touche Échap)
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && modal.style.display === 'flex') {
+                hideLogoutModal();
+            }
+        });
+        
+        // Fonction pour cacher le modal
+        function hideLogoutModal() {
+            modal.style.animation = 'fadeOut 0.3s ease forwards';
+            
+            setTimeout(() => {
+                modal.style.display = 'none';
+                modal.style.animation = '';
+                
+                // Réactiver tous les liens
+                const allLinks = document.querySelectorAll('a');
+                allLinks.forEach(l => {
+                    l.style.pointerEvents = '';
+                });
+                
+                // Réactiver les boutons
+                const allButtons = document.querySelectorAll('button');
+                allButtons.forEach(btn => {
+                    btn.disabled = false;
+                });
+                
+                // Réactiver les formulaires
+                const allForms = document.querySelectorAll('form');
+                allForms.forEach(form => {
+                    form.style.pointerEvents = '';
+                    form.style.opacity = '';
+                });
+            }, 300);
+        }
+        
+        // Gestion de la navigation avant déchargement
+        window.addEventListener('beforeunload', function(e) {
+            // Ne montrer le modal que si c'est pour la déconnexion
+            if (document.visibilityState === 'hidden') {
+                modal.style.display = 'flex';
+            }
+        });
+        
+        // Gestion des cas où la déconnexion pourrait échouer
+        window.addEventListener('pageshow', function(event) {
+            // Si la page est chargée depuis le cache, cacher le modal
+            if (event.persisted) {
+                modal.style.display = 'none';
+                
+                // Réactiver tous les éléments
+                const allLinks = document.querySelectorAll('a');
+                allLinks.forEach(l => {
+                    l.style.pointerEvents = '';
+                });
+                
+                const allButtons = document.querySelectorAll('button');
+                allButtons.forEach(btn => {
+                    btn.disabled = false;
+                });
+                
+                const allForms = document.querySelectorAll('form');
+                allForms.forEach(form => {
+                    form.style.pointerEvents = '';
+                    form.style.opacity = '';
+                });
+            }
+        });
+    });
+    
+    // Fonction globale pour afficher manuellement le modal
+    window.showLogoutLoader = function() {
+        const modal = document.getElementById('logoutLoadingModal');
+        if (modal) {
+            modal.style.display = 'flex';
+            
+            // Désactiver tous les liens et boutons
+            const allInteractiveElements = document.querySelectorAll('a, button, input, select, textarea');
+            allInteractiveElements.forEach(el => {
+                el.style.pointerEvents = 'none';
+                if (el.tagName === 'BUTTON' || el.tagName === 'INPUT') {
+                    el.disabled = true;
+                }
+            });
+        }
+    };
+    
+    // Fonction globale pour cacher le modal
+    window.hideLogoutLoader = function() {
+        const modal = document.getElementById('logoutLoadingModal');
+        if (modal) {
+            modal.style.animation = 'fadeOut 0.3s ease forwards';
+            
+            setTimeout(() => {
+                modal.style.display = 'none';
+                modal.style.animation = '';
+                
+                // Réactiver tous les éléments
+                const allInteractiveElements = document.querySelectorAll('a, button, input, select, textarea');
+                allInteractiveElements.forEach(el => {
+                    el.style.pointerEvents = '';
+                    if (el.tagName === 'BUTTON' || el.tagName === 'INPUT') {
+                        el.disabled = false;
+                    }
+                });
+            }, 300);
+        }
+    };
+        </script>
+        {% endif %}
+
+        <!-- Bootstrap JS -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+        <!-- Dans base.html.twig -->
+<!-- JavaScript pour Select2 -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+        {% block javascripts %}{% endblock %}
     </body>
+
 </html>

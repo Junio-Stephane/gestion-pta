@@ -1,0 +1,2830 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Tableau de Bord Admin{% endblock %}
+
+{% block stylesheets %}
+<style>
+:root {
+    --primary-color: #964ee3;
+    --secondary-color: #75165f;
+    --success-color: #10b981;
+    --warning-color: #f59e0b;
+    --danger-color: #ef4444;
+    --info-color: #3b82f6;
+    --dark-color: #1f2937;
+    --light-color: #f8fafc;
+}
+
+/* Dashboard Layout */
+.dashboard-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+/* Message de bienvenue amélioré */
+.welcome-container {
+    background: linear-gradient(135deg, #964ee3 0%, #75165f 100%);
+    color: white;
+    padding: 2rem;
+    border-radius: 16px;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 8px 32px rgba(150, 78, 227, 0.3);
+    position: relative;
+    overflow: hidden;
+}
+
+.welcome-container::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
+    transform: rotate(30deg);
+}
+
+.welcome-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2rem;
+    position: relative;
+    z-index: 2;
+}
+
+.welcome-text {
+    flex: 1;
+}
+
+.welcome-text h1 {
+    margin: 0 0 0.75rem 0;
+    font-size: 2rem;
+    font-weight: 700;
+    color: white;
+    line-height: 1.2;
+}
+
+.welcome-text p {
+    margin: 0 0 1.5rem 0;
+    opacity: 0.95;
+    font-size: 1.1rem;
+    line-height: 1.6;
+    max-width: 700px;
+    font-weight: 400;
+}
+
+.welcome-icon {
+    font-size: 4rem;
+    opacity: 0.9;
+    flex-shrink: 0;
+    animation: float 3s ease-in-out infinite;
+}
+
+.welcome-badge {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    margin-top: 1rem;
+    display: inline-block;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+}
+
+/* Responsive pour le message de bienvenue */
+@media (max-width: 768px) {
+    .welcome-container {
+        padding: 1.5rem;
+    }
+    
+    .welcome-content {
+        flex-direction: column;
+        text-align: center;
+        gap: 1.5rem;
+    }
+    
+    .welcome-text h1 {
+        font-size: 1.5rem;
+    }
+    
+    .welcome-text p {
+        font-size: 1rem;
+    }
+    
+    .welcome-icon {
+        font-size: 2.5rem;
+        order: -1;
+    }
+}
+
+@media (max-width: 480px) {
+    .welcome-container {
+        padding: 1.25rem;
+    }
+    
+    .welcome-text h1 {
+        font-size: 1.3rem;
+    }
+    
+    .welcome-text p {
+        font-size: 0.95rem;
+    }
+}
+
+/* Reste du CSS existant... */
+.inscriptions-table th:nth-child(1) { width: 120px; }
+.inscriptions-table th:nth-child(2) { width: 140px; }
+.inscriptions-table th:nth-child(3) { width: 140px; }
+.inscriptions-table th:nth-child(4) { width: 140px; }
+.inscriptions-table th:nth-child(5) { width: 140px; }
+.inscriptions-table th:nth-child(6) { width: 110px; }
+.inscriptions-table th:nth-child(7) { width: 190px; text-align: center;}
+
+/* Section Grid Compact pour Personnel */
+.section-grid-compact {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 0;
+}
+
+/* Stat Cards Compact */
+.stat-card-compact {
+    background: #d28eef58;
+    padding: 1.25rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    border-left: 4px solid var(--primary-color);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-card-compact:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+}
+
+.stat-card-compact.success { border-left-color: var(--success-color); }
+.stat-card-compact.warning { border-left-color: var(--warning-color); }
+.stat-card-compact.danger { border-left-color: var(--danger-color); }
+.stat-card-compact.info { border-left-color: var(--info-color); }
+.stat-card-compact.secondary { border-left-color: var(--secondary-color); }
+
+.stat-header-compact {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.75rem;
+}
+
+.stat-icon-compact {
+    width: 45px;
+    height: 45px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    color: white;
+    flex-shrink: 0;
+}
+
+.stat-card-compact .stat-icon-compact { background: var(--primary-color); }
+.stat-card-compact.success .stat-icon-compact { background: var(--success-color); }
+.stat-card-compact.warning .stat-icon-compact { background: var(--warning-color); }
+.stat-card-compact.danger .stat-icon-compact { background: var(--danger-color); }
+.stat-card-compact.info .stat-icon-compact { background: var(--info-color); }
+.stat-card-compact.secondary .stat-icon-compact { background: var(--secondary-color); }
+
+.stat-content-compact h3 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--dark-color);
+    margin: 0;
+    line-height: 1;
+}
+
+.stat-label-compact {
+    color: #6b7280;
+    font-size: 0.8rem;
+    margin: 0.25rem 0 0 0;
+    font-weight: 500;
+}
+
+/* Sections principales */
+.dashboard-section {
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
+    margin-bottom: 1.5rem;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #f1f5f9;
+}
+
+.section-header-inscription {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #f1f5f9;
+}
+
+.section-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--dark-color);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.section-title i {
+    color: var(--primary-color);
+}
+
+.inscriptions-table th:nth-child(1) { width: 120px; }
+.inscriptions-table th:nth-child(2) { width: 140px; }
+.inscriptions-table th:nth-child(3) { width: 140px; }
+.inscriptions-table th:nth-child(4) { width: 140px; }
+.inscriptions-table th:nth-child(5) { width: 140px; }
+.inscriptions-table th:nth-child(6) { width: 110px; }
+.inscriptions-table th:nth-child(7) { width: 190px; text-align: center;}
+
+/* Section Grid Compact pour Personnel */
+.section-grid-compact {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 0;
+}
+
+/* Stat Cards Compact */
+.stat-card-compact {
+    background: #d28eef58;
+    padding: 1.25rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    border-left: 4px solid var(--primary-color);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-card-compact:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+}
+
+.stat-card-compact.success { border-left-color: var(--success-color); }
+.stat-card-compact.warning { border-left-color: var(--warning-color); }
+.stat-card-compact.danger { border-left-color: var(--danger-color); }
+.stat-card-compact.info { border-left-color: var(--info-color); }
+.stat-card-compact.secondary { border-left-color: var(--secondary-color); }
+
+.stat-header-compact {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.75rem;
+}
+
+.stat-icon-compact {
+    width: 45px;
+    height: 45px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    color: white;
+    flex-shrink: 0;
+}
+
+.stat-card-compact .stat-icon-compact { background: var(--primary-color); }
+.stat-card-compact.success .stat-icon-compact { background: var(--success-color); }
+.stat-card-compact.warning .stat-icon-compact { background: var(--warning-color); }
+.stat-card-compact.danger .stat-icon-compact { background: var(--danger-color); }
+.stat-card-compact.info .stat-icon-compact { background: var(--info-color); }
+.stat-card-compact.secondary .stat-icon-compact { background: var(--secondary-color); }
+
+.stat-content-compact h3 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--dark-color);
+    margin: 0;
+    line-height: 1;
+}
+
+.stat-label-compact {
+    color: #6b7280;
+    font-size: 0.8rem;
+    margin: 0.25rem 0 0 0;
+    font-weight: 500;
+}
+
+/* Sections principales */
+.dashboard-section {
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
+    margin-bottom: 1.5rem;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #f1f5f9;
+}
+
+.section-header-inscription {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #f1f5f9;
+}
+
+.section-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--dark-color);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.section-title i {
+    color: var(--primary-color);
+}
+
+/* Styles pour les filtres de statuts */
+.statut-filters-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.statut-filter-group {
+    background: #f8fafc;
+    padding: 1.25rem;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+}
+
+.filter-group-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.filter-group-header i {
+    color: var(--primary-color);
+    font-size: 1.1rem;
+}
+
+.filter-group-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--dark-color);
+    margin: 0;
+}
+
+.filter-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.filter-btn {
+    padding: 0.5rem 1rem;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    background: white;
+    color: #6b7280;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.filter-btn:hover {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+    transform: translateY(-1px);
+}
+
+.filter-btn.active {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+    color: white;
+}
+
+.filter-btn.active:hover {
+    background: #8547d0;
+    transform: translateY(-1px);
+}
+
+.filter-btn i {
+    font-size: 0.8rem;
+}
+
+/* Message de bienvenue */
+.welcome-message {
+    background: linear-gradient(135deg, #964ee3 0%, #75165f 100%);
+    color: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    border-left: 4px solid var(--success-color);
+}
+
+.welcome-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.welcome-text h3 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: white;
+}
+
+.welcome-text p {
+    margin: 0;
+    opacity: 0.9;
+    font-size: 0.95rem;
+}
+
+.welcome-icon {
+    font-size: 2.5rem;
+    opacity: 0.8;
+    flex-shrink: 0;
+}
+
+/* Grid pour les diagrammes */
+.charts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1rem;
+}
+
+/* Diagramme Camembert */
+.pie-chart-container {
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
+    transition: all 0.3s ease;
+}
+
+.pie-chart-container:hover {
+    transform: translateY(-5px);
+    box-shadow: rgba(0, 0, 0, 0.15) 0px 8px 24px;
+}
+
+.chart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.chart-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--dark-color);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.chart-title i {
+    color: var(--primary-color);
+}
+
+.chart-wrapper {
+    position: relative;
+    width: 200px;
+    height: 200px;
+    margin: 0 auto;
+}
+
+.pie-chart {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    position: relative;
+    background: conic-gradient(
+        var(--primary-color) 0% 25%,
+        var(--success-color) 25% 50%,
+        var(--warning-color) 50% 75%,
+        var(--danger-color) 75% 100%
+    );
+    animation: rotatePie 2s ease-out;
+}
+
+@keyframes rotatePie {
+    from {
+        transform: rotate(-90deg) scale(0.8);
+        opacity: 0;
+    }
+    to {
+        transform: rotate(0deg) scale(1);
+        opacity: 1;
+    }
+}
+
+.chart-center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 80px;
+    height: 80px;
+    background: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.total-count {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--dark-color);
+    text-align: center;
+}
+
+.total-label {
+    font-size: 0.7rem;
+    color: #6b7280;
+    margin-top: 0.25rem;
+}
+
+/* Légende */
+.chart-legend {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.legend-item:hover {
+    background: #f8fafc;
+    transform: translateX(5px);
+}
+
+.legend-color {
+    width: 16px;
+    height: 16px;
+    border-radius: 4px;
+    flex-shrink: 0;
+}
+
+.legend-info {
+    flex: 1;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.legend-label {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--dark-color);
+}
+
+.legend-value {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #6b7280;
+}
+
+.legend-percentage {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--dark-color);
+    background: #f1f5f9;
+    padding: 0.2rem 0.5rem;
+    border-radius: 12px;
+}
+
+/* Badge */
+.badge {
+    background: var(--primary-color);
+    color: white;
+    padding: 0.4rem 1rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.badge-warning { background: var(--warning-color); }
+
+/* Table */
+.inscriptions-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 1200px;
+    margin-top: 1rem;
+}
+
+.inscriptions-table th,
+.inscriptions-table td {
+    padding: 0.75rem;
+    text-align: left;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.inscriptions-table th {
+    background: #eaeafaff;
+    font-weight: 600;
+    color: #1f2937;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+}
+
+.inscriptions-table td {
+    font-size: 14px;
+}
+
+.inscriptions-table tr:hover {
+    background: #f8fafc;
+}
+
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 600;
+    font-size: 0.875rem;
+}
+
+.user-info-cell {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.user-details h4 {
+    margin: 0;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--dark-color);
+}
+
+.user-details p {
+    margin: 0.25rem 0 0 0;
+    font-size: 0.75rem;
+    color: #6b7280;
+}
+
+.status-badge {
+    padding: 0.4rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.status-pending {
+    background: #fef3c7;
+    color: #d97706;
+}
+
+/* Formulaire de rôle */
+.role-form {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.role-select {
+    padding: 0.5rem;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    background: white;
+    font-size: 0.8rem;
+    min-width: 160px;
+}
+
+.role-select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(150, 78, 227, 0.1);
+}
+
+/* Styles pour les badges de temps écoulé */
+.time-ago-badge {
+    background: #f1f5f9;
+    color: #64748b;
+    padding: 0.3rem 0.6rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    border: 1px solid #e2e8f0;
+    white-space: nowrap;
+}
+
+/* Actions */
+.actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.btn {
+    padding: 0.35rem 0.6rem;
+    border: none;
+    border-radius: 10px;
+    font-size: 0.7rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.2rem;
+    white-space: nowrap;
+    min-width: auto;
+    box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.12) 0px 1px 3px 1px;
+}
+
+.btnG {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 16px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-height: 38px;
+    line-height: 1;
+    white-space: nowrap;
+    box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.12) 0px 1px 3px 1px;
+}
+
+.btnG:hover {
+    transform: translateY(-1px);
+    opacity: 0.9;
+}
+
+.btn-success {
+    background: var(--success-color);
+    color: white;
+}
+
+.btn-success:hover {
+    background: #059669;
+    transform: translateY(-1px);
+}
+
+.btn-danger {
+    background: var(--danger-color);
+    color: white;
+}
+
+.btn-danger:hover {
+    background: #dc2626;
+    transform: translateY(-1px);
+}
+
+.btn-secondary {
+    background: #6b7280;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: #4b5563;
+    transform: translateY(-1px);
+}
+
+/* Quick Actions */
+.quick-actions {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.action-card {
+    background: #f8fafc;
+    padding: 1.5rem;
+    border-radius: 10px;
+    text-align: center;
+    text-decoration: none;
+    color: var(--dark-color);
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+}
+
+.action-card:hover {
+    background: white;
+    border-color: var(--primary-color);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    color: var(--primary-color);
+}
+
+.action-icon {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+    color: var(--primary-color);
+}
+
+.action-title {
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+}
+
+.action-desc {
+    font-size: 0.8rem;
+    color: #6b7280;
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 3rem;
+    color: #6b7280;
+}
+
+.empty-state i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+
+.empty-state h3 {
+    margin-bottom: 0.5rem;
+    color: #374151;
+}
+
+/* Animation pour le rafraîchissement */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.table-container {
+    transition: opacity 0.3s ease;
+}
+
+.inscriptions-table tr {
+    animation: fadeIn 0.5s ease;
+}
+
+/* Bouton d'actualisation */
+.btn-outline-primary {
+    border: 1px solid #964ee3;
+    color: #964ee3;
+    transition: all 0.3s ease;
+    padding: 0.25rem 0.5rem;
+}
+
+.btn-outline-primary:hover {
+    background: #964ee3;
+    color: white;
+    transform: rotate(90deg);
+}
+
+/* Styles pour les modals */
+.modal-content {
+    border-radius: 12px;
+    border: none;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+
+.modal-header .btn-close {
+    background: transparent url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23fff'%3e%3cpath d='M.293.293a1 1 0 0 1 1.414 0L8 6.586 14.293.293a1 1 0 1 1 1.414 1.414L9.414 8l6.293 6.293a1 1 0 0 1-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 0 1-1.414-1.414L6.586 8 .293 1.707a1 1 0 0 1 0-1.414z'/%3e%3c/svg%3e") center/1em auto no-repeat;
+    border: 0;
+    border-radius: 0.375rem;
+    opacity: 0.5;
+    width: 1em;
+    height: 1em;
+    padding: 0.25em 0.25em;
+    margin: -0.5rem -0.5rem -0.5rem auto;
+}
+
+.modal-header .btn-close:hover {
+    opacity: 1;
+}
+
+.modal-header .btn-close:focus {
+    opacity: 1;
+    outline: 0;
+    box-shadow: 0 0 0 0.25rem rgba(150, 78, 227, 0.25);
+}
+
+/* Bouton de fermeture personnalisé */
+.btn-close-custom {
+    background: none;
+    border: none;
+    font-size: 2rem;
+    color: white;
+    opacity: 0.8;
+    transition: all 0.3s ease;
+    padding: 0.5rem;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    margin: -0.5rem -0.5rem -0.5rem auto;
+}
+
+.btn-close-custom:hover {
+    opacity: 1;
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.btn-close-custom:focus {
+    outline: none;
+    box-shadow: 0 0 0 0.25rem rgba(255, 255, 255, 0.25);
+}
+
+.modal-header {
+    background: linear-gradient(135deg, #964ee3 0%, #75165f 100%);
+    color: white;
+    border-radius: 12px 12px 0 0;
+    border: none;
+    padding: 1.5rem;
+}
+
+.modal-header .btn-close {
+    filter: invert(1);
+}
+
+.modal-title {
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0;
+}
+
+.modal-body {
+    padding: 1.5rem;
+    font-size: 0.95rem;
+}
+
+.modal-footer {
+    padding: 1rem 1.5rem;
+    border-top: 1px solid #e9ecef;
+    gap: 0.5rem;
+}
+
+/* Animation pour les modals */
+.modal.fade .modal-dialog {
+    transform: scale(0.8);
+    transition: transform 0.2s ease-out;
+}
+
+.modal.show .modal-dialog {
+    transform: scale(1);
+}
+
+/* Highlight pour les lignes */
+.highlighted-user {
+    background: linear-gradient(90deg, rgba(150, 78, 227, 0.1) 0%, transparent 100%) !important;
+    border-left: 3px solid var(--primary-color);
+}
+
+/* Responsive pour les filtres */
+@media (max-width: 768px) {
+    .statut-filters-container {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .filter-options {
+        justify-content: center;
+    }
+    
+    .filter-btn {
+        flex: 1;
+        min-width: 120px;
+        justify-content: center;
+    }
+    
+    .section-grid-compact {
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 0.75rem;
+    }
+    
+    .charts-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .chart-wrapper {
+        width: 150px;
+        height: 150px;
+    }
+    
+    .chart-center {
+        width: 60px;
+        height: 60px;
+    }
+    
+    .total-count {
+        font-size: 1.2rem;
+    }
+    
+    .section-header {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: flex-start;
+    }
+
+    .section-header-inscription {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: flex-start;
+    }
+    
+    .inscriptions-table {
+        display: block;
+        overflow-x: auto;
+    }
+    
+    .actions {
+        flex-direction: column;
+    }
+    
+    .role-form {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .quick-actions {
+        grid-template-columns: 1fr;
+    }
+
+    .welcome-content {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .welcome-icon {
+        font-size: 2rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .statut-filter-group {
+        padding: 1rem;
+    }
+    
+    .filter-btn {
+        min-width: 100px;
+        font-size: 0.8rem;
+        padding: 0.4rem 0.75rem;
+    }
+    
+    .section-grid-compact {
+        grid-template-columns: 1fr 1fr;
+    }
+    
+    .dashboard-section {
+        padding: 1rem;
+    }
+    
+    .pie-chart-container {
+        padding: 1rem;
+    }
+}
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="dashboard-container">
+    <!-- Message de bienvenue personnalisé -->
+    <div class="welcome-container">
+        <div class="welcome-content">
+            <div class="welcome-text">
+                <h1>Bienvenue sur votre tableau de bord Administrateur</h1>
+                <p>
+                    Vous disposez d'une vue complète du système : gestion des utilisateurs, des directions, 
+                    des services et supervision de tous les projets. Utilisez cet espace pour assurer le bon 
+                    fonctionnement de l'application et accompagner les équipes.
+                </p>
+                <span class="welcome-badge">
+                    <i class="bi bi-star-fill me-1"></i>
+                    Accès Administrateur Complet
+                </span>
+            </div>
+            <div class="welcome-icon">
+                <i class="bi bi-speedometer2"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section Personnel (seule section avec cartes) -->
+    <div class="dashboard-section">
+        <div class="section-header">
+            <h2 class="section-title">
+                <i class="bi bi-people"></i>
+                Aperçu des agents
+            </h2>
+        </div>
+
+        <div class="section-grid-compact">
+            <div class="stat-card-compact">
+                <div class="stat-header-compact">
+                    <div class="stat-content-compact">
+                        <h3>{{ total_users }}</h3>
+                        <p class="stat-label-compact">Utilisateurs totaux</p>
+                    </div>
+                    <div class="stat-icon-compact">
+                        <i class="bi bi-people"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card-compact success">
+                <div class="stat-header-compact">
+                    <div class="stat-content-compact">
+                        <h3>{{ active_users }}</h3>
+                        <p class="stat-label-compact">Comptes actifs</p>
+                    </div>
+                    <div class="stat-icon-compact">
+                        <i class="bi bi-check-circle"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card-compact warning">
+                <div class="stat-header-compact">
+                    <div class="stat-content-compact">
+                        <h3>{{ pending_users }}</h3>
+                        <p class="stat-label-compact">En attente</p>
+                    </div>
+                    <div class="stat-icon-compact">
+                        <i class="bi bi-clock"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card-compact danger">
+                <div class="stat-header-compact">
+                    <div class="stat-content-compact">
+                        <h3>{{ disabled_users }}</h3>
+                        <p class="stat-label-compact">Désactivés</p>
+                    </div>
+                    <div class="stat-icon-compact">
+                        <i class="bi bi-person-fill-slash"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card-compact secondary">
+                <div class="stat-header-compact">
+                    <div class="stat-content-compact">
+                        <h3>{{ rejected_users }}</h3>
+                        <p class="stat-label-compact">Rejetés</p>
+                    </div>
+                    <div class="stat-icon-compact">
+                        <i class="bi bi-person-x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Inscriptions en attente -->
+    <div class="dashboard-section">
+        <div class="section-header-inscription">
+            <h2 class="section-title">
+                <i class="bi bi-person-check"></i>
+                Inscriptions en attente de validation
+            </h2>
+            <span class="badge badge-warning" id="pendingCountBadge">{{ pending_users }} demandes</span>
+        </div>
+
+        <div class="table-container" id="pendingListContainer">
+            {% include 'dashboard/_pending_list.html.twig' %}
+        </div>
+    </div>
+
+    <!-- Section Diagrammes -->
+    <div class="dashboard-section">
+        <div class="section-header">
+            <h2 class="section-title">
+                <i class="bi bi-pie-chart"></i>
+                Statistiques par Catégorie
+            </h2>
+        </div>
+        
+        <!-- Filtres de statuts -->
+        <div class="statut-filters-container">
+            <!-- Container pour Directions et Services -->
+            <div class="statut-filter-group">
+                <div class="filter-group-header">
+                    <i class="bi bi-building"></i>
+                    <h3 class="filter-group-title">Directions & Services</h3>
+                </div>
+                <div class="filter-options" id="directionServiceFilters">
+                    <button class="filter-btn active" data-statut="all">
+                        <i class="bi bi-check-circle"></i>
+                        Tous les statuts
+                    </button>
+                    <button class="filter-btn" data-statut="active">
+                        <i class="bi bi-play-circle"></i>
+                        Actifs
+                    </button>
+                    <button class="filter-btn" data-statut="pending">
+                        <i class="bi bi-clock"></i>
+                        En attente
+                    </button>
+                    <button class="filter-btn" data-statut="disabled">
+                        <i class="bi bi-x-circle"></i>
+                        Désactivés
+                    </button>
+                </div>
+            </div>
+
+            <!-- Container pour Projets et Tâches -->
+            <div class="statut-filter-group">
+                <div class="filter-group-header">
+                    <i class="bi bi-folder"></i>
+                    <h3 class="filter-group-title">Projets & Tâches</h3>
+                </div>
+                <div class="filter-options" id="projetTacheFilters">
+                    <button class="filter-btn active" data-statut="all">
+                        <i class="bi bi-check-circle"></i>
+                        Tous les statuts
+                    </button>
+                    <button class="filter-btn" data-statut="started">
+                        <i class="bi bi-play-fill"></i>
+                        Débutés
+                    </button>
+                    <button class="filter-btn" data-statut="in_progress">
+                        <i class="bi bi-arrow-repeat"></i>
+                        En cours
+                    </button>
+                    <button class="filter-btn" data-statut="completed">
+                        <i class="bi bi-check-circle-fill"></i>
+                        Terminés
+                    </button>
+                    <button class="filter-btn" data-statut="suspended">
+                        <i class="bi bi-pause-circle"></i>
+                        Suspendus
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="charts-grid">
+            <!-- Diagramme Directions -->
+            <div class="pie-chart-container direction-service-chart" data-type="direction">
+                <div class="chart-header">
+                    <h3 class="chart-title">
+                        <i class="bi bi-building"></i>
+                        Directions
+                    </h3>
+                </div>
+                <div class="chart-wrapper">
+                    <div class="pie-chart" id="directionsChart"></div>
+                    <div class="chart-center">
+                        <div class="total-count">{{ total_directions ?? 0 }}</div>
+                        <div class="total-label">Total</div>
+                    </div>
+                </div>
+                <div class="chart-legend">
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: var(--success-color);"></div>
+                        <div class="legend-info">
+                            <span class="legend-label">Actives</span>
+                            <span class="legend-value">{{ active_directions ?? 0 }}</span>
+                        </div>
+                        <span class="legend-percentage" id="directionsActivePercent">0%</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: var(--warning-color);"></div>
+                        <div class="legend-info">
+                            <span class="legend-label">En attente</span>
+                            <span class="legend-value">{{ pending_directions ?? 0 }}</span>
+                        </div>
+                        <span class="legend-percentage" id="directionsPendingPercent">0%</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: var(--danger-color);"></div>
+                        <div class="legend-info">
+                            <span class="legend-label">Désactivées</span>
+                            <span class="legend-value">{{ disabled_directions ?? 0 }}</span>
+                        </div>
+                        <span class="legend-percentage" id="directionsDisabledPercent">0%</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Diagramme Services -->
+            <div class="pie-chart-container direction-service-chart" data-type="service">
+                <div class="chart-header">
+                    <h3 class="chart-title">
+                        <i class="bi bi-diagram-3"></i>
+                        Services
+                    </h3>
+                </div>
+                <div class="chart-wrapper">
+                    <div class="pie-chart" id="servicesChart"></div>
+                    <div class="chart-center">
+                        <div class="total-count">{{ total_services ?? 0 }}</div>
+                        <div class="total-label">Total</div>
+                    </div>
+                </div>
+                <div class="chart-legend">
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: var(--success-color);"></div>
+                        <div class="legend-info">
+                            <span class="legend-label">Actifs</span>
+                            <span class="legend-value">{{ active_services ?? 0 }}</span>
+                        </div>
+                        <span class="legend-percentage" id="servicesActivePercent">0%</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: var(--warning-color);"></div>
+                        <div class="legend-info">
+                            <span class="legend-label">En attente</span>
+                            <span class="legend-value">{{ pending_services ?? 0 }}</span>
+                        </div>
+                        <span class="legend-percentage" id="servicesPendingPercent">0%</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: var(--danger-color);"></div>
+                        <div class="legend-info">
+                            <span class="legend-label">Désactivés</span>
+                            <span class="legend-value">{{ disabled_services ?? 0 }}</span>
+                        </div>
+                        <span class="legend-percentage" id="servicesDisabledPercent">0%</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Diagramme Projets -->
+            <div class="pie-chart-container projet-tache-chart" data-type="projet">
+                <div class="chart-header">
+                    <h3 class="chart-title">
+                        <i class="bi bi-folder"></i>
+                        Projets
+                    </h3>
+                </div>
+                <div class="chart-wrapper">
+                    <div class="pie-chart" id="projetsChart"></div>
+                    <div class="chart-center">
+                        <div class="total-count">{{ total_projets ?? 0 }}</div>
+                        <div class="total-label">Total</div>
+                    </div>
+                </div>
+                <div class="chart-legend">
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: var(--info-color);"></div>
+                        <div class="legend-info">
+                            <span class="legend-label">Débutés</span>
+                            <span class="legend-value">{{ started_projets ?? 0 }}</span>
+                        </div>
+                        <span class="legend-percentage" id="projetsStartedPercent">0%</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: var(--warning-color);"></div>
+                        <div class="legend-info">
+                            <span class="legend-label">En cours</span>
+                            <span class="legend-value">{{ in_progress_projets ?? 0 }}</span>
+                        </div>
+                        <span class="legend-percentage" id="projetsProgressPercent">0%</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: var(--success-color);"></div>
+                        <div class="legend-info">
+                            <span class="legend-label">Terminés</span>
+                            <span class="legend-value">{{ completed_projets ?? 0 }}</span>
+                        </div>
+                        <span class="legend-percentage" id="projetsCompletedPercent">0%</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: var(--secondary-color);"></div>
+                        <div class="legend-info">
+                            <span class="legend-label">Suspendus</span>
+                            <span class="legend-value">{{ suspended_projets ?? 0 }}</span>
+                        </div>
+                        <span class="legend-percentage" id="projetsSuspendedPercent">0%</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Diagramme Tâches -->
+            <div class="pie-chart-container projet-tache-chart" data-type="tache">
+                <div class="chart-header">
+                    <h3 class="chart-title">
+                        <i class="bi bi-list-task"></i>
+                        Tâches
+                    </h3>
+                </div>
+                <div class="chart-wrapper">
+                    <div class="pie-chart" id="tachesChart"></div>
+                    <div class="chart-center">
+                        <div class="total-count">{{ total_taches ?? 0 }}</div>
+                        <div class="total-label">Total</div>
+                    </div>
+                </div>
+                <div class="chart-legend">
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: var(--info-color);"></div>
+                        <div class="legend-info">
+                            <span class="legend-label">Débutées</span>
+                            <span class="legend-value">{{ started_taches ?? 0 }}</span>
+                        </div>
+                        <span class="legend-percentage" id="tachesStartedPercent">0%</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: var(--warning-color);"></div>
+                        <div class="legend-info">
+                            <span class="legend-label">En cours</span>
+                            <span class="legend-value">{{ in_progress_taches ?? 0 }}</span>
+                        </div>
+                        <span class="legend-percentage" id="tachesProgressPercent">0%</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: var(--success-color);"></div>
+                        <div class="legend-info">
+                            <span class="legend-label">Terminées</span>
+                            <span class="legend-value">{{ completed_taches ?? 0 }}</span>
+                        </div>
+                        <span class="legend-percentage" id="tachesCompletedPercent">0%</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: var(--secondary-color);"></div>
+                        <div class="legend-info">
+                            <span class="legend-label">Suspendues</span>
+                            <span class="legend-value">{{ suspended_taches ?? 0 }}</span>
+                        </div>
+                        <span class="legend-percentage" id="tachesSuspendedPercent">0%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Actions rapides -->
+    {# <div class="dashboard-section">
+        <div class="section-header">
+            <h2 class="section-title">
+                <i class="bi bi-lightning"></i>
+                Actions rapides
+            </h2>
+        </div>
+        <div class="quick-actions">
+            <a href="#" class="action-card">
+                <div class="action-icon">
+                    <i class="bi bi-person-plus"></i>
+                </div>
+                <div class="action-title">Nouvel utilisateur</div>
+                <div class="action-desc">Ajouter manuellement</div>
+            </a>
+            <a href="#" class="action-card">
+                <div class="action-icon">
+                    <i class="bi bi-file-earmark-text"></i>
+                </div>
+                <div class="action-title">Rapport mensuel</div>
+                <div class="action-desc">Générer le rapport</div>
+            </a>
+            <a href="{{ path('admin_notifications') }}" class="action-card">
+                <div class="action-icon">
+                    <i class="bi bi-bell"></i>
+                </div>
+                <div class="action-title">Notifications</div>
+                <div class="action-desc">
+                    {% if unread_notifications_count > 0 %}
+                        <span class="text-danger">{{ unread_notifications_count }} non lues</span>
+                    {% else %}
+                        Voir les notifications
+                    {% endif %}
+                </div>
+            </a>
+            <a href="#" class="action-card">
+                <div class="action-icon">
+                    <i class="bi bi-gear"></i>
+                </div>
+                <div class="action-title">Paramètres</div>
+                <div class="action-desc">Configurer l'application</div>
+            </a>
+        </div>
+    </div> #}
+</div>
+
+<script>
+// SYSTÈME DE DIAGRAMMES CAMEMBERT
+// SYSTÈME DE DIAGRAMMES CAMEMBERT
+class PieChartSystem {
+    constructor() {
+        this.init();
+    }
+
+    init() {
+        console.log('📊 Initialisation système diagrammes camembert');
+        this.calculatePercentages();
+        this.updateCharts();
+        this.setupChartInteractions();
+    }
+
+    // 🎯 CALCULER LES POURCENTAGES - VERSION CORRIGÉE
+    calculatePercentages() {
+        // Directions - utiliser parseInt pour s'assurer d'avoir des nombres
+        const directionsTotal = parseInt('{{ total_directions ?? 0 }}') || 0;
+        if (directionsTotal > 0) {
+            const activeDir = parseInt('{{ active_directions ?? 0 }}') || 0;
+            const pendingDir = parseInt('{{ pending_directions ?? 0 }}') || 0;
+            const disabledDir = parseInt('{{ disabled_directions ?? 0 }}') || 0;
+            
+            document.getElementById('directionsActivePercent').textContent = 
+                Math.round((activeDir / directionsTotal) * 100) + '%';
+            document.getElementById('directionsPendingPercent').textContent = 
+                Math.round((pendingDir / directionsTotal) * 100) + '%';
+            document.getElementById('directionsDisabledPercent').textContent = 
+                Math.round((disabledDir / directionsTotal) * 100) + '%';
+        } else {
+            document.getElementById('directionsActivePercent').textContent = '0%';
+            document.getElementById('directionsPendingPercent').textContent = '0%';
+            document.getElementById('directionsDisabledPercent').textContent = '0%';
+        }
+
+        // Services
+        const servicesTotal = parseInt('{{ total_services ?? 0 }}') || 0;
+        if (servicesTotal > 0) {
+            const activeServ = parseInt('{{ active_services ?? 0 }}') || 0;
+            const pendingServ = parseInt('{{ pending_services ?? 0 }}') || 0;
+            const disabledServ = parseInt('{{ disabled_services ?? 0 }}') || 0;
+            
+            document.getElementById('servicesActivePercent').textContent = 
+                Math.round((activeServ / servicesTotal) * 100) + '%';
+            document.getElementById('servicesPendingPercent').textContent = 
+                Math.round((pendingServ / servicesTotal) * 100) + '%';
+            document.getElementById('servicesDisabledPercent').textContent = 
+                Math.round((disabledServ / servicesTotal) * 100) + '%';
+        } else {
+            document.getElementById('servicesActivePercent').textContent = '0%';
+            document.getElementById('servicesPendingPercent').textContent = '0%';
+            document.getElementById('servicesDisabledPercent').textContent = '0%';
+        }
+
+        // Projets
+        const projetsTotal = parseInt('{{ total_projets ?? 0 }}') || 0;
+        if (projetsTotal > 0) {
+            const startedProj = parseInt('{{ started_projets ?? 0 }}') || 0;
+            const inProgressProj = parseInt('{{ in_progress_projets ?? 0 }}') || 0;
+            const completedProj = parseInt('{{ completed_projets ?? 0 }}') || 0;
+            const suspendedProj = parseInt('{{ suspended_projets ?? 0 }}') || 0;
+            
+            document.getElementById('projetsStartedPercent').textContent = 
+                Math.round((startedProj / projetsTotal) * 100) + '%';
+            document.getElementById('projetsProgressPercent').textContent = 
+                Math.round((inProgressProj / projetsTotal) * 100) + '%';
+            document.getElementById('projetsCompletedPercent').textContent = 
+                Math.round((completedProj / projetsTotal) * 100) + '%';
+            document.getElementById('projetsSuspendedPercent').textContent = 
+                Math.round((suspendedProj / projetsTotal) * 100) + '%';
+        } else {
+            document.getElementById('projetsStartedPercent').textContent = '0%';
+            document.getElementById('projetsProgressPercent').textContent = '0%';
+            document.getElementById('projetsCompletedPercent').textContent = '0%';
+            document.getElementById('projetsSuspendedPercent').textContent = '0%';
+        }
+
+        // Tâches
+        const tachesTotal = parseInt('{{ total_taches ?? 0 }}') || 0;
+        if (tachesTotal > 0) {
+            const startedTache = parseInt('{{ started_taches ?? 0 }}') || 0;
+            const inProgressTache = parseInt('{{ in_progress_taches ?? 0 }}') || 0;
+            const completedTache = parseInt('{{ completed_taches ?? 0 }}') || 0;
+            const suspendedTache = parseInt('{{ suspended_taches ?? 0 }}') || 0;
+            
+            document.getElementById('tachesStartedPercent').textContent = 
+                Math.round((startedTache / tachesTotal) * 100) + '%';
+            document.getElementById('tachesProgressPercent').textContent = 
+                Math.round((inProgressTache / tachesTotal) * 100) + '%';
+            document.getElementById('tachesCompletedPercent').textContent = 
+                Math.round((completedTache / tachesTotal) * 100) + '%';
+            document.getElementById('tachesSuspendedPercent').textContent = 
+                Math.round((suspendedTache / tachesTotal) * 100) + '%';
+        } else {
+            document.getElementById('tachesStartedPercent').textContent = '0%';
+            document.getElementById('tachesProgressPercent').textContent = '0%';
+            document.getElementById('tachesCompletedPercent').textContent = '0%';
+            document.getElementById('tachesSuspendedPercent').textContent = '0%';
+        }
+    }
+
+    // 🎯 METTRE À JOUR LES DIAGRAMMES
+    updateCharts() {
+        this.updateChart('directionsChart', [
+            { value: parseInt('{{ active_directions ?? 0 }}') || 0, color: 'var(--success-color)' },
+            { value: parseInt('{{ pending_directions ?? 0 }}') || 0, color: 'var(--warning-color)' },
+            { value: parseInt('{{ disabled_directions ?? 0 }}') || 0, color: 'var(--danger-color)' }
+        ]);
+
+        this.updateChart('servicesChart', [
+            { value: parseInt('{{ active_services ?? 0 }}') || 0, color: 'var(--success-color)' },
+            { value: parseInt('{{ pending_services ?? 0 }}') || 0, color: 'var(--warning-color)' },
+            { value: parseInt('{{ disabled_services ?? 0 }}') || 0, color: 'var(--danger-color)' }
+        ]);
+
+        this.updateChart('projetsChart', [
+            { value: parseInt('{{ started_projets ?? 0 }}') || 0, color: 'var(--info-color)' },
+            { value: parseInt('{{ in_progress_projets ?? 0 }}') || 0, color: 'var(--warning-color)' },
+            { value: parseInt('{{ completed_projets ?? 0 }}') || 0, color: 'var(--success-color)' },
+            { value: parseInt('{{ suspended_projets ?? 0 }}') || 0, color: 'var(--secondary-color)' }
+        ]);
+
+        this.updateChart('tachesChart', [
+            { value: parseInt('{{ started_taches ?? 0 }}') || 0, color: 'var(--info-color)' },
+            { value: parseInt('{{ in_progress_taches ?? 0 }}') || 0, color: 'var(--warning-color)' },
+            { value: parseInt('{{ completed_taches ?? 0 }}') || 0, color: 'var(--success-color)' },
+            { value: parseInt('{{ suspended_taches ?? 0 }}') || 0, color: 'var(--secondary-color)' }
+        ]);
+    }
+
+    // 🎯 METTRE À JOUR UN DIAGRAMME SPÉCIFIQUE
+    updateChart(chartId, data) {
+        const chart = document.getElementById(chartId);
+        if (!chart) return;
+        
+        const total = data.reduce((sum, item) => sum + item.value, 0);
+        
+        if (total === 0) {
+            chart.style.background = 'conic-gradient(#e5e7eb 0% 100%)';
+            return;
+        }
+
+        let gradientString = '';
+        let currentPercent = 0;
+
+        data.forEach((item, index) => {
+            const percent = (item.value / total) * 100;
+            const startPercent = currentPercent;
+            const endPercent = currentPercent + percent;
+            
+            gradientString += `${item.color} ${startPercent}% ${endPercent}%`;
+            if (index < data.length - 1) {
+                gradientString += ', ';
+            }
+            
+            currentPercent = endPercent;
+        });
+
+        chart.style.background = `conic-gradient(${gradientString})`;
+    }
+
+    // 🎯 INTERACTIONS DES DIAGRAMMES
+    setupChartInteractions() {
+        document.querySelectorAll('.legend-item').forEach(item => {
+            item.addEventListener('mouseenter', () => {
+                item.style.background = '#f8fafc';
+                item.style.transform = 'translateX(5px)';
+            });
+
+            item.addEventListener('mouseleave', () => {
+                item.style.background = '';
+                item.style.transform = '';
+            });
+        });
+    }
+}
+
+// SYSTÈME CRITIQUE D'INITIALISATION DES BOUTONS
+class ButtonInitializationSystem {
+    constructor() {
+        this.isInitialized = false;
+        this.initializedElements = new Set();
+        this.init();
+    }
+
+    init() {
+        console.log('🎯 Initialisation système boutons (version sans polling)');
+        
+        // Initialiser immédiatement les éléments existants
+        this.initializeExistingElements();
+        
+        // Observer les changements du DOM pour les nouveaux éléments
+        this.setupDOMObserver();
+        
+        // S'assurer que l'initialisation se fait même après un délai
+        this.setupDelayedInitialization();
+        
+        this.isInitialized = true;
+    }
+
+    initializeExistingElements() {
+        console.log('🔄 Initialisation des éléments existants...');
+        
+        // Initialiser tous les selects de rôle
+        this.initializeAllRoleSelects();
+        
+        // Initialiser tous les boutons
+        this.initializeAllButtons();
+        
+        // Vérifier la surbrillance
+        this.checkForHighlight();
+        
+        console.log('✅ Éléments existants initialisés');
+    }
+
+    initializeAllRoleSelects() {
+        const roleSelects = document.querySelectorAll('.role-select, .role-select-mobile');
+        console.log(`🔍 ${roleSelects.length} selects de rôle trouvés`);
+        
+        roleSelects.forEach(select => {
+            this.initializeSingleSelect(select);
+        });
+    }
+
+    initializeSingleSelect(selectElement) {
+        const selectId = selectElement.id;
+        
+        // Éviter les doubles initialisations
+        if (this.initializedElements.has(selectId)) {
+            return;
+        }
+
+        const version = selectElement.classList.contains('role-select-mobile') ? 'mobile' : 'desktop';
+        const userIm = selectId.replace('role-select-', '').replace('role-select-mobile-', '');
+        
+        // Trouver le bouton correspondant
+        const approveBtnId = version === 'mobile' 
+            ? `approve-btn-mobile-${userIm}`
+            : `approve-btn-${userIm}`;
+        
+        const approveBtn = document.getElementById(approveBtnId);
+        
+        if (approveBtn) {
+            // État initial basé sur la valeur actuelle
+            const hasValue = selectElement.value !== '';
+            this.updateSelectAndButton(selectElement, approveBtn, hasValue);
+            
+            // Événement de changement
+            selectElement.addEventListener('change', () => {
+                const isValid = selectElement.value !== '';
+                this.updateSelectAndButton(selectElement, approveBtn, isValid);
+            });
+            
+            // Marquer comme initialisé
+            this.initializedElements.add(selectId);
+            selectElement.dataset.initialized = 'true';
+            
+            console.log(`✅ Select ${selectId} initialisé`);
+        }
+    }
+
+    initializeAllButtons() {
+        // Boutons d'approbation
+        const approveBtns = document.querySelectorAll('.approve-btn, .approve-btn-mobile');
+        approveBtns.forEach(btn => {
+            this.initializeApproveButton(btn);
+        });
+
+        // Boutons de rejet
+        const rejectBtns = document.querySelectorAll('.reject-btn, .reject-btn-mobile');
+        rejectBtns.forEach(btn => {
+            this.initializeRejectButton(btn);
+        });
+
+        console.log(`✅ ${approveBtns.length} boutons approbation et ${rejectBtns.length} boutons rejet initialisés`);
+    }
+
+    initializeApproveButton(button) {
+        const buttonId = button.id;
+        
+        if (this.initializedElements.has(buttonId)) {
+            return;
+        }
+
+        const version = button.classList.contains('approve-btn-mobile') ? 'mobile' : 'desktop';
+        const userIm = button.getAttribute('data-user-im');
+        
+        // Trouver le select correspondant
+        const selectId = `role-select-${version === 'mobile' ? 'mobile-' : ''}${userIm}`;
+        const select = document.getElementById(selectId);
+        
+        // Si le select existe, s'assurer qu'il est initialisé
+        if (select && !this.initializedElements.has(selectId)) {
+            this.initializeSingleSelect(select);
+        }
+        
+        // Ajouter l'événement de clic
+        button.addEventListener('click', (e) => {
+            e.preventDefault();
+            
+            if (button.disabled) {
+                this.showRoleRequiredAlert(button, version);
+                return;
+            }
+            
+            const userName = button.getAttribute('data-user-name');
+            console.log(`📝 Tentative approbation: ${userName} (${userIm})`);
+            
+            // Utiliser le système modal
+            if (window.pendingListModalSystem) {
+                window.pendingListModalSystem.handleApprove(userIm, userName, version);
+            }
+        });
+
+        this.initializedElements.add(buttonId);
+        button.dataset.initialized = 'true';
+    }
+
+    initializeRejectButton(button) {
+        const buttonId = button.id;
+        
+        if (this.initializedElements.has(buttonId)) {
+            return;
+        }
+
+        const version = button.classList.contains('reject-btn-mobile') ? 'mobile' : 'desktop';
+        const userIm = button.getAttribute('data-user-im');
+        const userName = button.getAttribute('data-user-name');
+        
+        // Ajouter l'événement de clic
+        button.addEventListener('click', (e) => {
+            e.preventDefault();
+            console.log(`📝 Tentative rejet: ${userName} (${userIm})`);
+            
+            // Utiliser le système modal
+            if (window.pendingListModalSystem) {
+                window.pendingListModalSystem.handleReject(userIm, userName, version);
+            }
+        });
+
+        this.initializedElements.add(buttonId);
+        button.dataset.initialized = 'true';
+    }
+
+    updateSelectAndButton(selectElement, button, isValid) {
+        // Mettre à jour l'apparence du select
+        selectElement.classList.remove('is-invalid', 'is-valid');
+        if (isValid) {
+            selectElement.classList.add('is-valid');
+        } else {
+            selectElement.classList.add('is-invalid');
+        }
+        
+        // Mettre à jour l'état du bouton
+        if (button) {
+            button.disabled = !isValid;
+        }
+    }
+
+    showRoleRequiredAlert(button, version) {
+        const userIm = button.getAttribute('data-user-im');
+        const select = document.getElementById(`role-select-${version === 'mobile' ? 'mobile-' : ''}${userIm}`);
+        
+        if (!select) return;
+        
+        // Animation de shake
+        select.classList.add('shake-animation');
+        select.focus();
+        
+        setTimeout(() => {
+            select.classList.remove('shake-animation');
+        }, 500);
+        
+        console.log('⚠️ Rôle requis pour valider');
+    }
+
+    setupDOMObserver() {
+        const observer = new MutationObserver((mutations) => {
+            let shouldInitialize = false;
+            
+            mutations.forEach((mutation) => {
+                if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
+                    mutation.addedNodes.forEach((node) => {
+                        if (node.nodeType === 1) {
+                            // Vérifier si le nœud contient des éléments à initialiser
+                            if (node.matches('.role-select, .role-select-mobile, .approve-btn, .approve-btn-mobile, .reject-btn, .reject-btn-mobile') ||
+                                node.querySelector('.role-select, .role-select-mobile, .approve-btn, .approve-btn-mobile, .reject-btn, .reject-btn-mobile')) {
+                                shouldInitialize = true;
+                            }
+                        }
+                    });
+                }
+            });
+            
+            if (shouldInitialize) {
+                console.log('🆕 Nouveaux éléments détectés dans le DOM');
+                setTimeout(() => {
+                    this.initializeExistingElements();
+                }, 100);
+            }
+        });
+        
+        // Observer le conteneur principal et le document entier
+        const container = document.getElementById('pendingListContainer');
+        if (container) {
+            observer.observe(container, {
+                childList: true,
+                subtree: true
+            });
+        }
+        
+        // Observer aussi le body pour les cas extrêmes
+        observer.observe(document.body, {
+            childList: true,
+            subtree: false
+        });
+        
+        this.observer = observer;
+    }
+
+    setupDelayedInitialization() {
+        // Réessayer l'initialisation après 1 seconde (pour les chargements lents)
+        setTimeout(() => {
+            const uninitializedSelects = document.querySelectorAll('.role-select:not([data-initialized]), .role-select-mobile:not([data-initialized])');
+            const uninitializedButtons = document.querySelectorAll('.approve-btn:not([data-initialized]), .approve-btn-mobile:not([data-initialized]), .reject-btn:not([data-initialized]), .reject-btn-mobile:not([data-initialized])');
+            
+            if (uninitializedSelects.length > 0 || uninitializedButtons.length > 0) {
+                console.log('⏱️ Réinitialisation différée pour éléments non initialisés');
+                this.initializeExistingElements();
+            }
+        }, 1000);
+    }
+
+    checkForHighlight() {
+        const highlightedRow = document.querySelector('.highlighted-user');
+        const highlightedCard = document.querySelector('.user-card.highlighted-user');
+        
+        if (highlightedRow) {
+            setTimeout(() => {
+                highlightedRow.scrollIntoView({ 
+                    behavior: 'smooth', 
+                    block: 'center',
+                    inline: 'nearest'
+                });
+            }, 500);
+        }
+        
+        if (highlightedCard) {
+            setTimeout(() => {
+                highlightedCard.scrollIntoView({ 
+                    behavior: 'smooth', 
+                    block: 'center',
+                    inline: 'nearest'
+                });
+            }, 500);
+        }
+    }
+
+    // Méthode pour forcer la réinitialisation (utile après rafraîchissement AJAX manuel)
+    reinitialize() {
+        console.log('🔄 Réinitialisation forcée du système de boutons');
+        this.initializedElements.clear();
+        this.initializeExistingElements();
+    }
+}
+
+// SYSTÈME DE RAFRAÎCHISSEMENT MANUEL
+class ManualRefreshSystem {
+    constructor() {
+        this.init();
+    }
+
+    init() {
+        console.log('🔄 Initialisation système rafraîchissement manuel');
+        this.addRefreshButton();
+    }
+
+    async refreshPendingList() {
+        try {
+            console.log('🔄 Rafraîchissement manuel de la liste...');
+            
+            const response = await fetch('{{ path('app_dashboard_admin') }}?partial=pending_list&_=' + Date.now(), {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            });
+            
+            if (!response.ok) throw new Error('Erreur lors du chargement');
+            
+            const html = await response.text();
+            
+            const container = document.getElementById('pendingListContainer');
+            if (container) {
+                // Animation de transition
+                container.style.opacity = '0.7';
+                container.style.transition = 'opacity 0.3s ease';
+                
+                setTimeout(() => {
+                    container.innerHTML = html;
+                    container.style.opacity = '1';
+                    
+                    // Réinitialiser les systèmes après le rafraîchissement
+                    this.reinitializeSystems();
+                    
+                    console.log('✅ Liste rafraîchie avec succès');
+                }, 300);
+            }
+            
+        } catch (error) {
+            console.error('❌ Erreur rafraîchissement:', error);
+            alert('Erreur lors du rafraîchissement de la liste');
+        }
+    }
+
+    reinitializeSystems() {
+        // Réinitialiser le système de boutons
+        if (window.buttonInitializationSystem) {
+            window.buttonInitializationSystem.reinitialize();
+        }
+        
+        // Réinitialiser le système modal
+        if (window.pendingListModalSystem) {
+            window.pendingListModalSystem.init();
+        }
+        
+        // Réinitialiser les modals Bootstrap
+        reinitializeBootstrapModals();
+        
+        // Vérifier la surbrillance
+        this.checkForHighlight();
+        
+        // METTRE À JOUR LES STATISTIQUES DES AGENTS
+        this.updateAgentStats();
+    }
+
+    async updateAgentStats() {
+        try {
+            // Récupérer les nouvelles statistiques via une requête AJAX
+            const response = await fetch('{{ path('app_dashboard_admin_stats') }}?_=' + Date.now());
+            if (response.ok) {
+                const data = await response.json();
+                
+                // Mettre à jour les cartes d'aperçu des agents
+                document.querySelectorAll('.stat-card-compact h3').forEach(card => {
+                    const label = card.nextElementSibling?.textContent?.toLowerCase();
+                    if (label) {
+                        if (label.includes('utilisateurs totaux')) {
+                            card.textContent = data.total_users || 0;
+                        } else if (label.includes('comptes actifs')) {
+                            card.textContent = data.active_users || 0;
+                        } else if (label.includes('en attente')) {
+                            card.textContent = data.pending_users || 0;
+                        } else if (label.includes('désactivés')) {
+                            card.textContent = data.disabled_users || 0;
+                        }
+                    }
+                });
+                
+                // Mettre à jour le badge de demande
+                const pendingCountBadge = document.getElementById('pendingCountBadge');
+                if (pendingCountBadge) {
+                    pendingCountBadge.textContent = data.pending_users + ' demandes';
+                }
+                
+                console.log('📊 Statistiques agents mises à jour');
+            }
+        } catch (error) {
+            console.error('❌ Erreur mise à jour stats agents:', error);
+        }
+    }
+
+    checkForHighlight() {
+        const highlightedRow = document.querySelector('.highlighted-user');
+        const highlightedCard = document.querySelector('.user-card.highlighted-user');
+        
+        if (highlightedRow || highlightedCard) {
+            console.log('🎯 Utilisateur mis en évidence détecté');
+        }
+    }
+
+    addRefreshButton() {
+        const sectionHeader = document.querySelector('.section-header-inscription');
+        if (sectionHeader && !sectionHeader.querySelector('.manual-refresh-btn')) {
+            const refreshBtn = document.createElement('button');
+            refreshBtn.className = 'btn btn-sm btn-outline-primary ms-2 manual-refresh-btn';
+            refreshBtn.innerHTML = '<i class="bi bi-arrow-clockwise"></i>';
+            refreshBtn.title = 'Actualiser la liste manuellement';
+            refreshBtn.onclick = (e) => {
+                e.preventDefault();
+                this.refreshPendingList();
+            };
+            sectionHeader.appendChild(refreshBtn);
+        }
+    }
+}
+
+// SYSTÈME DE FILTRES POUR LES STATISTIQUES - VERSION CORRIGÉE
+class StatutFilterSystem {
+    constructor() {
+        this.currentDirectionServiceFilter = 'all';
+        this.currentProjetTacheFilter = 'all';
+        this.init();
+    }
+
+    init() {
+        console.log('🎛️ Initialisation système filtres statuts');
+        this.setupFilterEvents();
+        this.updateCharts();
+    }
+
+    // 🎛️ CONFIGURATION DES ÉVÉNEMENTS DES FILTRES
+    setupFilterEvents() {
+        // Filtres pour Directions & Services
+        document.querySelectorAll('#directionServiceFilters .filter-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.setActiveFilter('directionService', btn.dataset.statut);
+            });
+        });
+
+        // Filtres pour Projets & Tâches
+        document.querySelectorAll('#projetTacheFilters .filter-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.setActiveFilter('projetTache', btn.dataset.statut);
+            });
+        });
+    }
+
+    // 🎯 DÉFINIR LE FILTRE ACTIF
+    setActiveFilter(filterGroup, statut) {
+        if (filterGroup === 'directionService') {
+            this.currentDirectionServiceFilter = statut;
+            this.updateFilterButtons('directionServiceFilters', statut);
+        } else {
+            this.currentProjetTacheFilter = statut;
+            this.updateFilterButtons('projetTacheFilters', statut);
+        }
+        
+        this.updateCharts();
+    }
+
+    // 🎯 METTRE À JOUR L'ÉTAT DES BOUTONS DE FILTRE
+    updateFilterButtons(containerId, activeStatut) {
+        document.querySelectorAll(`#${containerId} .filter-btn`).forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.statut === activeStatut);
+        });
+    }
+
+    // 📊 METTRE À JOUR LES DIAGRAMMES EN FONCTION DES FILTRES
+    updateCharts() {
+        this.updateDirectionServiceCharts();
+        this.updateProjetTacheCharts();
+    }
+
+    // 📊 METTRE À JOUR LES DIAGRAMMES DIRECTIONS & SERVICES
+    updateDirectionServiceCharts() {
+        const filter = this.currentDirectionServiceFilter;
+        
+        // Directions
+        this.updateSingleChart('direction', filter, {
+            active: parseInt('{{ active_directions ?? 0 }}') || 0,
+            pending: parseInt('{{ pending_directions ?? 0 }}') || 0,
+            disabled: parseInt('{{ disabled_directions ?? 0 }}') || 0,
+            total: parseInt('{{ total_directions ?? 0 }}') || 0
+        });
+
+        // Services
+        this.updateSingleChart('service', filter, {
+            active: parseInt('{{ active_services ?? 0 }}') || 0,
+            pending: parseInt('{{ pending_services ?? 0 }}') || 0,
+            disabled: parseInt('{{ disabled_services ?? 0 }}') || 0,
+            total: parseInt('{{ total_services ?? 0 }}') || 0
+        });
+    }
+
+    // 📊 METTRE À JOUR LES DIAGRAMMES PROJETS & TÂCHES
+    updateProjetTacheCharts() {
+        const filter = this.currentProjetTacheFilter;
+        
+        // Projets
+        this.updateSingleChart('projet', filter, {
+            started: parseInt('{{ started_projets ?? 0 }}') || 0,
+            in_progress: parseInt('{{ in_progress_projets ?? 0 }}') || 0,
+            completed: parseInt('{{ completed_projets ?? 0 }}') || 0,
+            suspended: parseInt('{{ suspended_projets ?? 0 }}') || 0,
+            total: parseInt('{{ total_projets ?? 0 }}') || 0
+        });
+
+        // Tâches
+        this.updateSingleChart('tache', filter, {
+            started: parseInt('{{ started_taches ?? 0 }}') || 0,
+            in_progress: parseInt('{{ in_progress_taches ?? 0 }}') || 0,
+            completed: parseInt('{{ completed_taches ?? 0 }}') || 0,
+            suspended: parseInt('{{ suspended_taches ?? 0 }}') || 0,
+            total: parseInt('{{ total_taches ?? 0 }}') || 0
+        });
+    }
+
+    // 📊 METTRE À JOUR UN DIAGRAMME INDIVIDUEL
+    updateSingleChart(type, filter, data) {
+        const chartElement = document.querySelector(`.pie-chart-container[data-type="${type}"]`);
+        if (!chartElement) return;
+        
+        const totalElement = chartElement.querySelector('.total-count');
+        const chartId = `${type}sChart`;
+        
+        let filteredData = [];
+        let filteredTotal = 0;
+
+        if (type === 'direction' || type === 'service') {
+            // Filtrage pour Directions & Services
+            switch (filter) {
+                case 'active':
+                    filteredData = [{ value: data.active, color: 'var(--success-color)' }];
+                    filteredTotal = data.active;
+                    break;
+                case 'pending':
+                    filteredData = [{ value: data.pending, color: 'var(--warning-color)' }];
+                    filteredTotal = data.pending;
+                    break;
+                case 'disabled':
+                    filteredData = [{ value: data.disabled, color: 'var(--danger-color)' }];
+                    filteredTotal = data.disabled;
+                    break;
+                default: // 'all'
+                    filteredData = [
+                        { value: data.active, color: 'var(--success-color)' },
+                        { value: data.pending, color: 'var(--warning-color)' },
+                        { value: data.disabled, color: 'var(--danger-color)' }
+                    ];
+                    filteredTotal = data.total;
+            }
+        } else {
+            // Filtrage pour Projets & Tâches
+            switch (filter) {
+                case 'started':
+                    filteredData = [{ value: data.started, color: 'var(--info-color)' }];
+                    filteredTotal = data.started;
+                    break;
+                case 'in_progress':
+                    filteredData = [{ value: data.in_progress, color: 'var(--warning-color)' }];
+                    filteredTotal = data.in_progress;
+                    break;
+                case 'completed':
+                    filteredData = [{ value: data.completed, color: 'var(--success-color)' }];
+                    filteredTotal = data.completed;
+                    break;
+                case 'suspended':
+                    filteredData = [{ value: data.suspended, color: 'var(--secondary-color)' }];
+                    filteredTotal = data.suspended;
+                    break;
+                default: // 'all'
+                    filteredData = [
+                        { value: data.started, color: 'var(--info-color)' },
+                        { value: data.in_progress, color: 'var(--warning-color)' },
+                        { value: data.completed, color: 'var(--success-color)' },
+                        { value: data.suspended, color: 'var(--secondary-color)' }
+                    ];
+                    filteredTotal = data.total;
+            }
+        }
+
+        // Mettre à jour le total affiché
+        if (totalElement) {
+            totalElement.textContent = filteredTotal;
+        }
+
+        // Mettre à jour le diagramme
+        this.updateChartVisual(chartId, filteredData);
+
+        // Mettre à jour les pourcentages dans la légende
+        this.updateLegendPercentages(chartElement, filteredData, filteredTotal);
+    }
+
+    // 🎨 METTRE À JOUR L'APPEARANCE VISUELLE DU DIAGRAMME
+    updateChartVisual(chartId, data) {
+        const chart = document.getElementById(chartId);
+        if (!chart) return;
+        
+        const total = data.reduce((sum, item) => sum + item.value, 0);
+        
+        if (total === 0) {
+            chart.style.background = 'conic-gradient(#e5e7eb 0% 100%)';
+            return;
+        }
+
+        let gradientString = '';
+        let currentPercent = 0;
+
+        data.forEach((item, index) => {
+            if (item.value > 0) {
+                const percent = (item.value / total) * 100;
+                const startPercent = currentPercent;
+                const endPercent = currentPercent + percent;
+                
+                if (gradientString) gradientString += ', ';
+                gradientString += `${item.color} ${startPercent}% ${endPercent}%`;
+                
+                currentPercent = endPercent;
+            }
+        });
+
+        // Si un seul statut est sélectionné, créer un diagramme complet avec cette couleur
+        if (data.length === 1 && data[0].value > 0) {
+            gradientString = `${data[0].color} 0% 100%`;
+        }
+
+        chart.style.background = `conic-gradient(${gradientString})`;
+    }
+
+    // 📈 METTRE À JOUR LES POURCENTAGES DANS LA LÉGENDE
+    updateLegendPercentages(chartElement, data, total) {
+        const legendItems = chartElement.querySelectorAll('.legend-item');
+        
+        legendItems.forEach(item => {
+            const valueElement = item.querySelector('.legend-value');
+            const percentElement = item.querySelector('.legend-percentage');
+            const statut = this.getStatutFromLegend(item.querySelector('.legend-label').textContent);
+            
+            let value = 0;
+            
+            // Trouver la valeur correspondante dans les données
+            data.forEach(dataItem => {
+                if (this.getColorForStatut(statut) === dataItem.color) {
+                    value = dataItem.value;
+                }
+            });
+            
+            if (valueElement) {
+                valueElement.textContent = value;
+            }
+            
+            // Calculer le pourcentage
+            const percentage = total > 0 ? Math.round((value / total) * 100) : 0;
+            if (percentElement) {
+                percentElement.textContent = `${percentage}%`;
+            }
+        });
+    }
+
+    // 🎯 OBTENIR LE STATUT À PARTIR DU LABEL
+    getStatutFromLegend(label) {
+        const mappings = {
+            'Actives': 'active',
+            'Actifs': 'active',
+            'En attente': 'pending',
+            'Débutés': 'started',
+            'Débutées': 'started',
+            'En cours': 'in_progress',
+            'Terminés': 'completed',
+            'Terminées': 'completed',
+            'Désactivées': 'disabled',
+            'Désactivés': 'disabled',
+            'Suspendus': 'suspended',
+            'Suspendues': 'suspended'
+        };
+        
+        return mappings[label] || label.toLowerCase();
+    }
+
+    // 🎨 OBTENIR LA COULEUR POUR UN STATUT
+    getColorForStatut(statut) {
+        const colors = {
+            'active': 'var(--success-color)',
+            'pending': 'var(--warning-color)',
+            'disabled': 'var(--danger-color)',
+            'started': 'var(--info-color)',
+            'in_progress': 'var(--warning-color)',
+            'completed': 'var(--success-color)',
+            'suspended': 'var(--secondary-color)'
+        };
+        
+        return colors[statut] || 'var(--primary-color)';
+    }
+}
+
+// SYSTÈME DE GESTION DES MODALS - VÉRIFICATION POUR ÉVITER LA DOUBLE DÉCLARATION
+if (typeof window.PendingListModalSystem === 'undefined') {
+    window.PendingListModalSystem = class PendingListModalSystem {
+        constructor() {
+            this.currentApproveForm = null;
+            this.currentRejectForm = null;
+            this.isMobile = window.innerWidth <= 768;
+            this.init();
+            this.setupResponsive();
+        }
+
+        setupResponsive() {
+            window.addEventListener('resize', () => {
+                this.isMobile = window.innerWidth <= 768;
+            });
+        }
+
+        init() {
+            console.log('🎯 Initialisation système modals pending list');
+            this.setupModalDelegation();
+            this.setupFormDelegation();
+            this.checkForHighlight();
+        }
+        
+        setupModalDelegation() {
+            document.addEventListener('click', (e) => {
+                if (e.target.matches('#confirmApprove, #confirmApprove *')) {
+                    e.preventDefault();
+                    this.handleConfirmApprove();
+                    return;
+                }
+                
+                if (e.target.matches('#confirmReject, #confirmReject *')) {
+                    e.preventDefault();
+                    this.handleConfirmReject();
+                    return;
+                }
+                
+                if (e.target.matches('#cancelApproveBtn, #cancelApproveBtn *')) {
+                    e.preventDefault();
+                    this.handleCancelModal('approveModal');
+                    return;
+                }
+                
+                if (e.target.matches('#cancelRejectBtn, #cancelRejectBtn *')) {
+                    e.preventDefault();
+                    this.handleCancelModal('rejectModal');
+                    return;
+                }
+                
+                if (e.target.matches('.btn-close-custom, .btn-close-custom *')) {
+                    e.preventDefault();
+                    const modal = e.target.closest('.modal');
+                    if (modal) {
+                        this.handleCancelModal(modal.id);
+                    }
+                    return;
+                }
+            });
+            
+            document.addEventListener('hidden.bs.modal', (e) => {
+                const modal = e.target;
+                this.handleModalHidden(modal);
+            });
+        }
+        
+        setupFormDelegation() {
+            // La délégation est maintenant gérée par ButtonInitializationSystem
+            // Cette méthode est conservée pour compatibilité
+        }
+        
+        handleConfirmApprove() {
+            const btn = document.getElementById('confirmApprove');
+            if (!btn) {
+                console.error('❌ Bouton confirmApprove non trouvé');
+                return;
+            }
+            
+            this.showLoading(btn);
+            this.disableCancelButtons(true);
+            
+            setTimeout(() => {
+                if (this.currentApproveForm) {
+                    console.log('✅ Confirmation approbation soumise');
+                    this.currentApproveForm.submit();
+                } else {
+                    console.error('❌ Formulaire d\'approbation non trouvé');
+                    this.hideLoading(btn);
+                    this.disableCancelButtons(false);
+                }
+            }, 500);
+        }
+        
+        handleConfirmReject() {
+            const btn = document.getElementById('confirmReject');
+            if (!btn) {
+                console.error('❌ Bouton confirmReject non trouvé');
+                return;
+            }
+            
+            this.showLoading(btn);
+            this.disableCancelButtons(true);
+            
+            setTimeout(() => {
+                if (this.currentRejectForm) {
+                    console.log('❌ Confirmation rejet soumise');
+                    this.currentRejectForm.submit();
+                } else {
+                    console.error('❌ Formulaire de rejet non trouvé');
+                    this.hideLoading(btn);
+                    this.disableCancelButtons(false);
+                }
+            }, 500);
+        }
+        
+        handleCancelModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (!modal) {
+                console.error(`❌ Modal ${modalId} non trouvé`);
+                return;
+            }
+            
+            const bsModal = bootstrap.Modal.getInstance(modal);
+            if (bsModal) {
+                bsModal.hide();
+            }
+        }
+        
+        handleModalHidden(modal) {
+            const modalId = modal.id;
+            
+            if (modalId === 'approveModal') {
+                const approveBtn = document.getElementById('confirmApprove');
+                if (approveBtn) {
+                    this.hideLoading(approveBtn);
+                    this.disableCancelButtons(false);
+                }
+                this.currentApproveForm = null;
+            } else if (modalId === 'rejectModal') {
+                const rejectBtn = document.getElementById('confirmReject');
+                if (rejectBtn) {
+                    this.hideLoading(rejectBtn);
+                    this.disableCancelButtons(false);
+                }
+                this.currentRejectForm = null;
+            }
+        }
+
+        showLoading(button) {
+            if (button) {
+                button.classList.add('loading');
+                button.disabled = true;
+            }
+        }
+
+        hideLoading(button) {
+            if (button) {
+                button.classList.remove('loading');
+                button.disabled = false;
+            }
+        }
+
+        disableCancelButtons(disabled) {
+            const cancelApproveBtn = document.getElementById('cancelApproveBtn');
+            const cancelRejectBtn = document.getElementById('cancelRejectBtn');
+            
+            if (cancelApproveBtn) cancelApproveBtn.disabled = disabled;
+            if (cancelRejectBtn) cancelRejectBtn.disabled = disabled;
+        }
+
+        handleApprove(userIm, userName, version) {
+            const formId = version === 'mobile' ? `approve-form-mobile-${userIm}` : `approve-form-${userIm}`;
+            const form = document.getElementById(formId);
+            
+            if (!form) {
+                console.error(`❌ Formulaire non trouvé: ${formId}`);
+                return;
+            }
+            
+            const roleSelect = form.querySelector(version === 'mobile' ? '.role-select-mobile' : '.role-select');
+            
+            if (!roleSelect) {
+                console.error(`❌ Sélecteur de rôle non trouvé pour: ${userIm}`);
+                return;
+            }
+
+            if (!roleSelect.value) {
+                const btnId = version === 'mobile' ? `approve-btn-mobile-${userIm}` : `approve-btn-${userIm}`;
+                const button = document.getElementById(btnId);
+                if (button) {
+                    this.showRoleRequiredAlert(button, version);
+                }
+                return;
+            }
+
+            this.currentApproveForm = form;
+            
+            const approveBtn = document.getElementById('confirmApprove');
+            if (approveBtn) {
+                this.hideLoading(approveBtn);
+                this.disableCancelButtons(false);
+            }
+            
+            const approveUserName = document.getElementById('approveUserName');
+            const selectedRoleText = document.getElementById('selectedRoleText');
+            
+            if (approveUserName) approveUserName.textContent = userName;
+            
+            const selectedOption = roleSelect.options[roleSelect.selectedIndex];
+            if (selectedRoleText) selectedRoleText.textContent = selectedOption.text;
+            
+            const modalElement = document.getElementById('approveModal');
+            if (modalElement) {
+                const modal = new bootstrap.Modal(modalElement);
+                modal.show();
+                
+                console.log(`✅ Modal approbation ouvert pour: ${userName}`);
+            } else {
+                console.error('❌ Modal approbation non trouvé');
+            }
+        }
+
+        handleReject(userIm, userName, version) {
+            const formId = version === 'mobile' ? `reject-form-mobile-${userIm}` : `reject-form-${userIm}`;
+            const form = document.getElementById(formId);
+            
+            if (!form) {
+                console.error(`❌ Formulaire de rejet non trouvé: ${formId}`);
+                return;
+            }
+            
+            this.currentRejectForm = form;
+            
+            const rejectBtn = document.getElementById('confirmReject');
+            if (rejectBtn) {
+                this.hideLoading(rejectBtn);
+                this.disableCancelButtons(false);
+            }
+            
+            const rejectUserName = document.getElementById('rejectUserName');
+            if (rejectUserName) rejectUserName.textContent = userName;
+            
+            const modalElement = document.getElementById('rejectModal');
+            if (modalElement) {
+                const modal = new bootstrap.Modal(modalElement);
+                modal.show();
+                
+                console.log(`❌ Modal rejet ouvert pour: ${userName}`);
+            } else {
+                console.error('❌ Modal rejet non trouvé');
+            }
+        }
+
+        checkForHighlight() {
+            const highlightedRow = document.querySelector('.highlighted-user');
+            const highlightedCard = document.querySelector('.user-card.highlighted-user');
+            
+            if (highlightedRow) {
+                highlightedRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+            
+            if (highlightedCard) {
+                highlightedCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+            
+            if (highlightedRow || highlightedCard) {
+                console.log('🎯 Utilisateur mis en évidence détecté');
+            }
+        }
+    };
+}
+
+// FONCTION POUR RÉINITIALISER LES MODALS BOOTSTRAP
+function reinitializeBootstrapModals() {
+    const modalIds = ['approveModal', 'rejectModal'];
+    
+    modalIds.forEach(modalId => {
+        const modalElement = document.getElementById(modalId);
+        if (modalElement) {
+            const oldInstance = bootstrap.Modal.getInstance(modalElement);
+            if (oldInstance) {
+                oldInstance.dispose();
+            }
+            
+            new bootstrap.Modal(modalElement, {
+                backdrop: 'static',
+                keyboard: false
+            });
+            
+            console.log(`✅ Modal ${modalId} réinitialisé`);
+        }
+    });
+}
+
+// FONCTION DE DÉPANNAGE
+window.forceButtonInit = function() {
+    console.log('🛠️ Forçage manuel de l\'initialisation des boutons');
+    
+    if (window.buttonInitializationSystem) {
+        window.buttonInitializationSystem.reinitialize();
+    }
+    
+    if (window.pendingListModalSystem) {
+        window.pendingListModalSystem.init();
+    }
+    
+    reinitializeBootstrapModals();
+    
+    console.log('✅ Initialisation forcée terminée');
+};
+
+// 🚀 DÉMARRAGE DES SYSTÈMES - COMBINAISON
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('🚀 Démarrage des systèmes combinés');
+    
+    // 1. Système de diagrammes
+    window.pieChartSystem = new PieChartSystem();
+    
+    // 2. Système CRITIQUE d'initialisation des boutons
+    window.buttonInitializationSystem = new ButtonInitializationSystem();
+    
+    // 3. Système de rafraîchissement manuel
+    window.dashboardRefreshSystem = new ManualRefreshSystem();
+    
+    // 4. Système de filtres
+    window.statutFilterSystem = new StatutFilterSystem();
+    
+    // 5. Système modal (avec vérification pour éviter double déclaration)
+    window.pendingListModalSystem = new window.PendingListModalSystem();
+    
+    console.log('✅ Tous les systèmes initialisés');
+    
+    // Vérification finale
+    setTimeout(() => {
+        const totalUsers = parseInt('{{ pending_users|default(0) }}') || 0;
+        const totalButtons = document.querySelectorAll('.approve-btn, .reject-btn').length;
+        
+        console.log(`📊 Vérification: ${totalUsers} utilisateurs en attente, ${totalButtons} boutons trouvés`);
+        
+        if (totalUsers > 0 && totalButtons === 0) {
+            console.warn('⚠️ Problème détecté: utilisateurs mais pas de boutons');
+            window.forceButtonInit();
+        }
+    }, 1500);
+});
+
+// GESTION DES CHANGEMENTS DE RÔLE POUR LE SYSTÈME DE BOUTONS
+document.addEventListener('change', (e) => {
+    if (e.target.matches('.role-select, .role-select-mobile')) {
+        // Cette logique est maintenant gérée par ButtonInitializationSystem
+        // Laisser le gestionnaire pour compatibilité
+        const version = e.target.matches('.role-select-mobile') ? 'mobile' : 'desktop';
+        const userIm = e.target.id.replace('role-select-', '').replace('role-select-mobile-', '');
+        
+        const approveBtnId = version === 'mobile' 
+            ? `approve-btn-mobile-${userIm}`
+            : `approve-btn-${userIm}`;
+        
+        const approveBtn = document.getElementById(approveBtnId);
+        if (approveBtn) {
+            const hasValue = e.target.value !== '';
+            
+            // Mettre à jour l'apparence
+            e.target.classList.remove('is-invalid', 'is-valid');
+            if (hasValue) {
+                e.target.classList.add('is-valid');
+            } else {
+                e.target.classList.add('is-invalid');
+            }
+            
+            // Mettre à jour le bouton
+            approveBtn.disabled = !hasValue;
+        }
+    }
+});
+</script>
+{% endblock %}

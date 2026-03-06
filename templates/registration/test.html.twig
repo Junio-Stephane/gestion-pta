@@ -1,0 +1,1200 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Inscription{% endblock %}
+
+{% block stylesheets %}
+<style>
+/* Reset et styles de base */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #964ee3 0%, #75165f 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    padding: 20px;
+}
+
+/* Container principal - VERTICAL ET ÉLARGI */
+.auth-container {
+    display: flex;
+    flex-direction: column;
+    width: 95%;
+    max-width: 1000px;
+    min-height: auto;
+    border-radius: 25px;
+    overflow: hidden;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+}
+
+/* Partie supérieure - Bienvenue (AGRANDIE) */
+.auth-pre {
+    position: relative;
+    background: linear-gradient(135deg, #eada70 0%, #fd8617 100%);
+    min-height: 250px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 30px;
+}
+
+/* Sceau en arrière-plan */
+.auth-sceau {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.4;
+    z-index: 1;
+}
+
+.auth-sceau img {
+    width: 50%;
+    height: auto;
+    object-fit: contain;
+}
+
+/* Contenu par-dessus */
+.auth-overlay {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    color: #fff;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.auth-logo {
+    margin-bottom: 15px;
+}
+
+.auth-logo img {
+    width: 180px;
+    height: 120px;
+    max-width: 100%;
+    object-fit: contain;
+}
+
+/* Bloc de bienvenue - AGRANDI */
+.auth-welcome {
+    text-align: center;
+    color: #fff;
+    z-index: 3;
+    padding: 25px;
+    background: rgba(0, 0, 0, 0.25);
+    border-radius: 20px;
+    backdrop-filter: blur(5px);
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.auth-welcome h2 {
+    font-size: 24px;
+    margin: 0 0 15px 0;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.auth-welcome p {
+    font-size: 16px;
+    margin: 0;
+    line-height: 1.6;
+    text-align: center;
+}
+
+/* Carte d'inscription - PARTIE PRINCIPALE */
+.auth-card {
+    background: white;
+    padding: 40px 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.auth-content {
+    width: 100%;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.login-icon {
+    width: 120px;
+    height: 120px;
+    background: linear-gradient(135deg, #964ee3 0%, #75165f 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 25px auto;
+    box-shadow: 0 8px 20px rgba(128, 102, 234, 0.3);
+    border: 4px solid white;
+}
+
+.login-icon i {
+    font-size: 4rem;
+    color: white;
+}
+
+.auth-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.auth-header h1 {
+    color: #1d0933;
+    margin-bottom: 10px;
+    font-weight: 600;
+    font-size: 28px;
+}
+
+.auth-header p {
+    color: #666;
+    font-size: 16px;
+}
+
+/* Formulaire */
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: #333;
+    font-weight: 500;
+    font-size: 14px;
+}
+
+.form-control {
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid #e1e5e9;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: #7566ea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+/* CORRECTION : Styles améliorés pour les erreurs Bootstrap */
+.is-invalid {
+    border-color: #dc3545 !important;
+    padding-right: 60px !important; /* Espace supplémentaire pour l'icône d'erreur ET l'œil */
+}
+
+.invalid-feedback {
+    display: block;
+    width: 100%;
+    margin-top: 0.25rem;
+    font-size: 0.875em;
+    color: #dc3545;
+}
+
+/* NOUVEAU : Indicateur de force du mot de passe - AMÉLIORÉ */
+.password-strength {
+    margin-top: 8px;
+    font-size: 12px;
+}
+
+.strength-bar {
+    height: 4px;
+    background-color: #e9ecef;
+    border-radius: 2px;
+    margin-bottom: 4px;
+    overflow: hidden;
+}
+
+.strength-fill {
+    height: 100%;
+    width: 0%;
+    transition: all 0.3s ease;
+    border-radius: 2px;
+}
+
+.strength-weak .strength-fill {
+    background-color: #dc3545;
+    width: 25%;
+}
+
+.strength-fair .strength-fill {
+    background-color: #fd7e14;
+    width: 50%;
+}
+
+.strength-good .strength-fill {
+    background-color: #ffc107;
+    width: 75%;
+}
+
+.strength-strong .strength-fill {
+    background-color: #198754;
+    width: 100%;
+}
+
+.strength-text {
+    font-size: 11px;
+    color: #666;
+}
+
+.strength-weak .strength-text {
+    color: #dc3545;
+}
+
+.strength-fair .strength-text {
+    color: #fd7e14;
+}
+
+.strength-good .strength-text {
+    color: #ffc107;
+}
+
+.strength-strong .strength-text {
+    color: #198754;
+}
+
+/* NOUVEAU : Exigences du mot de passe - COMPACT ET ÉLÉGANT */
+.password-requirements {
+    margin: 8px 0;
+    padding: 12px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+}
+
+.requirements-title {
+    font-size: 11px;
+    font-weight: 600;
+    color: #495057;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.requirements-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 6px;
+}
+
+.requirement {
+    display: flex;
+    align-items: center;
+    font-size: 10px;
+    padding: 4px 6px;
+    border-radius: 4px;
+    background: white;
+    border: 1px solid #e9ecef;
+}
+
+.requirement i {
+    font-size: 9px;
+    margin-right: 4px;
+    transition: all 0.3s ease;
+}
+
+.requirement.met {
+    color: #198754;
+    background: #f8fff9;
+    border-color: #d1e7dd;
+}
+
+.requirement.met i {
+    color: #198754;
+}
+
+.requirement.unmet {
+    color: #6c757d;
+    background: #f8f9fa;
+}
+
+.requirement.unmet i {
+    color: #6c757d;
+}
+
+/* CORRECTION : Styles pour les groupes de mots de passe avec gestion des erreurs */
+.password-group {
+    position: relative;
+}
+
+.password-input-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.password-input {
+    padding-right: 45px;
+    width: 100%;
+}
+
+/* CORRECTION : Positionnement amélioré du bouton œil */
+.password-toggle {
+    position: absolute;
+    right: 12px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #666;
+    padding: 5px;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 5; /* Assure que l'œil soit au-dessus de l'icône d'erreur */
+}
+
+.password-toggle:hover {
+    background-color: #f5f5f5;
+    color: #333;
+}
+
+.password-toggle i {
+    font-size: 1.1rem;
+}
+
+/* CORRECTION : Style pour quand il y a une erreur - décalage supplémentaire */
+.password-group .is-invalid + .password-toggle {
+    right: 35px; /* Déplace l'œil vers la gauche quand il y a une erreur */
+}
+
+/* Styles pour inscription */
+.form-row {
+    display: flex;
+    gap: 15px;
+}
+
+.form-row .form-group {
+    flex: 1;
+}
+
+.form-text {
+    display: block;
+    margin-top: 5px;
+    font-size: 12px;
+    color: #666;
+}
+
+.form-check {
+    margin: 20px 0;
+    display: flex;
+    align-items: center;
+}
+
+.form-check-input {
+    margin-right: 8px;
+}
+
+.form-check-label {
+    font-size: 14px;
+    color: #333;
+}
+
+.text-link {
+    color: #7566ea;
+    text-decoration: none;
+}
+
+.text-link:hover {
+    text-decoration: underline;
+}
+
+select.form-control {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 0.5rem center;
+    background-repeat: no-repeat;
+    background-size: 1.5em 1.5em;
+    padding-right: 2.5rem;
+}
+
+.btn-primary {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, #964ee3 0%, #75165f 100%);
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 10px;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.btn-primary:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Footer */
+.auth-footer {
+    text-align: center;
+    margin-top: 25px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+}
+
+.auth-footer p {
+    color: #666;
+    font-size: 14px;
+}
+
+.auth-footer a {
+    color: #7566ea;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s ease;
+}
+
+.auth-footer a:hover {
+    text-decoration: underline;
+    color: #8066ea;
+}
+
+/* Alertes */
+.alert-error {
+    background-color: #fee;
+    border: 1px solid #fcc;
+    color: #c33;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    font-size: 14px;
+    text-align: center;
+}
+
+.alert-success {
+    background-color: #f0f9f0;
+    border: 1px solid #4caf50;
+    color: #2e7d32;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    font-size: 14px;
+    text-align: center;
+}
+
+/* Animation légère */
+.auth-container {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .auth-container {
+        width: 95%;
+        max-width: 500px;
+    }
+    
+    .auth-pre {
+        min-height: 200px;
+        padding: 20px;
+    }
+    
+    .auth-card {
+        padding: 30px 20px;
+    }
+    
+    .auth-welcome {
+        padding: 20px;
+        max-width: 400px;
+    }
+    
+    .auth-welcome h2 {
+        font-size: 20px;
+    }
+    
+    .auth-welcome p {
+        font-size: 14px;
+    }
+    
+    .auth-header h1 {
+        font-size: 24px;
+    }
+    
+    .form-row {
+        flex-direction: column;
+        gap: 0;
+    }
+    
+    .auth-content {
+        max-width: 100%;
+    }
+    
+    /* CORRECTION : Ajustement responsive pour les boutons œil */
+    .password-group .is-invalid + .password-toggle {
+        right: 30px;
+    }
+    
+    /* Ajustement responsive pour les exigences */
+    .requirements-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .auth-container {
+        width: 100%;
+        border-radius: 15px;
+    }
+    
+    .auth-pre {
+        min-height: 180px;
+        border-radius: 15px 15px 0 0;
+        padding: 15px;
+    }
+    
+    .auth-card {
+        border-radius: 0 0 15px 15px;
+        padding: 25px 15px;
+    }
+    
+    .auth-content {
+        padding: 0 5px;
+    }
+    
+    .auth-logo img {
+        width: 140px;
+        height: 90px;
+    }
+    
+    .auth-welcome {
+        padding: 15px;
+    }
+    
+    .auth-welcome h2 {
+        font-size: 18px;
+    }
+    
+    .auth-welcome p {
+        font-size: 13px;
+    }
+    
+    .login-icon {
+        width: 100px;
+        height: 100px;
+    }
+    
+    .login-icon i {
+        font-size: 3rem;
+    }
+    
+    /* CORRECTION : Ajustement mobile pour les boutons œil */
+    .password-group .is-invalid + .password-toggle {
+        right: 25px;
+    }
+    
+    /* Ajustement mobile pour les exigences */
+    .password-requirements {
+        padding: 10px;
+    }
+    
+    .requirement {
+        font-size: 9px;
+        padding: 3px 5px;
+    }
+}
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="auth-container">
+    <!-- Partie supérieure - Bienvenue (AGRANDIE) -->
+    <div class="auth-pre">
+        <!-- Image du sceau en arrière-plan -->
+        <div class="auth-sceau">
+            <img src="{{ asset('images/sceau.png') }}" alt="Sceau">
+        </div>
+
+        <!-- Contenu par-dessus -->
+        <div class="auth-overlay">      
+            <div class="auth-welcome">
+                <div class="auth-logo">
+                    <img src="{{ asset('images/logo.png') }}" alt="Logo">
+                </div>
+                
+                <p>
+                    Rejoignez la plateforme de gestion du 
+                    <strong>Plan de Travail Annuel (PTA)</strong> du 
+                    Ministère de l'Industrialisation, du Commerce et de la Consommation.<br><br>
+                    Créez votre compte pour accéder à l'ensemble des fonctionnalités 
+                    de suivi des projets et génération de rapports.
+                </p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Partie inférieure - Formulaire (GRANDE) -->
+    <div class="auth-card">
+        <div class="auth-content">
+            <div class="login-icon">
+                <i class="bi bi-person-plus"></i>
+            </div>
+            <div class="auth-header">
+                <h1>Inscription</h1>
+                <p>Créez votre compte personnel</p>
+            </div>
+
+            {% for message in app.flashes('success') %}
+                <div class="alert-success">
+                    {{ message }}
+                </div>
+            {% endfor %}
+
+            {% for message in app.flashes('error') %}
+                <div class="alert-error">
+                    {{ message }}
+                </div>
+            {% endfor %}
+
+            <form method="post" action="{{ path('app_register_submit') }}" id="registerForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="im_per">Immatricule *</label>
+                        <input 
+                            type="text" 
+                            name="im_per" 
+                            id="im_per" 
+                            class="form-control {% if errors.im_per is defined %}is-invalid{% endif %}" 
+                            required 
+                            pattern="\d{6}"
+                            title="6 chiffres exactement"
+                            placeholder="123456"
+                            maxlength="6"
+                            value="{{ formData.im_per ?? app.request.request.get('im_per') }}"
+                        >
+                        <small class="form-text">Format: 6 chiffres</small>
+                        {% if errors.im_per is defined %}
+                            <div class="invalid-feedback">
+                                {{ errors.im_per }}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="nom_per">Nom *</label>
+                        <input 
+                            type="text" 
+                            name="nom_per" 
+                            id="nom_per" 
+                            class="form-control {% if errors.nom_per is defined %}is-invalid{% endif %}" 
+                            required
+                            placeholder="Votre nom"
+                            value="{{ formData.nom_per ?? app.request.request.get('nom_per') }}"
+                        >
+                        {% if errors.nom_per is defined %}
+                            <div class="invalid-feedback">
+                                {{ errors.nom_per }}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label for="prenom_per">Prénom *</label>
+                        <input 
+                            type="text" 
+                            name="prenom_per" 
+                            id="prenom_per" 
+                            class="form-control {% if errors.prenom_per is defined %}is-invalid{% endif %}" 
+                            required
+                            placeholder="Votre prénom"
+                            value="{{ formData.prenom_per ?? app.request.request.get('prenom_per') }}"
+                        >
+                        {% if errors.prenom_per is defined %}
+                            <div class="invalid-feedback">
+                                {{ errors.prenom_per }}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="email_per">Email *</label>
+                    <input 
+                        type="email" 
+                        name="email_per" 
+                        id="email_per" 
+                        class="form-control {% if errors.email_per is defined %}is-invalid{% endif %}" 
+                        required
+                        placeholder="votre@email.gov.mg"
+                        value="{{ formData.email_per ?? app.request.request.get('email_per') }}"
+                    >
+                    {% if errors.email_per is defined %}
+                        <div class="invalid-feedback">
+                            {{ errors.email_per }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="code_service">Service</label>
+                        <select name="code_service" id="code_service" class="form-control {% if errors.code_service is defined %}is-invalid{% endif %}">
+                            <option value="">Sélectionnez votre service</option>
+                            {% for service in services %}
+                                <option value="{{ service.CodeService }}" 
+                                    {% if (formData.code_service ?? app.request.request.get('code_service')) == service.CodeService %}selected{% endif %}>
+                                    {{ service.nomService }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                        {% if errors.code_service is defined %}
+                            <div class="invalid-feedback">
+                                {{ errors.code_service }}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label for="code_direction">Direction</label>
+                        <select name="code_direction" id="code_direction" class="form-control {% if errors.code_direction is defined %}is-invalid{% endif %}">
+                            <option value="">Sélectionnez votre direction</option>
+                            {% for direction in directions %}
+                                <option value="{{ direction.CodeDirection }}"
+                                    {% if (formData.code_direction ?? app.request.request.get('code_direction')) == direction.CodeDirection %}selected{% endif %}>
+                                    {{ direction.nomDirection }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                        {% if errors.code_direction is defined %}
+                            <div class="invalid-feedback">
+                                {{ errors.code_direction }}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="tel_per">Téléphone</label>
+                    <input 
+                        type="tel" 
+                        name="tel_per" 
+                        id="tel_per" 
+                        class="form-control {% if errors.tel_per is defined %}is-invalid{% endif %}" 
+                        placeholder="034 12 345 67"
+                        value="{{ formData.tel_per ?? app.request.request.get('tel_per') }}"
+                    >
+                    {% if errors.tel_per is defined %}
+                        <div class="invalid-feedback">
+                            {{ errors.tel_per }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="form-group password-group">
+                    <label for="mdp_per">Mot de passe *</label>
+                    
+                    <!-- NOUVEAU : Exigences au-dessus du champ -->
+                    <div class="password-requirements" id="passwordRequirements">
+                        <div class="requirements-title">
+                            <span>Exigences de sécurité :</span>
+                            <span id="requirementsStatus"></span>
+                        </div>
+                        <div class="requirements-grid">
+                            <div class="requirement unmet" id="reqLength">
+                                <i class="bi bi-circle"></i>
+                                6+ caractères
+                            </div>
+                            <div class="requirement unmet" id="reqLowercase">
+                                <i class="bi bi-circle"></i>
+                                Minuscule
+                            </div>
+                            <div class="requirement unmet" id="reqUppercase">
+                                <i class="bi bi-circle"></i>
+                                Majuscule
+                            </div>
+                            <div class="requirement unmet" id="reqNumber">
+                                <i class="bi bi-circle"></i>
+                                Chiffre
+                            </div>
+                            <div class="requirement unmet" id="reqSpecial">
+                                <i class="bi bi-circle"></i>
+                                Spécial (@$!%*?&)
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="password-input-container">
+                        <input 
+                            type="password" 
+                            name="mdp_per" 
+                            id="mdp_per" 
+                            class="form-control password-input {% if errors.mdp_per is defined or errors.password_mismatch is defined %}is-invalid{% endif %}" 
+                            required
+                            minlength="6"
+                            placeholder="Créez un mot de passe sécurisé"
+                            value="{{ formData.mdp_per ?? '' }}"
+                        >
+                        <button type="button" class="password-toggle" id="passwordToggle">
+                            <i class="bi bi-eye-slash"></i>
+                        </button>
+                    </div>
+                    
+                    <!-- Indicateur de force du mot de passe -->
+                    <div class="password-strength" id="passwordStrength">
+                        <div class="strength-bar">
+                            <div class="strength-fill"></div>
+                        </div>
+                        <div class="strength-text" id="strengthText">Saisissez votre mot de passe</div>
+                    </div>
+                    
+                    {% if errors.mdp_per is defined %}
+                        <div class="invalid-feedback">
+                            {{ errors.mdp_per }}
+                        </div>
+                    {% endif %}
+                    {% if errors.password_mismatch is defined %}
+                        <div class="invalid-feedback">
+                            {{ errors.password_mismatch }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="form-group password-group">
+                    <label for="confirm_mdp_per">Confirmer le mot de passe *</label>
+                    <div class="password-input-container">
+                        <input 
+                            type="password" 
+                            name="confirm_mdp_per" 
+                            id="confirm_mdp_per" 
+                            class="form-control password-input {% if errors.password_mismatch is defined %}is-invalid{% endif %}" 
+                            required
+                            placeholder="Confirmez votre mot de passe"
+                            value="{{ formData.confirm_mdp_per ?? '' }}"
+                        >
+                        <button type="button" class="password-toggle" id="confirmPasswordToggle">
+                            <i class="bi bi-eye-slash"></i>
+                        </button>
+                    </div>
+                    {% if errors.password_mismatch is defined %}
+                        <div class="invalid-feedback">
+                            {{ errors.password_mismatch }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <button type="submit" class="btn-primary" id="submitButton">Créer mon compte</button>
+            </form>
+
+            <div class="auth-footer">
+                <p>Déjà inscrit ? <a href="{{ path('app_login') }}">Se connecter</a></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Toggle pour le mot de passe principal
+    const passwordToggle = document.getElementById('passwordToggle');
+    const passwordInput = document.getElementById('mdp_per');
+    const eyeIcon = passwordToggle.querySelector('i');
+    
+    passwordToggle.addEventListener('click', function() {
+        const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+        passwordInput.setAttribute('type', type);
+        
+        if (type === 'text') {
+            eyeIcon.classList.remove('bi-eye-slash');
+            eyeIcon.classList.add('bi-eye');
+        } else {
+            eyeIcon.classList.remove('bi-eye');
+            eyeIcon.classList.add('bi-eye-slash');
+        }
+    });
+
+    // Toggle pour la confirmation du mot de passe
+    const confirmPasswordToggle = document.getElementById('confirmPasswordToggle');
+    const confirmPasswordInput = document.getElementById('confirm_mdp_per');
+    const confirmEyeIcon = confirmPasswordToggle.querySelector('i');
+    
+    confirmPasswordToggle.addEventListener('click', function() {
+        const type = confirmPasswordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+        confirmPasswordInput.setAttribute('type', type);
+        
+        if (type === 'text') {
+            confirmEyeIcon.classList.remove('bi-eye-slash');
+            confirmEyeIcon.classList.add('bi-eye');
+        } else {
+            confirmEyeIcon.classList.remove('bi-eye');
+            confirmEyeIcon.classList.add('bi-eye-slash');
+        }
+    });
+
+    // NOUVEAU : Validation de la force du mot de passe
+    function checkPasswordStrength(password) {
+        let strength = 0;
+        const requirements = {
+            length: password.length >= 6,
+            lowercase: /[a-z]/.test(password),
+            uppercase: /[A-Z]/.test(password),
+            number: /[0-9]/.test(password),
+            special: /[@$!%*?&]/.test(password)
+        };
+
+        // Compter le nombre d'exigences remplies
+        const metCount = Object.values(requirements).filter(Boolean).length;
+        const totalCount = Object.keys(requirements).length;
+
+        // Mettre à jour les indicateurs visuels
+        Object.keys(requirements).forEach(key => {
+            const element = document.getElementById(`req${key.charAt(0).toUpperCase() + key.slice(1)}`);
+            if (element) {
+                if (requirements[key]) {
+                    element.classList.remove('unmet');
+                    element.classList.add('met');
+                    element.innerHTML = '<i class="bi bi-check-circle-fill"></i>' + element.innerHTML.substring(element.innerHTML.indexOf('>') + 1);
+                    strength++;
+                } else {
+                    element.classList.remove('met');
+                    element.classList.add('unmet');
+                    element.innerHTML = '<i class="bi bi-circle"></i>' + element.innerHTML.substring(element.innerHTML.indexOf('>') + 1);
+                }
+            }
+        });
+
+        // Mettre à jour le statut des exigences
+        const requirementsStatus = document.getElementById('requirementsStatus');
+        if (password.length === 0) {
+            requirementsStatus.textContent = '';
+            requirementsStatus.style.color = '#6c757d';
+        } else if (metCount === totalCount) {
+            requirementsStatus.textContent = '✓ Complètes';
+            requirementsStatus.style.color = '#198754';
+        } else {
+            requirementsStatus.textContent = `${metCount}/${totalCount}`;
+            requirementsStatus.style.color = '#fd7e14';
+        }
+
+        // Mettre à jour la barre de force
+        const strengthBar = document.getElementById('passwordStrength');
+        const strengthText = document.getElementById('strengthText');
+        
+        strengthBar.className = 'password-strength';
+        
+        if (password.length === 0) {
+            strengthText.textContent = 'Saisissez votre mot de passe';
+            return false;
+        } else if (strength <= 2) {
+            strengthBar.classList.add('strength-weak');
+            strengthText.textContent = 'Faible - Améliorez votre mot de passe';
+            return false;
+        } else if (strength <= 3) {
+            strengthBar.classList.add('strength-fair');
+            strengthText.textContent = 'Moyen - Peut être amélioré';
+            return true;
+        } else if (strength <= 4) {
+            strengthBar.classList.add('strength-good');
+            strengthText.textContent = 'Bon - Mot de passe sécurisé';
+            return true;
+        } else {
+            strengthBar.classList.add('strength-strong');
+            strengthText.textContent = 'Très fort - Excellent mot de passe';
+            return true;
+        }
+    }
+
+    // Écouter les changements du mot de passe
+    passwordInput.addEventListener('input', function() {
+        const isStrongEnough = checkPasswordStrength(this.value);
+        const submitButton = document.getElementById('submitButton');
+        
+        // Désactiver le bouton si le mot de passe est trop faible
+        if (this.value.length > 0 && !isStrongEnough) {
+            submitButton.disabled = true;
+            submitButton.title = 'Veuillez renforcer votre mot de passe pour répondre à toutes les exigences';
+        } else {
+            submitButton.disabled = false;
+            submitButton.title = '';
+        }
+        
+        validatePasswords();
+    });
+
+    // Validation des mots de passe côté client
+    function validatePasswords() {
+        const password = document.getElementById('mdp_per').value;
+        const confirmPassword = document.getElementById('confirm_mdp_per').value;
+        const submitButton = document.getElementById('submitButton');
+        
+        if (password && confirmPassword && password !== confirmPassword) {
+            document.getElementById('mdp_per').classList.add('is-invalid');
+            document.getElementById('confirm_mdp_per').classList.add('is-invalid');
+            
+            // Créer les messages d'erreur s'ils n'existent pas
+            let passwordError = document.getElementById('passwordMismatchError');
+            let confirmError = document.getElementById('confirmPasswordMismatchError');
+            
+            if (!passwordError) {
+                passwordError = document.createElement('div');
+                passwordError.id = 'passwordMismatchError';
+                passwordError.className = 'invalid-feedback';
+                passwordError.textContent = 'Les mots de passe ne correspondent pas';
+                document.querySelector('.password-group').appendChild(passwordError);
+            }
+            
+            if (!confirmError) {
+                confirmError = document.createElement('div');
+                confirmError.id = 'confirmPasswordMismatchError';
+                confirmError.className = 'invalid-feedback';
+                confirmError.textContent = 'Les mots de passe ne correspondent pas';
+                document.querySelectorAll('.password-group')[1].appendChild(confirmError);
+            }
+            
+            submitButton.disabled = true;
+            return false;
+        } else {
+            // Supprimer les erreurs de correspondance si elles existent
+            const passwordMismatchError = document.getElementById('passwordMismatchError');
+            const confirmPasswordMismatchError = document.getElementById('confirmPasswordMismatchError');
+            
+            if (passwordMismatchError) passwordMismatchError.remove();
+            if (confirmPasswordMismatchError) confirmPasswordMismatchError.remove();
+            
+            document.getElementById('mdp_per').classList.remove('is-invalid');
+            document.getElementById('confirm_mdp_per').classList.remove('is-invalid');
+            
+            // Réactiver le bouton seulement si le mot de passe est assez fort
+            const isStrongEnough = checkPasswordStrength(password);
+            submitButton.disabled = !isStrongEnough;
+            return true;
+        }
+    }
+
+    // Écouter les changements de la confirmation de mot de passe
+    confirmPasswordInput.addEventListener('input', validatePasswords);
+
+    // Validation finale du formulaire
+    const form = document.getElementById('registerForm');
+    form.addEventListener('submit', function(e) {
+        const password = document.getElementById('mdp_per').value;
+        const confirmPassword = document.getElementById('confirm_mdp_per').value;
+        const isStrongEnough = checkPasswordStrength(password);
+        
+        if (!isStrongEnough) {
+            e.preventDefault();
+            alert('Veuillez renforcer votre mot de passe pour répondre à toutes les exigences de sécurité.');
+            return false;
+        }
+        
+        if (password !== confirmPassword) {
+            e.preventDefault();
+            return false;
+        }
+    });
+
+    // Effacer les erreurs quand l'utilisateur tape
+    const inputs = form.querySelectorAll('input, select');
+    inputs.forEach(input => {
+        input.addEventListener('input', function() {
+            this.classList.remove('is-invalid');
+            
+            // Supprimer les messages d'erreur spécifiques à ce champ
+            const parentGroup = this.closest('.form-group');
+            if (parentGroup) {
+                const errorDivs = parentGroup.querySelectorAll('.invalid-feedback');
+                errorDivs.forEach(div => {
+                    if (div.id.includes('Mismatch')) {
+                        div.remove();
+                    }
+                });
+            }
+        });
+    });
+
+    // Initialiser la validation
+    checkPasswordStrength(passwordInput.value);
+    validatePasswords();
+});
+
+function validatePasswords() {
+        const password = document.getElementById('mdp_per').value;
+        const confirmPassword = document.getElementById('confirm_mdp_per').value;
+        const submitButton = document.getElementById('submitButton');
+        
+        if (password && confirmPassword && password !== confirmPassword) {
+            document.getElementById('mdp_per').classList.add('is-invalid');
+            document.getElementById('confirm_mdp_per').classList.add('is-invalid');
+            
+            // Créer les messages d'erreur s'ils n'existent pas
+            let passwordError = document.getElementById('passwordMismatchError');
+            let confirmError = document.getElementById('confirmPasswordMismatchError');
+            
+            if (!passwordError) {
+                passwordError = document.createElement('div');
+                passwordError.id = 'passwordMismatchError';
+                passwordError.className = 'invalid-feedback';
+                passwordError.textContent = 'Les mots de passe ne correspondent pas';
+                document.querySelector('.password-group').appendChild(passwordError);
+            }
+            
+            if (!confirmError) {
+                confirmError = document.createElement('div');
+                confirmError.id = 'confirmPasswordMismatchError';
+                confirmError.className = 'invalid-feedback';
+                confirmError.textContent = 'Les mots de passe ne correspondent pas';
+                document.querySelectorAll('.password-group')[1].appendChild(confirmError);
+            }
+            
+            submitButton.disabled = true;
+            return false;
+        } else {
+            // Supprimer les erreurs de correspondance si elles existent
+            const passwordMismatchError = document.getElementById('passwordMismatchError');
+            const confirmPasswordMismatchError = document.getElementById('confirmPasswordMismatchError');
+            
+            if (passwordMismatchError) passwordMismatchError.remove();
+            if (confirmPasswordMismatchError) confirmPasswordMismatchError.remove();
+            
+            document.getElementById('mdp_per').classList.remove('is-invalid');
+            document.getElementById('confirm_mdp_per').classList.remove('is-invalid');
+            
+            // Réactiver le bouton seulement si le mot de passe est assez fort
+            const isStrongEnough = checkPasswordStrength(password);
+            submitButton.disabled = !isStrongEnough;
+            return true;
+        }
+    }
+
+</script>
+{% endblock %}
+

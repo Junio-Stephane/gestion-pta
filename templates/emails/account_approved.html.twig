@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background: linear-gradient(135deg, #964ee3 0%, #75165f 100%); color: white; padding: 20px; text-align: center; border-radius: 10px 10px 0 0; }
+        .content { background: #f8f9fa; padding: 30px; border-radius: 0 0 10px 10px; }
+        .button { display: inline-block; background: #964ee3; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; margin: 20px 0; }
+        .footer { text-align: center; margin-top: 20px; font-size: 12px; color: #666; }
+        .signature { margin-top: 20px; padding-top: 20px; border-top: 1px solid #ddd; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>MIC - Inscription</h1>
+        </div>
+        <div class="content">
+            <h2>Félicitations {{ user_name }} !</h2>
+            <p>Votre compte a été approuvé avec succès.</p>
+            <p>Vous pouvez maintenant vous connecter à l'application et accéder à toutes les fonctionnalités.</p>
+            
+            <div style="text-align: center;">
+                <a href="{{ login_url }}" class="button">Se connecter à l'application</a>
+            </div>
+
+            <p><strong>Informations importantes :</strong></p>
+            <ul>
+                <li>Conservez vos identifiants de connexion en lieu sûr</li>
+                <li>Votre identifiant est l'adresse email que vous avez fournie</li>
+                {# <li>En cas d'oubli de mot de passe, utilisez la fonction "Mot de passe oublié"</li> #}
+            </ul>
+
+            <div class="signature">
+                <p>Cordialement,<br>
+                <strong>{{ admin_name }}</strong><br>
+                Administrateur MIC PTA</p>
+            </div>
+        </div>
+        <div class="footer">
+            <p>Ministère de l'Industrialisation et du Commerce<br>
+            Ceci est un message automatique, merci de ne pas y répondre directement.</p>
+        </div>
+    </div>
+</body>
+</html>

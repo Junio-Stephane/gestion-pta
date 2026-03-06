@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background: #f59e0b; color: white; padding: 20px; text-align: center; border-radius: 10px 10px 0 0; }
+        .content { background: #f8f9fa; padding: 30px; border-radius: 0 0 10px 10px; }
+        .footer { text-align: center; margin-top: 20px; font-size: 12px; color: #666; }
+        .signature { margin-top: 20px; padding-top: 20px; border-top: 1px solid #ddd; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>MIC - Plateforme de Gestion de Projets</h1>
+        </div>
+        <div class="content">
+            <h2>Demande d'inscription</h2>
+            <p>Bonjour {{ user_name }},</p>
+            <p>Votre demande d'inscription a été examinée.</p>
+            <p>Malheureusement, votre demande n'a pas pu être approuvée pour le moment.</p>
+            
+            <p><strong>Raisons possibles :</strong></p>
+            <ul>
+                <li>Informations incomplètes ou incorrectes</li>
+                <li>Immatricule non reconnu</li>
+                <li>Capacité d'accueil limitée</li>
+            </ul>
+
+            <p>Si vous pensez qu'il s'agit d'une erreur, vous pouvez :</p>
+            <ul>
+                <li>Réessayer avec des informations complètes et exactes</li>
+                <li>Contacter le service administratif</li>
+            </ul>
+
+            <div class="signature">
+                <p>Cordialement,<br>
+                <strong>{{ admin_name }}</strong><br>
+                Administrateur MIC PTA</p>
+            </div>
+        </div>
+        <div class="footer">
+            <p>Ministère de l'Industrialisation et du Commerce<br>
+            Ceci est un message automatique, merci de ne pas y répondre directement.</p>
+        </div>
+    </div>
+</body>
+</html>

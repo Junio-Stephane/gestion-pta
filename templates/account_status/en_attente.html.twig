@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Compte en Attente - MIC PTA</title>
+        <link rel="icon" type="image/png" sizes="48x48" href="{{ asset('images/logo.png') }}">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+        
+        <style>
+            /* RESET ET STYLES DE BASE */
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            body {
+                margin: 0;
+                min-height: 100vh;
+                background: linear-gradient(135deg, #964ee3 0%, #75165f 100%);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 20px;
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            }
+
+            /* CARTE DE STATUT */
+            .status-container {
+                width: 100%;
+                max-width: 500px;
+            }
+
+            .status-card {
+                background: white;
+                padding: 50px 40px;
+                border-radius: 20px;
+                box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+                text-align: center;
+                width: 100%;
+            }
+
+            .status-icon {
+                width: 100px;
+                height: 100px;
+                background: #ffd93d;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin: 0 auto 30px;
+                color: white;
+                font-size: 3rem;
+            }
+
+            .status-title {
+                color: #333;
+                font-size: 28px;
+                font-weight: 600;
+                margin-bottom: 20px;
+            }
+
+            .status-message {
+                color: #666;
+                font-size: 16px;
+                line-height: 1.6;
+                margin-bottom: 30px;
+            }
+
+            .status-steps {
+                background: #f8f9fa;
+                padding: 20px;
+                border-radius: 10px;
+                margin: 25px 0;
+                text-align: left;
+            }
+
+            .step {
+                display: flex;
+                align-items: flex-start;
+                margin-bottom: 15px;
+            }
+
+            .step-number {
+                background: #964ee3;
+                color: white;
+                width: 25px;
+                height: 25px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 14px;
+                font-weight: bold;
+                margin-right: 15px;
+                flex-shrink: 0;
+            }
+
+            .step-text {
+                color: #666;
+                font-size: 14px;
+            }
+
+            /* BOUTONS */
+            .status-actions {
+                display: flex;
+                flex-direction: column;
+                gap: 15px;
+                margin-top: 30px;
+            }
+
+            .btn-primary {
+                padding: 12px 24px;
+                background: linear-gradient(135deg, #964ee3 0%, #75165f 100%);
+                color: white;
+                text-decoration: none;
+                border-radius: 8px;
+                transition: all 0.3s ease;
+                border: none;
+                cursor: pointer;
+                font-size: 14px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 8px;
+            }
+
+            .btn-primary:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+                text-decoration: none;
+                color: white;
+            }
+
+            /* RESPONSIVE */
+            @media (max-width: 768px) {
+                body {
+                    padding: 15px;
+                }
+
+                .status-card {
+                    padding: 40px 30px;
+                }
+
+                .status-icon {
+                    width: 80px;
+                    height: 80px;
+                    font-size: 2.5rem;
+                    margin-bottom: 25px;
+                }
+
+                .status-title {
+                    font-size: 24px;
+                }
+
+                .status-message {
+                    font-size: 15px;
+                }
+
+                .status-steps {
+                    padding: 15px;
+                }
+            }
+
+            @media (max-width: 480px) {
+                .status-card {
+                    padding: 30px 20px;
+                }
+
+                .status-icon {
+                    width: 70px;
+                    height: 70px;
+                    font-size: 2rem;
+                }
+
+                .status-title {
+                    font-size: 22px;
+                }
+
+                .status-message {
+                    font-size: 14px;
+                }
+
+                .status-steps {
+                    padding: 15px;
+                }
+
+                .status-actions {
+                    gap: 10px;
+                }
+            }
+
+            /* ANIMATIONS */
+            .status-card {
+                animation: fadeInUp 0.6s ease-out;
+            }
+
+            @keyframes fadeInUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(20px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="status-container">
+            <div class="status-card">
+                <div class="status-icon">
+                    <i class="bi bi-clock"></i>
+                </div>
+                
+                <h1 class="status-title">Compte en Attente d'Activation</h1>
+                
+                <div class="status-message">
+                    <p><strong>Votre compte est en cours de validation.</strong></p>
+                    <p>Veuillez patienter pendant que notre équipe administrative traite votre demande d'inscription.</p>
+                </div>
+
+                <div class="status-steps">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <div class="step-text">Votre inscription a été soumise avec succès</div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <div class="step-text">Notre équipe vérifie vos informations</div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <div class="step-text">Vous recevrez un email de confirmation une fois votre compte activé</div>
+                    </div>
+                </div>
+
+                <div class="status-message">
+                    <p><strong>Temps de traitement estimé :</strong> 24 à 48 heures</p>
+                    <p>Si vous n'avez pas reçu de confirmation après ce délai, veuillez contacter votre administrateur.</p>
+                </div>
+
+                <div class="status-actions">
+                    <a href="{{ path('app_login') }}" class="btn-primary">
+                        <i class="bi bi-arrow-left"></i> Retour à la page de connexion
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            // EMPÊCHER LE CACHE ET LE RETOUR EN ARRIÈRE
+            history.pushState(null, null, location.href);
+            
+            window.onpopstate = function(event) {
+                history.pushState(null, null, location.href);
+            };
+
+            // Empêcher l'ouverture de la page dans un nouvel onglet/retour
+            if (performance.navigation.type === 2) {
+                // Page chargée via le cache du navigateur (bouton retour)
+                window.location.replace('{{ path('app_login') }}');
+            }
+
+            // Désactiver le cache pour cette page
+            if (window.history && window.history.replaceState) {
+                window.history.replaceState(null, null, window.location.href);
+            }
+
+            // Empêcher le rafraîchissement avec F5 de remettre la page en cache
+            window.addEventListener('beforeunload', function() {
+                sessionStorage.setItem('last_unload', new Date().getTime());
+            });
+
+            // Vérifier si la page a été chargée depuis le cache
+            window.addEventListener('pageshow', function(event) {
+                if (event.persisted) {
+                    // Page chargée depuis le cache du navigateur
+                    window.location.reload();
+                }
+            });
+
+            // Headers no-cache
+            fetch(window.location.href, {
+                headers: {
+                    'Cache-Control': 'no-cache',
+                    'Pragma': 'no-cache'
+                }
+            });
+        </script>
+    </body>
+</html>

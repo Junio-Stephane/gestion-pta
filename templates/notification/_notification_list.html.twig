@@ -1,0 +1,27 @@
+{% for notification in notifications %}
+<div class="notification-item {% if not notification.isRead %}unread{% endif %}" 
+     onclick="window.location.href='{{ path('admin_notification_mark_read', {'id': notification.id}) }}'">
+    <div class="notification-icon {{ notification.type }}">
+        <i class="bi 
+            {% if notification.type == 'success' %}bi-check-circle
+            {% elseif notification.type == 'warning' %}bi-exclamation-triangle
+            {% elseif notification.type == 'danger' %}bi-x-circle
+            {% else %}bi-info-circle{% endif %}">
+        </i>
+    </div>
+    <div class="notification-content">
+        <p class="notification-message">{{ notification.message }}</p>
+        <small class="notification-time">{{ notification.createdAt|date('H:i') }}</small>
+        {% if notification.relatedUser %}
+            <span class="notification-user">
+                {{ notification.relatedUser.prenomPer }} {{ notification.relatedUser.nomPer }}
+            </span>
+        {% endif %}
+    </div>
+</div>
+{% else %}
+<div class="empty-notifications">
+    <i class="bi bi-bell-slash"></i>
+    <p>Aucune notification</p>
+</div>
+{% endfor %}

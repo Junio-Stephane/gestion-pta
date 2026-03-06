@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Rapport des Projets - {{ direction.nomDirection }}</title>
+    <style>
+        /* Styles CSS identiques à votre aperçu HTML */
+        body {
+            font-family: 'DejaVu Sans', Arial, sans-serif;
+            background: #fdfdffff;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+            font-size: 12px;
+            line-height: 1.4;
+        }
+
+        .rapport-container {
+            background: #fdfdffff;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #f1f5f9;
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: #1f2937;
+            margin: 0;
+        }
+
+        .direction-header {
+            background: linear-gradient(135deg, #964ee3 0%, #75165f 100%);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .logo-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .header-text h2 {
+            margin: 0 0 0.5rem 0;
+            font-size: 1.4rem;
+        }
+
+        .header-text h4 {
+            margin: 0 0 0.5rem 0;
+            font-size: 1.1rem;
+        }
+
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #964ee3;
+            margin-bottom: 0.3rem;
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: #6b7280;
+            font-weight: 500;
+        }
+
+        .service-section {
+            background: #f8fafc;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            page-break-inside: avoid;
+        }
+
+        .service-header {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            padding: 1rem 1.5rem;
+            border-radius: 6px;
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+            color: #ffffff;
+            font-size: 1.1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .service-stats {
+            font-size: 0.8rem;
+            color: #ffffff;
+            font-weight: 500;
+        }
+
+        .projet-table-container {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            page-break-inside: avoid;
+        }
+
+        .projet-header {
+            background: #f6ecfeff;
+            padding: 1.5rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .projet-main-info {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .projet-title-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .projet-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #1f2937;
+            margin: 0;
+            flex: 1;
+        }
+
+        .projet-meta-primary {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            font-size: 0.75rem;
+            color: #4b5563;
+        }
+
+        .meta-item strong {
+            color: #374151;
+            font-weight: 600;
+        }
+
+        .status-badge {
+            padding: 0.3rem 0.6rem;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .status-debute { background: #dbeafe; color: #1e40af; }
+        .status-encours { background: #fef3c7; color: #d97706; }
+        .status-termine { background: #d1fae5; color: #065f46; }
+        .status-suspendu { background: #f3f4f6; color: #6b7280; }
+        .status-desactive { background: #f3f4f6; color: #6b7280; }
+
+        .projet-details-compact {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-top: 0.75rem;
+        }
+
+        .description-commentaire-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .info-container {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .info-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.75rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .info-title {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #964ee3;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin: 0;
+        }
+
+        .info-content {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+        }
+
+        .info-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .info-label {
+            font-size: 0.65rem;
+            color: #6b7280;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .info-value {
+            font-size: 0.8rem;
+            color: #374151;
+            font-weight: 500;
+        }
+
+        .info-value.budget {
+            font-weight: 700;
+            color: #059669;
+            font-size: 0.85rem;
+        }
+
+        .progress-container {
+            margin-top: 0.25rem;
+        }
+
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.2rem;
+        }
+
+        .progress-percent {
+            font-weight: 700;
+            color: #964ee3;
+            font-size: 0.75rem;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 5px;
+            background: #e5e7eb;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #964ee3 0%, #75165f 100%);
+            border-radius: 3px;
+        }
+
+        .taches-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+            font-size: 0.7rem;
+        }
+
+        .taches-table th {
+            background: #f8fafc;
+            padding: 0.6rem;
+            text-align: left;
+            font-weight: 600;
+            color: #374151;
+            border-bottom: 2px solid #e5e7eb;
+            text-transform: uppercase;
+        }
+
+        .taches-table td {
+            padding: 0.6rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .tache-commentaire-cell {
+            max-width: 150px;
+        }
+
+        .tache-commentaire {
+            font-size: 0.7rem;
+            color: #a16207;
+            background: #fefce8;
+            padding: 0.3rem 0.5rem;
+            border-radius: 4px;
+            border-left: 3px solid #f59e0b;
+            line-height: 1.3;
+        }
+
+        .tache-commentaire.empty {
+            color: #9ca3af;
+            font-style: italic;
+            background: #f9fafb;
+            border-left-color: #d1d5db;
+        }
+
+        .text-preview {
+            font-size: 0.75rem;
+            line-height: 1.4;
+            color: #4b5563;
+        }
+
+        /* Styles pour éléments désactivés */
+        .service-desactive {
+            background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%) !important;
+            border: 1px solid #d1d5db !important;
+            color: #6b7280 !important;
+        }
+
+        .projet-suspendu {
+            background: #f9fafb !important;
+            border: 1px solid #e5e7eb !important;
+            opacity: 0.8;
+        }
+
+        .service-header-desactive {
+            background: linear-gradient(135deg, #9ca3af 0%, #6b7280 100%) !important;
+            color: #ffffff !important;
+        }
+
+        .projet-header-suspendu {
+            background: #f3f4f6 !important;
+            border-bottom: 1px solid #e5e7eb !important;
+        }
+
+        .grised {
+            opacity: 0.7;
+        }
+
+        /* Gestion des sauts de page */
+        .page-break {
+            page-break-after: always;
+        }
+
+        .no-break {
+            page-break-inside: avoid;
+        }
+
+        /* Responsive pour PDF */
+        @media print {
+            .service-section {
+                page-break-inside: avoid;
+            }
+            
+            .projet-table-container {
+                page-break-inside: avoid;
+            }
+            
+            .stats-row {
+                grid-template-columns: repeat(5, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="rapport-container">
+        <!-- En-tête de direction -->
+        <div class="direction-header">
+            <div class="logo-header">
+                <div class="header-text">
+                    <h2>MINISTÈRE DE L'INDUSTRIE ET DU COMMERCE</h2>
+                    <h4>Direction: {{ direction.nomDirection }} (n°: {{ direction.CodeDirection }})</h4>
+                    {% if direction.statutDirection != 'ACTIVE' %}
+                        <span class="status-badge status-desactive">
+                            Direction Désactivée
+                        </span>
+                    {% endif %}
+                </div>
+            </div>
+            <p style="margin: 0; font-size: 0.9rem;">Rapport des Projets et Tâches - Généré le {{ dateRapport }}</p>
+        </div>
+
+        <!-- Statistiques -->
+        <div class="stats-row">
+            <div class="stat-card">
+                <div class="stat-value">{{ stats.totalServices }}</div>
+                <div class="stat-label">Services Total</div>
+                <div style="font-size: 0.65rem; margin-top: 0.2rem;">
+                    <span style="color: #059669;">{{ stats.servicesActifs }} actifs</span>
+                    {% if stats.servicesDesactives > 0 %}
+                        <span style="color: #6b7280;"> • {{ stats.servicesDesactives }} désactivés</span>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">{{ stats.totalProjets }}</div>
+                <div class="stat-label">Projets Total</div>
+                <div style="font-size: 0.65rem; margin-top: 0.2rem;">
+                    <span style="color: #059669;">{{ stats.projetsActifs }} actifs</span>
+                    {% if stats.projetsSuspendus > 0 %}
+                        <span style="color: #6b7280;"> • {{ stats.projetsSuspendus }} suspendus</span>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">{{ stats.totalTaches }}</div>
+                <div class="stat-label">Tâches Total</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">{{ stats.budgetTotal|number_format(0, ',', ' ') }}</div>
+                <div class="stat-label">Budget Total (Ar)</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">{{ stats.avancementMoyen }}%</div>
+                <div class="stat-label">Avancement Moyen</div>
+            </div>
+        </div>
+
+        <!-- Services et projets -->
+        {% for service in direction.services %}
+            <div class="service-section {% if service.statutService == 'DESACTIVE' %}service-desactive grised{% endif %} no-break">
+                <div class="service-header {% if service.statutService == 'DESACTIVE' %}service-header-desactive{% endif %}">
+                    <div>
+                        {{ service.nomService }} (n°: {{ service.CodeService }})
+                        {% if service.statutService == 'DESACTIVE' %}
+                            <span class="status-badge status-desactive">Service Désactivé</span>
+                        {% elseif service.statutService == 'EN_ATTENTE' %}
+                            <span class="status-badge status-suspendu">En Attente</span>
+                        {% endif %}
+                    </div>
+                    <div class="service-stats">
+                        {% set projetsCount = service.projets|length %}
+                        {% set tachesCount = 0 %}
+                        {% for projet in service.projets %}
+                            {% set tachesCount = tachesCount + (projet.taches|length) %}
+                        {% endfor %}
+                        {{ projetsCount }} projet(s) • {{ tachesCount }} tâche(s)
+                    </div>
+                </div>
+
+                {% if service.projets and service.projets|length > 0 %}
+                    {% for projet in service.projets %}
+                        <div class="projet-table-container {% if projet.StatutPro == 'Suspendu' or service.statutService == 'DESACTIVE' %}projet-suspendu grised{% endif %} no-break">
+                            <div class="projet-header {% if projet.StatutPro == 'Suspendu' or service.statutService == 'DESACTIVE' %}projet-header-suspendu{% endif %}">
+                                <div class="projet-main-info">
+                                    <div class="projet-title-section">
+                                        <div class="projet-title">{{ projet.titrePro }}</div>
+                                        <div class="projet-meta-primary">
+                                            <div class="meta-item">
+                                                <strong>N°:</strong> {{ projet.numProjet }}
+                                            </div>
+                                            <div class="meta-item">
+                                                <strong>Tâches:</strong> {{ projet.taches|length }}
+                                            </div>
+                                            <div class="meta-item">
+                                                <span class="status-badge status-{{ projet.StatutPro|lower|replace({' ': '', 'é': 'e'}) }}">
+                                                    {{ projet.StatutPro }}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="projet-details-compact">
+                                        <!-- Description et Commentaire -->
+                                        <div class="description-commentaire-row">
+                                            <!-- Description -->
+                                            <div class="info-container {% if projet.StatutPro == 'Suspendu' or service.statutService == 'DESACTIVE' %}grised{% endif %}">
+                                                <div class="info-header">
+                                                    <h4 class="info-title">Description du Projet</h4>
+                                                </div>
+                                                <div class="info-content">
+                                                    <div class="info-value">
+                                                        {{ projet.descriptionPro|default('Aucune description fournie') }}
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Commentaire -->
+                                            <div class="info-container {% if projet.StatutPro == 'Suspendu' or service.statutService == 'DESACTIVE' %}grised{% endif %}" 
+                                                 {% if projet.commentairePro %}style="background: #fefce8; border-color: #fef08a;"{% endif %}>
+                                                <div class="info-header">
+                                                    <h4 class="info-title" {% if projet.commentairePro %}style="color: #854d0e;"{% endif %}>Commentaire</h4>
+                                                </div>
+                                                <div class="info-content">
+                                                    <div class="info-value" {% if projet.commentairePro %}style="color: #a16207;"{% endif %}>
+                                                        {{ projet.commentairePro|default('Aucun commentaire') }}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Informations Générales -->
+                                        <div class="info-container {% if projet.StatutPro == 'Suspendu' or service.statutService == 'DESACTIVE' %}grised{% endif %}">
+                                            <div class="info-header">
+                                                <h4 class="info-title">Informations Générales</h4>
+                                            </div>
+                                            <div class="info-grid">
+                                                <div class="info-item">
+                                                    <span class="info-label">Date de Début</span>
+                                                    <span class="info-value">
+                                                        {{ projet.dateDebutPro ? projet.dateDebutPro|date('d/m/Y') : 'Non définie' }}
+                                                    </span>
+                                                </div>
+                                                <div class="info-item">
+                                                    <span class="info-label">Date de Fin</span>
+                                                    <span class="info-value">
+                                                        {{ projet.dateFinPro ? projet.dateFinPro|date('d/m/Y') : 'Non définie' }}
+                                                    </span>
+                                                </div>
+                                                <div class="info-item">
+                                                    <span class="info-label">Budget Alloué</span>
+                                                    <span class="info-value budget">
+                                                        {{ projet.budgetPro|default(0)|number_format(0, ',', ' ') }} Ar
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Avancement -->
+                                        <div class="info-container {% if projet.StatutPro == 'Suspendu' or service.statutService == 'DESACTIVE' %}grised{% endif %}">
+                                            <div class="info-header">
+                                                <h4 class="info-title">État d'Avancement</h4>
+                                            </div>
+                                            <div class="info-content">
+                                                <div class="info-item">
+                                                    <span class="info-label">Progression Globale</span>
+                                                    <div class="info-value">
+                                                        <div class="progress-container">
+                                                            <div class="progress-info">
+                                                                <span class="progress-percent">{{ projet.avancementPro|default(0) }}%</span>
+                                                            </div>
+                                                            <div class="progress-bar">
+                                                                <div class="progress-fill" style="width: {{ projet.avancementPro|default(0) }}%"></div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Équipe -->
+                                        <div class="info-container {% if projet.StatutPro == 'Suspendu' or service.statutService == 'DESACTIVE' %}grised{% endif %}">
+                                            <div class="info-header">
+                                                <h4 class="info-title">Équipe du Projet</h4>
+                                            </div>
+                                            <div class="info-grid">
+                                                {% if projet.createur %}
+                                                    <div class="info-item">
+                                                        <span class="info-label">Créateur</span>
+                                                        <div style="background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 6px; padding: 0.5rem;">
+                                                            <div style="font-size: 0.8rem; color: #075985;">
+                                                                {{ projet.createur.NomPer }} {{ projet.createur.PrenomPer|default('') }}
+                                                                {% if projet.createur.ImPer %}(IM: {{ projet.createur.ImPer }}){% endif %}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                {% endif %}
+
+                                                <div class="info-item">
+                                                    <span class="info-label">Responsables</span>
+                                                    <div style="background: #f8fafc; border: 1px solid #e5e7eb; border-radius: 6px; padding: 0.5rem;">
+                                                        {% if projet.personnels and projet.personnels|length > 0 %}
+                                                            <div style="display: flex; flex-direction: column; gap: 0.3rem;">
+                                                                {% for personnel in projet.personnels %}
+                                                                    <div style="padding: 0.4rem; background: white; border: 1px solid #e5e7eb; border-radius: 4px; font-size: 0.75rem;">
+                                                                        <div style="font-weight: 600; color: #374151;">
+                                                                            {{ personnel.NomPer }} {{ personnel.PrenomPer|default('') }}
+                                                                        </div>
+                                                                        <div style="font-size: 0.7rem; color: #6b7280;">
+                                                                            {% if personnel.ImPer %}IM: {{ personnel.ImPer }}{% endif %}
+                                                                            {% if personnel.EmailPer %} • {{ personnel.EmailPer }}{% endif %}
+                                                                        </div>
+                                                                    </div>
+                                                                {% endfor %}
+                                                            </div>
+                                                        {% else %}
+                                                            <div style="color: #6b7280; font-style: italic; font-size: 0.75rem; text-align: center; padding: 0.5rem;">
+                                                                Aucun responsable assigné
+                                                            </div>
+                                                        {% endif %}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Tâches du projet -->
+                            <div style="padding: 1rem;">
+                                <h5 style="margin-bottom: 0.8rem; color: #374151; font-size: 1rem;">
+                                    Liste des Tâches
+                                    {% if projet.StatutPro == 'Suspendu' or service.statutService == 'DESACTIVE' %}
+                                        <span class="status-badge status-desactive" style="font-size: 0.6rem; margin-left: 0.5rem;">
+                                            Projet Suspendu/Service Désactivé
+                                        </span>
+                                    {% endif %}
+                                </h5>
+                                <table class="taches-table">
+                                    <thead>
+                                        <tr>
+                                            <th style="width: 50px;">#</th>
+                                            <th style="width: 150px;">Titre</th>
+                                            <th>Description</th>
+                                            <th class="tache-commentaire-cell">Commentaire</th>
+                                            <th style="width: 120px;">Période</th>
+                                            <th style="width: 90px;">Avancement</th>
+                                            <th style="width: 70px;">Statut</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% if projet.taches and projet.taches|length > 0 %}
+                                            {% for tache in projet.taches %}
+                                                {% set isTacheSuspendue = tache.statutTache == 'Suspendu' %}
+                                                {% set isParentSuspendu = projet.StatutPro == 'Suspendu' or service.statutService == 'DESACTIVE' %}
+                                                <tr {% if isTacheSuspendue or isParentSuspendu %}style="opacity: 0.7;"{% endif %}>
+                                                    <td><strong>{{ tache.numTache }}</strong></td>
+                                                    <td>{{ tache.titreTache }}</td>
+                                                    <td>
+                                                        <div class="text-preview {% if not tache.descriptionTache %}empty{% endif %}">
+                                                            {{ tache.descriptionTache|default('Aucune description') }}
+                                                        </div>
+                                                    </td>
+                                                    <td class="tache-commentaire-cell">
+                                                        <div class="tache-commentaire {% if not tache.commentaireTache %}empty{% endif %}">
+                                                            {{ tache.commentaireTache|default('Aucun commentaire') }}
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div>
+                                                            <div><small><strong>Début:</strong> {{ tache.dateDebutTache ? tache.dateDebutTache|date('d/m/Y') : '-' }}</small></div>
+                                                            <div><small><strong>Fin:</strong> {{ tache.dateFinTache ? tache.dateFinTache|date('d/m/Y') : '-' }}</small></div>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div>
+                                                            <span style="font-size: 0.7rem;">{{ tache.avancementTache|default(0) }}%</span>
+                                                            <div class="progress-bar">
+                                                                <div class="progress-fill" style="width: {{ tache.avancementTache|default(0) }}%"></div>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <span class="status-badge status-{{ tache.statutTache|lower|replace({' ': '', 'é': 'e'}) }}">
+                                                            {{ tache.statutTache }}
+                                                        </span>
+                                                    </td>
+                                                </tr>
+                                            {% endfor %}
+                                        {% else %}
+                                            <tr>
+                                                <td colspan="7" style="text-align: center; padding: 1.5rem; color: #6b7280; font-style: italic; background: #f9fafb;">
+                                                    Aucune tâche définie pour ce projet
+                                                </td>
+                                            </tr>
+                                        {% endif %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="projet-table-container {% if service.statutService == 'DESACTIVE' %}grised{% endif %}">
+                        <div class="projet-header {% if service.statutService == 'DESACTIVE' %}projet-header-suspendu{% endif %}">
+                            <div class="projet-title-section">
+                                <div class="projet-title">Aucun projet</div>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        {% endfor %}
+    </div>
+</body>
+</html>

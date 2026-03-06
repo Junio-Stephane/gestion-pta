@@ -3,8 +3,13 @@
 
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
+# config/services.yaml
 parameters:
-
+    mercure.public_url: '%env(MERCURE_PUBLIC_URL)%'
+    mercure.url: '%env(MERCURE_URL)%'
+    mercure.jwt.secret: '%env(MERCURE_JWT_SECRET)%'
+    
+    
 services:
     # default configuration for services in *this* file
     _defaults:
@@ -15,6 +20,32 @@ services:
     # this creates a service per class whose id is the fully-qualified class name
     App\:
         resource: '../src/'
+        exclude:
+            - '../src/DependencyInjection/'
+            - '../src/Entity/'
+            - '../src/Kernel.php'
 
-    # add more service definitions when explicit configuration is needed
-    # please note that last definitions always *replace* previous ones
+    App\EventListener\ResponseListener:
+        tags:
+            - { name: kernel.event_listener, event: kernel.response, method: onKernelResponse }
+        arguments:
+            $security: '@security.helper'
+    
+    App\Service\PdfGeneratorService:
+        arguments:
+            $projectDir: '%kernel.project_dir%'
+
+    
+
+    # App\Service\DirectionApiService:
+    #     arguments:
+    #         $projectDir: '%kernel.project_dir%'
+
+    # App\EventListener\LoginRedirectListener:
+    #     arguments:
+    #         $urlGenerator: '@router'
+    #         $requestStack: '@request_stack'
+    #     tags:
+    #         - { name: kernel.event_subscriber }
+
+    

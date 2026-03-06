@@ -1,0 +1,2200 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Tableau de Bord - Utilisateur{% endblock %}
+
+{% block stylesheets %}
+<style>
+:root {
+    --primary-color: #964ee3;
+    --secondary-color: #75165f;
+    --success-color: #10b981;
+    --warning-color: #f59e0b;
+    --danger-color: #ef4444;
+    --info-color: #3b82f6;
+    --dark-color: #1f2937;
+    --light-color: #f8fafc;
+}
+
+/* Message de bienvenue utilisateur */
+.welcome-container-user {
+    background: linear-gradient(135deg, #964ee3 0%, #75165f 100%);
+    color: white;
+    padding: 2.5rem;
+    border-radius: 20px;
+    margin-bottom: 2rem;
+    box-shadow: 0 12px 40px #964ee3(16, 185, 129, 0.3);
+    position: relative;
+    overflow: hidden;
+}
+
+.welcome-container-user::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 70%);
+    transform: rotate(30deg);
+    animation: gentle-shine 6s infinite linear;
+}
+
+@keyframes gentle-shine {
+    0% { transform: rotate(30deg) translateX(-100%); }
+    100% { transform: rotate(30deg) translateX(100%); }
+}
+
+.welcome-content-user {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2.5rem;
+    position: relative;
+    z-index: 2;
+}
+
+.welcome-text-user {
+    flex: 1;
+}
+
+.welcome-text-user h1 {
+    margin: 0 0 1rem 0;
+    font-size: 2rem;
+    font-weight: 700;
+    color: white;
+    line-height: 1.2;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.welcome-text-user p {
+    margin: 0 0 1.5rem 0;
+    opacity: 0.95;
+    font-size: 1.1rem;
+    line-height: 1.6;
+    max-width: 700px;
+    font-weight: 400;
+}
+
+.welcome-features-user {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.feature-card-user {
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+    padding: 1rem;
+    border-radius: 12px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.feature-card-user:hover {
+    background: rgba(255, 255, 255, 0.25);
+    transform: translateY(-2px);
+}
+
+.feature-icon-user {
+    font-size: 1.5rem;
+    opacity: 0.9;
+}
+
+.feature-text-user h4 {
+    margin: 0 0 0.25rem 0;
+    font-size: 0.95rem;
+    font-weight: 600;
+}
+
+.feature-text-user p {
+    margin: 0;
+    font-size: 0.85rem;
+    opacity: 0.9;
+}
+
+.welcome-actions-user {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.action-btn-user {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 12px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.95rem;
+    backdrop-filter: blur(10px);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.action-btn-user:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    color: white;
+}
+
+.action-btn-user.primary {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.action-btn-user.primary:hover {
+    background: #8547d0;
+    border-color: #8547d0;
+}
+
+.welcome-icon-user {
+    font-size: 4rem;
+    opacity: 0.9;
+    flex-shrink: 0;
+    animation: float-user 4s ease-in-out infinite;
+    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
+}
+
+@keyframes float-user {
+    0%, 100% { transform: translateY(0px) scale(1); }
+    50% { transform: translateY(-10px) scale(1.05); }
+}
+
+/* Responsive pour le message de bienvenue utilisateur */
+@media (max-width: 1024px) {
+    .welcome-content-user {
+        gap: 2rem;
+    }
+    
+    .welcome-text-user h1 {
+        font-size: 1.75rem;
+    }
+    
+    .welcome-text-user p {
+        font-size: 1.05rem;
+    }
+    
+    .welcome-icon-user {
+        font-size: 3.5rem;
+    }
+    
+    .welcome-features-user {
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    }
+}
+
+@media (max-width: 768px) {
+    .welcome-container-user {
+        padding: 2rem 1.5rem;
+    }
+    
+    .welcome-content-user {
+        flex-direction: column;
+        text-align: center;
+        gap: 1.5rem;
+    }
+    
+    .welcome-text-user h1 {
+        font-size: 1.5rem;
+    }
+    
+    .welcome-text-user p {
+        font-size: 1rem;
+    }
+    
+    .welcome-features-user {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+    }
+    
+    .welcome-actions-user {
+        justify-content: center;
+    }
+    
+    .welcome-icon-user {
+        font-size: 3rem;
+        order: -1;
+    }
+}
+
+@media (max-width: 480px) {
+    .welcome-container-user {
+        padding: 1.5rem 1.25rem;
+    }
+    
+    .welcome-text-user h1 {
+        font-size: 1.3rem;
+    }
+    
+    .welcome-text-user p {
+        font-size: 0.95rem;
+    }
+    
+    .feature-card-user {
+        padding: 0.75rem;
+    }
+    
+    .feature-icon-user {
+        font-size: 1.25rem;
+    }
+    
+    .action-btn-user {
+        padding: 0.6rem 1.2rem;
+        font-size: 0.9rem;
+    }
+    
+    .welcome-icon-user {
+        font-size: 2.5rem;
+    }
+}
+
+
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+/* Section Grid Compact pour Utilisateur */
+.section-grid-compact {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 0;
+}
+
+.dashboard-section {
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
+    margin-bottom: 1.5rem;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #f1f5f9;
+}
+
+.section-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--dark-color);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.section-title i {
+    color: var(--primary-color);
+}
+
+/* Stat Cards Compact */
+.stat-card-compact {
+    background: #d28eef58;
+    padding: 1.25rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    border-left: 4px solid var(--primary-color);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-card-compact:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+}
+
+.stat-card-compact.success { border-left-color: var(--success-color); }
+.stat-card-compact.warning { border-left-color: var(--warning-color); }
+.stat-card-compact.danger { border-left-color: var(--danger-color); }
+.stat-card-compact.info { border-left-color: var(--info-color); }
+.stat-card-compact.secondary { border-left-color: var(--secondary-color); }
+
+.stat-header-compact {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.75rem;
+}
+
+.stat-icon-compact {
+    width: 45px;
+    height: 45px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    color: white;
+    flex-shrink: 0;
+}
+
+.stat-card-compact .stat-icon-compact { background: var(--primary-color); }
+.stat-card-compact.success .stat-icon-compact { background: var(--success-color); }
+.stat-card-compact.warning .stat-icon-compact { background: var(--warning-color); }
+.stat-card-compact.danger .stat-icon-compact { background: var(--danger-color); }
+.stat-card-compact.info .stat-icon-compact { background: var(--info-color); }
+.stat-card-compact.secondary .stat-icon-compact { background: var(--secondary-color); }
+
+.stat-content-compact h3 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--dark-color);
+    margin: 0;
+    line-height: 1;
+}
+
+.stat-label-compact {
+    color: #6b7280;
+    font-size: 0.8rem;
+    margin: 0.25rem 0 0 0;
+    font-weight: 500;
+}
+
+/* Graphiques */
+.charts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1rem;
+}
+
+.chart-container {
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
+    transition: all 0.3s ease;
+}
+
+.chart-container:hover {
+    transform: translateY(-5px);
+    box-shadow: rgba(0, 0, 0, 0.15) 0px 8px 24px;
+}
+
+.chart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.chart-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--dark-color);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.chart-title i {
+    color: var(--primary-color);
+}
+
+/* DIAGRAMME EN BÂTONS VERTICAL CLASSIQUE */
+.bar-chart-container {
+    position: relative;
+    width: 100%;
+    height: 450px;
+    display: flex;
+    flex-direction: column;
+}
+
+.chart-area-with-labels {
+    flex: 1;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-around;
+    padding: 20px 20px 80px 50px;
+    border-left: 2px solid #e5e7eb;
+    border-bottom: 2px solid #e5e7eb;
+    position: relative;
+    min-height: 250px;
+}
+
+.bar-column {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100%;
+    position: relative;
+    flex: 1;
+    max-width: 80px;
+    min-width: 50px;
+}
+
+.bar-wrapper {
+    flex: 1;
+    width: 100%;
+    display: flex;
+    align-items: flex-end;
+    position: relative;
+    min-height: 50px;
+}
+
+.bar {
+    width: 35px;
+    background: var(--primary-color);
+    border-radius: 6px 6px 0 0;
+    transition: all 0.3s ease;
+    position: relative;
+    cursor: pointer;
+    margin: 0 auto;
+    min-height: 3px;
+}
+
+.bar.zero-progress {
+    background: var(--info-color);
+    min-height: 3px;
+    opacity: 0.7;
+}
+
+.bar:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(150, 78, 227, 0.3);
+    filter: brightness(1.1);
+}
+
+.bar-label {
+    position: absolute;
+    bottom: -70px;
+    left: 50%;
+    transform: translateX(-50%) rotate(-45deg);
+    transform-origin: top left;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--dark-color);
+    text-align: left;
+    white-space: nowrap;
+    padding: 4px 6px;
+    max-width: 120px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 3px;
+    z-index: 5;
+    line-height: 1.2;
+}
+
+.bar-label:hover {
+    background: white;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    z-index: 20;
+    max-width: 200px;
+}
+
+.bar-value {
+    position: absolute;
+    top: -25px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--dark-color);
+    color: white;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    opacity: 0;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    z-index: 10;
+}
+
+.bar:hover .bar-value {
+    opacity: 1;
+}
+
+.y-axis {
+    position: absolute;
+    left: 0;
+    top: 20px;
+    bottom: 80px;
+    width: 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    font-size: 0.75rem;
+    color: #6b7280;
+    text-align: center;
+}
+
+.x-axis-label {
+    position: absolute;
+    left: 40px;
+    right: 0;
+    bottom: 0;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-top: 1px solid #e5e7eb;
+    font-size: 0.8rem;
+    color: #6b7280;
+    font-weight: 500;
+}
+
+/* DIAGRAMME HORIZONTAL AMÉLIORÉ */
+.horizontal-gantt-container {
+    width: 100%;
+    max-height: 600px;
+    overflow-y: auto;
+    padding: 1rem 0;
+    border: 1px solid #f1f5f9;
+    border-radius: 8px;
+    background: #fafafa;
+}
+
+/* Scrollbar styling */
+.horizontal-gantt-container::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+.horizontal-gantt-container::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 4px;
+}
+
+.horizontal-gantt-container::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 4px;
+}
+
+.horizontal-gantt-container::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+.gantt-row {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    border-bottom: 1px solid #f1f5f9;
+    gap: 1rem;
+    transition: background-color 0.2s ease;
+    min-width: min-content;
+}
+
+.gantt-row:hover {
+    background-color: #f8fafc;
+}
+
+.gantt-row:last-child {
+    border-bottom: none;
+}
+
+.gantt-project-info {
+    width: 200px;
+    min-width: 200px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    flex-shrink: 0;
+}
+
+.gantt-project-name {
+    font-weight: 600;
+    color: var(--dark-color);
+    font-size: 0.9rem;
+}
+
+.gantt-project-dates {
+    font-size: 0.75rem;
+    color: #6b7280;
+    display: flex;
+    gap: 0.5rem;
+}
+
+.gantt-timeline-container {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    min-height: 40px;
+    min-width: 500px;
+}
+
+.gantt-bar-container {
+    flex: 1;
+    height: 25px;
+    background: #f1f5f9;
+    border-radius: 12px;
+    overflow: hidden;
+    position: relative;
+    min-width: 300px;
+}
+
+.gantt-bar {
+    height: 100%;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: 8px;
+    min-width: 5px;
+}
+
+/* Couleurs des barres - Suppression des dégradés */
+.gantt-bar.in-progress {
+    background: var(--info-color);
+}
+
+.gantt-bar.completed {
+    background: var(--success-color);
+}
+
+.gantt-bar.warning {
+    background: var(--warning-color);
+}
+
+.gantt-bar.danger {
+    background: var(--danger-color);
+}
+
+.gantt-bar.suspended {
+    background: #6b7280;
+}
+
+.gantt-bar-value {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: white;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+}
+
+.gantt-percentage {
+    width: 50px;
+    text-align: right;
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--dark-color);
+    flex-shrink: 0;
+}
+
+.gantt-status-indicators {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+/* Indicateurs avec icônes */
+.status-indicator {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.8rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 12px;
+    background: #f8fafc;
+    white-space: nowrap;
+}
+
+.status-indicator.warning {
+    background: #fffbeb;
+    color: #d97706;
+    border: 1px solid #fed7aa;
+}
+
+.status-indicator.danger {
+    background: #fef2f2;
+    color: #dc2626;
+    border: 1px solid #fecaca;
+    animation: blink 2s infinite;
+}
+
+.status-indicator.success {
+    background: #ecfdf5;
+    color: #065f46;
+}
+
+@keyframes blink {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0.5; }
+}
+
+/* Dates sur la timeline */
+.gantt-date-marker {
+    position: absolute;
+    top: -20px;
+    font-size: 0.7rem;
+    color: #6b7280;
+    transform: translateX(-50%);
+}
+
+.gantt-date-marker.start {
+    left: 0;
+}
+
+.gantt-date-marker.end {
+    right: 0;
+}
+
+/* Légende améliorée */
+.gantt-legend {
+    display: flex;
+    gap: 1.5rem;
+    margin-top: 1rem;
+    padding: 1rem;
+    background: #ffff;
+    border-radius: 8px;
+    flex-wrap: wrap;
+}
+
+.legend-items {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.8rem;
+    color: var(--dark-color);
+    padding: 0.5rem;
+    border-radius: 6px;
+    background: white;
+    white-space: nowrap;
+}
+
+.legend-color {
+    width: 16px;
+    height: 16px;
+    border-radius: 4px;
+}
+
+.legend-color.in-progress { background: var(--info-color); }
+.legend-color.completed { background: var(--success-color); }
+.legend-color.warning { background: var(--warning-color); }
+.legend-color.danger { background: var(--danger-color); }
+.legend-color.suspended { background: #6b7280; }
+
+/* DIAGRAMME CAMEMBERT */
+.pie-chart-wrapper {
+    position: relative;
+    width: 200px;
+    height: 200px;
+    margin: 0 auto;
+}
+
+.pie-chart {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    position: relative;
+    background: conic-gradient(
+        var(--info-color) 0% 25%,
+        var(--success-color) 25% 50%,
+        var(--warning-color) 50% 75%,
+        var(--danger-color) 75% 100%
+    );
+    animation: rotatePie 2s ease-out;
+}
+
+@keyframes rotatePie {
+    from {
+        transform: rotate(-90deg) scale(0.8);
+        opacity: 0;
+    }
+    to {
+        transform: rotate(0deg) scale(1);
+        opacity: 1;
+    }
+}
+
+.chart-center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 80px;
+    height: 80px;
+    background: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.total-count {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--dark-color);
+    text-align: center;
+}
+
+.total-label {
+    font-size: 0.7rem;
+    color: #6b7280;
+    margin-top: 0.25rem;
+}
+
+.chart-legend {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.legend-item:hover {
+    background: #f8fafc;
+    transform: translateX(5px);
+}
+
+.legend-color {
+    width: 16px;
+    height: 16px;
+    border-radius: 4px;
+    flex-shrink: 0;
+}
+
+.legend-info {
+    flex: 1;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.legend-label {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--dark-color);
+}
+
+.legend-value {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #6b7280;
+}
+
+.legend-percentage {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--dark-color);
+    background: #f1f5f9;
+    padding: 0.2rem 0.5rem;
+    border-radius: 12px;
+}
+
+/* Filtres */
+.filters {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    align-items: end;
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    min-width: 150px;
+}
+
+.filter-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--dark-color);
+}
+
+.filter-select {
+    padding: 0.5rem;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    background: white;
+    font-size: 0.8rem;
+    min-width: 100%;
+    cursor: pointer;
+}
+
+.filter-select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(150, 78, 227, 0.1);
+}
+
+.btn-reset-filters {
+    background: #6b7280;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    height: fit-content;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    white-space: nowrap;
+}
+
+.btn-reset-filters:hover {
+    background: #4b5563;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+/* Actions rapides */
+.quick-actions {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.action-card {
+    background: #f8fafc;
+    padding: 1.5rem;
+    border-radius: 10px;
+    text-align: center;
+    text-decoration: none;
+    color: var(--dark-color);
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+    cursor: pointer;
+}
+
+.action-card:hover {
+    background: white;
+    border-color: var(--primary-color);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    color: var(--primary-color);
+}
+
+.action-icon {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+    color: var(--primary-color);
+}
+
+.action-title {
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+}
+
+.action-desc {
+    font-size: 0.8rem;
+    color: #6b7280;
+}
+
+/* Tâches */
+.task-item {
+    border-left: 4px solid var(--primary-color);
+    margin-bottom: 1rem;
+    padding: 1rem;
+    background: #f8fafc;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.task-item:hover {
+    background: white;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.progress-sm {
+    height: 6px;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 3rem;
+    color: #6b7280;
+}
+
+.empty-state i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+
+.empty-chart-message {
+    text-align: center;
+    padding: 3rem;
+    color: #6b7280;
+    font-style: italic;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .charts-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .bar-chart-container {
+        height: 400px;
+    }
+    
+    .chart-area-with-labels {
+        height: 300px;
+        padding: 15px 15px 70px 40px;
+    }
+    
+    .bar {
+        width: 25px;
+    }
+    
+    .bar-label {
+        font-size: 10px;
+        bottom: -60px;
+        max-width: 100px;
+    }
+    
+    .gantt-project-info {
+        width: 150px;
+        min-width: 150px;
+    }
+    
+    .gantt-bar-container {
+        min-width: 200px;
+    }
+    
+    .gantt-timeline-container {
+        min-width: 400px;
+    }
+    
+    .filters {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .filter-group {
+        min-width: auto;
+    }
+    
+    .gantt-legend {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .gantt-timeline-container {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+    
+    .gantt-status-indicators {
+        align-self: flex-end;
+    }
+}
+
+@media (max-width: 480px) {
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .charts-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .bar-chart-container {
+        height: 350px;
+    }
+    
+    .chart-area-with-labels {
+        height: 250px;
+        padding: 10px 10px 60px 35px;
+    }
+    
+    .bar {
+        width: 20px;
+    }
+    
+    .bar-label {
+        font-size: 9px;
+        bottom: -50px;
+        max-width: 80px;
+        padding: 2px 4px;
+    }
+    
+    .pie-chart-wrapper {
+        width: 150px;
+        height: 150px;
+    }
+    
+    .chart-center {
+        width: 60px;
+        height: 60px;
+    }
+    
+    .total-count {
+        font-size: 1.2rem;
+    }
+    
+    .gantt-project-info {
+        width: 120px;
+        min-width: 120px;
+    }
+    
+    .gantt-bar-container {
+        min-width: 150px;
+    }
+    
+    .gantt-timeline-container {
+        min-width: 300px;
+    }
+    
+    .gantt-status-indicators {
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+}
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="dashboard-container">
+
+    <div class="welcome-container-user">
+        <div class="welcome-content-user">
+            <div class="welcome-text-user">
+                <h1>Bienvenue sur votre tableau de bord</h1>
+                <p>
+                    Retrouvez ici vos tâches, vos projets assignés et suivez votre progression.
+                    Mettez à jour votre travail facilement et restez informé de vos responsabilités.
+                </p>
+                
+                <div class="welcome-features-user">
+                    <div class="feature-card-user">
+                        <div class="feature-icon-user">
+                            <i class="bi bi-list-task"></i>
+                        </div>
+                        <div class="feature-text-user">
+                            <h4>Gestion des Tâches</h4>
+                            <p>Suivez vos missions en cours</p>
+                        </div>
+                    </div>
+                    <div class="feature-card-user">
+                        <div class="feature-icon-user">
+                            <i class="bi bi-folder"></i>
+                        </div>
+                        <div class="feature-text-user">
+                            <h4>Projets Assignés</h4>
+                            <p>Vos projets en un coup d'œil</p>
+                        </div>
+                    </div>
+                    <div class="feature-card-user">
+                        <div class="feature-icon-user">
+                            <i class="bi bi-graph-up"></i>
+                        </div>
+                        <div class="feature-text-user">
+                            <h4>Suivi Progression</h4>
+                            <p>Visualisez votre avancement</p>
+                        </div>
+                    </div>
+                    {# <div class="feature-card-user">
+                        <div class="feature-icon-user">
+                            <i class="bi bi-bell"></i>
+                        </div>
+                        <div class="feature-text-user">
+                            <h4>Notifications</h4>
+                            <p>Restez informé en temps réel</p>
+                        </div>
+                    </div> #}
+                </div>
+            </div>
+            <div class="welcome-icon-user">
+                <i class="bi bi-person-circle"></i>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Premier Container: Statistiques des projets de l'utilisateur -->
+    <div class="dashboard-section">
+        <div class="section-header">
+            <h2 class="section-title">
+                <i class="bi bi-folder"></i>
+                Mes Projets Assignés
+            </h2>
+        </div>
+
+        <div class="section-grid-compact">
+            <div class="stat-card-compact">
+                <div class="stat-header-compact">
+                    <div class="stat-content-compact">
+                        <h3>{{ total_projets }}</h3>
+                        <p class="stat-label-compact">Total des projets</p>
+                    </div>
+                    <div class="stat-icon-compact">
+                        <i class="bi bi-folder"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card-compact info">
+                <div class="stat-header-compact">
+                    <div class="stat-content-compact">
+                        <h3>{{ projets_debutes }}</h3>
+                        <p class="stat-label-compact">Projets débutés</p>
+                    </div>
+                    <div class="stat-icon-compact">
+                        <i class="bi bi-play-circle"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card-compact warning">
+                <div class="stat-header-compact">
+                    <div class="stat-content-compact">
+                        <h3>{{ projets_en_cours }}</h3>
+                        <p class="stat-label-compact">Projets en cours</p>
+                    </div>
+                    <div class="stat-icon-compact">
+                        <i class="bi bi-clock"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card-compact success">
+                <div class="stat-header-compact">
+                    <div class="stat-content-compact">
+                        <h3>{{ projets_termines }}</h3>
+                        <p class="stat-label-compact">Projets terminés</p>
+                    </div>
+                    <div class="stat-icon-compact">
+                        <i class="bi bi-check-circle"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card-compact danger">
+                <div class="stat-header-compact">
+                    <div class="stat-content-compact">
+                        <h3>{{ projets_suspendus }}</h3>
+                        <p class="stat-label-compact">Projets suspendus</p>
+                    </div>
+                    <div class="stat-icon-compact">
+                        <i class="bi bi-pause-circle"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Deuxième Container: Diagramme baton avec filtre -->
+    <div class="dashboard-section">
+        <div class="section-header">
+            <h2 class="section-title">
+                <i class="bi bi-bar-chart"></i>
+                Avancement de mes projets
+            </h2>
+        </div>
+
+        <!-- Filtres POUR LA VUE D'ENSEMBLE -->
+        <div class="filters" id="overviewFilters">
+            <div class="filter-group">
+                <label class="filter-label">Statut</label>
+                <select class="filter-select" id="statutFilter">
+                    <option value="all">Tous les statuts</option>
+                    <option value="Débuté">Débuté</option>
+                    <option value="En cours">En cours</option>
+                    <option value="Terminé">Terminé</option>
+                    <option value="Suspendu">Suspendu</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label class="filter-label">Avancement</label>
+                <select class="filter-select" id="avancementFilter">
+                    <option value="all">Tous les avancements</option>
+                    <option value="0">0% (Non débuté)</option>
+                    <option value="1-25">1-25% (Débuté)</option>
+                    <option value="26-50">26-50% (En progression)</option>
+                    <option value="51-75">51-75% (Avancé)</option>
+                    <option value="76-99">76-99% (Bientôt terminé)</option>
+                    <option value="100">100% (Terminé)</option>
+                </select>
+            </div>
+            <button class="btn-reset-filters" id="resetOverviewFilters">
+                <i class="bi bi-arrow-clockwise"></i> Réinitialiser
+            </button>
+        </div>
+
+        <!-- Diagramme en bâtons vertical -->
+        <div class="chart-container">
+            <div class="chart-header">
+                <h3 class="chart-title">
+                    <i class="bi bi-bar-chart-line"></i>
+                    Avancement par projet
+                </h3>
+            </div>
+            <div class="bar-chart-container">
+                <div class="y-axis">
+                    <span>100%</span>
+                    <span>75%</span>
+                    <span>50%</span>
+                    <span>25%</span>
+                    <span>0%</span>
+                </div>
+                <div class="chart-area-with-labels" id="verticalBarChart">
+                    <!-- Les barres seront générées par JavaScript -->
+                </div>
+                <div class="x-axis-label">Projets</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Troisième Container: Diagramme horizontal amélioré -->
+    <div class="dashboard-section">
+        <div class="section-header">
+            <h2 class="section-title">
+                <i class="bi bi-calendar-range"></i>
+                Vue détaillée de mes projets
+            </h2>
+        </div>
+
+        <!-- Filtres INDÉPENDANTS POUR LA VUE DÉTAILLÉE -->
+        <div class="filters" id="detailFilters">
+            <div class="filter-group">
+                <label class="filter-label">Statut</label>
+                <select class="filter-select" id="detailStatutFilter">
+                    <option value="all">Tous les statuts</option>
+                    <option value="Débuté">Débuté</option>
+                    <option value="En cours">En cours</option>
+                    <option value="Terminé">Terminé</option>
+                    <option value="Suspendu">Suspendu</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label class="filter-label">Avancement</label>
+                <select class="filter-select" id="detailAvancementFilter">
+                    <option value="all">Tous les avancements</option>
+                    <option value="0">0% (Non débuté)</option>
+                    <option value="1-25">1-25% (Débuté)</option>
+                    <option value="26-50">26-50% (En progression)</option>
+                    <option value="51-75">51-75% (Avancé)</option>
+                    <option value="76-99">76-99% (Bientôt terminé)</option>
+                    <option value="100">100% (Terminé)</option>
+                </select>
+            </div>
+            <button class="btn-reset-filters" id="resetDetailFilters">
+                <i class="bi bi-arrow-clockwise"></i> Réinitialiser
+            </button>
+        </div>
+
+        <div class="chart-container">
+            <div class="chart-header">
+                <h3 class="chart-title">
+                    <i class="bi bi-bar-chart-steps"></i>
+                    Timeline et avancement
+                </h3>
+            </div>
+            
+            <!-- Légende améliorée -->
+            <div class="gantt-legend">
+                <div class="legend-items">
+                    <div class="legend-item">
+                        <div class="legend-color in-progress"></div>
+                        <span><i class="bi bi-play-circle"></i> En cours</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color completed"></div>
+                        <span><i class="bi bi-check-circle"></i> Terminé</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color warning"></div>
+                        <span><i class="bi bi-exclamation-triangle"></i> Proche échéance</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color danger"></div>
+                        <span><i class="bi bi-clock"></i> En retard</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color suspended"></div>
+                        <span><i class="bi bi-pause-circle"></i> Suspendu</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="horizontal-gantt-container" id="horizontalGanttChart">
+                <!-- Le diagramme horizontal sera généré par JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Quatrième Container: Statistiques des tâches -->
+    <div class="dashboard-section">
+        <div class="section-header">
+            <h2 class="section-title">
+                <i class="bi bi-list-task"></i>
+                Mes Tâches Assignées
+            </h2>
+        </div>
+
+        <div class="section-grid-compact">
+            <div class="stat-card-compact secondary">
+                <div class="stat-header-compact">
+                    <div class="stat-content-compact">
+                        <h3>{{ total_taches }}</h3>
+                        <p class="stat-label-compact">Total des tâches</p>
+                    </div>
+                    <div class="stat-icon-compact">
+                        <i class="bi bi-list-task"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card-compact info">
+                <div class="stat-header-compact">
+                    <div class="stat-content-compact">
+                        <h3>{{ taches_debutees }}</h3>
+                        <p class="stat-label-compact">Tâches débutées</p>
+                    </div>
+                    <div class="stat-icon-compact">
+                        <i class="bi bi-play-circle"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card-compact warning">
+                <div class="stat-header-compact">
+                    <div class="stat-content-compact">
+                        <h3>{{ taches_en_cours }}</h3>
+                        <p class="stat-label-compact">Tâches en cours</p>
+                    </div>
+                    <div class="stat-icon-compact">
+                        <i class="bi bi-clock"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card-compact success">
+                <div class="stat-header-compact">
+                    <div class="stat-content-compact">
+                        <h3>{{ taches_terminees }}</h3>
+                        <p class="stat-label-compact">Tâches terminées</p>
+                    </div>
+                    <div class="stat-icon-compact">
+                        <i class="bi bi-check-circle"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card-compact danger">
+                <div class="stat-header-compact">
+                    <div class="stat-content-compact">
+                        <h3>{{ taches_suspendues }}</h3>
+                        <p class="stat-label-compact">Tâches suspendues</p>
+                    </div>
+                    <div class="stat-icon-compact">
+                        <i class="bi bi-pause-circle"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cinquième Container: Diagramme camembert des tâches -->
+    <div class="dashboard-section">
+        <div class="section-header">
+            <h2 class="section-title">
+                <i class="bi bi-pie-chart"></i>
+                Avancement des tâches par projet
+            </h2>
+        </div>
+
+        <!-- Filtre projet -->
+        <div class="filters">
+            <div class="filter-group">
+                <label class="filter-label">Projet</label>
+                <select class="filter-select" id="projetFilter">
+                    <option value="all">Pour tous les projets</option>
+                    {% for projet in projets_assignes %}
+                        <option value="{{ projet.numProjet }}">{{ projet.titrePro }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <div class="charts-grid">
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h3 class="chart-title">
+                        <i class="bi bi-pie-chart-fill"></i>
+                        Répartition des tâches
+                    </h3>
+                </div>
+                <div class="pie-chart-wrapper">
+                    <div class="pie-chart" id="tachesPieChart"></div>
+                    <div class="chart-center">
+                        <div class="total-count" id="totalTachesCount">0</div>
+                        <div class="total-label">Total tâches</div>
+                    </div>
+                </div>
+                <div class="chart-legend" id="tachesLegend">
+                    <!-- La légende sera générée par JavaScript -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+class UtilisateurDashboardCharts {
+    constructor() {
+        this.projetsData = {{ donnees_projets_utilisateur|json_encode|raw }};
+        this.tachesData = {{ donnees_taches_utilisateur|json_encode|raw }};
+        this.init();
+    }
+
+    init() {
+        console.log('📊 Initialisation dashboard utilisateur');
+        console.log('📁 Données projets:', this.projetsData);
+        console.log('📋 Données tâches:', this.tachesData);
+        
+        this.updateOverviewCharts();
+        this.updateDetailCharts();
+        this.updateTachesPieChart(); // Chargement immédiat
+        this.setupFilters();
+    }
+
+    // 🎯 FILTRER LES PROJETS POUR LA VUE D'ENSEMBLE
+    getFilteredOverviewProjets() {
+        const statutFilter = document.getElementById('statutFilter').value;
+        const avancementFilter = document.getElementById('avancementFilter').value;
+        
+        let filteredProjets = this.projetsData;
+
+        // Filtre par statut
+        if (statutFilter !== 'all') {
+            filteredProjets = filteredProjets.filter(p => p.statut === statutFilter);
+        }
+
+        // Filtre par avancement
+        if (avancementFilter !== 'all') {
+            filteredProjets = filteredProjets.filter(projet => {
+                const avancement = projet.avancement;
+                
+                switch (avancementFilter) {
+                    case '0':
+                        return avancement === 0;
+                    case '1-25':
+                        return avancement >= 1 && avancement <= 25;
+                    case '26-50':
+                        return avancement >= 26 && avancement <= 50;
+                    case '51-75':
+                        return avancement >= 51 && avancement <= 75;
+                    case '76-99':
+                        return avancement >= 76 && avancement <= 99;
+                    case '100':
+                        return avancement === 100;
+                    default:
+                        return true;
+                }
+            });
+        }
+
+        console.log('Projets vue d\'ensemble filtrés:', filteredProjets.length);
+        return filteredProjets;
+    }
+
+    // 🎯 FILTRER LES PROJETS POUR LA VUE DÉTAILLÉE
+    getFilteredDetailProjets() {
+        const statutFilter = document.getElementById('detailStatutFilter').value;
+        const avancementFilter = document.getElementById('detailAvancementFilter').value;
+        
+        let filteredProjets = this.projetsData;
+
+        // Filtre par statut
+        if (statutFilter !== 'all') {
+            filteredProjets = filteredProjets.filter(p => p.statut === statutFilter);
+        }
+
+        // Filtre par avancement
+        if (avancementFilter !== 'all') {
+            filteredProjets = filteredProjets.filter(projet => {
+                const avancement = projet.avancement;
+                
+                switch (avancementFilter) {
+                    case '0':
+                        return avancement === 0;
+                    case '1-25':
+                        return avancement >= 1 && avancement <= 25;
+                    case '26-50':
+                        return avancement >= 26 && avancement <= 50;
+                    case '51-75':
+                        return avancement >= 51 && avancement <= 75;
+                    case '76-99':
+                        return avancement >= 76 && avancement <= 99;
+                    case '100':
+                        return avancement === 100;
+                    default:
+                        return true;
+                }
+            });
+        }
+
+        console.log('Projets vue détaillée filtrés:', filteredProjets.length);
+        return filteredProjets;
+    }
+
+    // 🎯 FILTRER LES TÂCHES PAR PROJET - CORRIGÉ
+    getFilteredTaches() {
+        const projetFilter = document.getElementById('projetFilter').value;
+        
+        console.log('🔍 Filtre projet sélectionné:', projetFilter);
+        console.log('📋 Toutes les tâches disponibles:', this.tachesData);
+
+        let filteredTaches = this.tachesData;
+
+        // Filtre par projet
+        if (projetFilter !== 'all') {
+            filteredTaches = filteredTaches.filter(t => {
+                const match = t.projetId == projetFilter;
+                console.log(`🔍 Tâche "${t.titre}" - projetId: ${t.projetId}, filtre: ${projetFilter}, match: ${match}`);
+                return match;
+            });
+        }
+
+        console.log('✅ Tâches filtrées:', filteredTaches.length, filteredTaches);
+        return filteredTaches;
+    }
+
+    // 🔄 RÉINITIALISER LES FILTRES VUE D'ENSEMBLE
+    resetOverviewFilters() {
+        document.getElementById('statutFilter').value = 'all';
+        document.getElementById('avancementFilter').value = 'all';
+        
+        this.updateOverviewCharts();
+        
+        const resetBtn = document.getElementById('resetOverviewFilters');
+        const originalText = resetBtn.innerHTML;
+        resetBtn.innerHTML = '<i class="bi bi-check"></i> Réinitialisé !';
+        resetBtn.style.background = 'var(--success-color)';
+        
+        setTimeout(() => {
+            resetBtn.innerHTML = originalText;
+            resetBtn.style.background = '';
+        }, 1500);
+    }
+
+    // 🔄 RÉINITIALISER LES FILTRES VUE DÉTAILLÉE
+    resetDetailFilters() {
+        document.getElementById('detailStatutFilter').value = 'all';
+        document.getElementById('detailAvancementFilter').value = 'all';
+        
+        this.updateDetailCharts();
+        
+        const resetBtn = document.getElementById('resetDetailFilters');
+        const originalText = resetBtn.innerHTML;
+        resetBtn.innerHTML = '<i class="bi bi-check"></i> Réinitialisé !';
+        resetBtn.style.background = 'var(--success-color)';
+        
+        setTimeout(() => {
+            resetBtn.innerHTML = originalText;
+            resetBtn.style.background = '';
+        }, 1500);
+    }
+
+    // 📊 DIAGRAMME EN BÂTONS VERTICAL CLASSIQUE (VUE D'ENSEMBLE)
+    updateVerticalBarChart() {
+        const filteredProjets = this.getFilteredOverviewProjets();
+        const chartArea = document.getElementById('verticalBarChart');
+        
+        chartArea.innerHTML = '';
+
+        if (filteredProjets.length === 0) {
+            const emptyMessage = document.createElement('div');
+            emptyMessage.className = 'empty-chart-message';
+            emptyMessage.textContent = 'Aucun projet correspondant aux filtres';
+            chartArea.appendChild(emptyMessage);
+            return;
+        }
+
+        filteredProjets.forEach(projet => {
+            const barColumn = document.createElement('div');
+            barColumn.className = 'bar-column';
+            
+            const barWrapper = document.createElement('div');
+            barWrapper.className = 'bar-wrapper';
+            
+            const barValue = document.createElement('div');
+            barValue.className = 'bar-value';
+            barValue.textContent = `${projet.avancement}%`;
+            
+            const bar = document.createElement('div');
+            bar.className = 'bar';
+            
+            const barHeight = Math.max(projet.avancement, 3);
+            bar.style.height = `${barHeight}%`;
+            
+            if (projet.avancement === 0) {
+                bar.classList.add('zero-progress');
+            } else {
+                const color = this.getColorForStatus(projet.statut);
+                bar.style.background = color;
+            }
+            
+            bar.appendChild(barValue);
+            barWrapper.appendChild(bar);
+            
+            const barLabel = document.createElement('div');
+            barLabel.className = 'bar-label';
+            barLabel.textContent = this.truncateText(projet.titre, 15);
+            barLabel.title = `${projet.titre} (${projet.avancement}%) - ${projet.statut}`;
+            
+            barColumn.appendChild(barWrapper);
+            barColumn.appendChild(barLabel);
+            chartArea.appendChild(barColumn);
+        });
+    }
+
+    // 📊 DIAGRAMME HORIZONTAL AMÉLIORÉ (VUE DÉTAILLÉE)
+    updateHorizontalGanttChart() {
+        const filteredProjets = this.getFilteredDetailProjets();
+        const container = document.getElementById('horizontalGanttChart');
+        
+        container.innerHTML = '';
+
+        if (filteredProjets.length === 0) {
+            const emptyMessage = document.createElement('div');
+            emptyMessage.className = 'empty-chart-message';
+            emptyMessage.textContent = 'Aucun projet correspondant aux filtres';
+            container.appendChild(emptyMessage);
+            return;
+        }
+
+        // Trier les projets par date de début
+        const projetsTries = [...filteredProjets].sort((a, b) => {
+            const dateA = this.parseDate(a.dateDebut);
+            const dateB = this.parseDate(b.dateDebut);
+            return dateA - dateB;
+        });
+
+        projetsTries.forEach(projet => {
+            const ganttRow = document.createElement('div');
+            ganttRow.className = 'gantt-row';
+            
+            // Informations du projet
+            const projectInfo = document.createElement('div');
+            projectInfo.className = 'gantt-project-info';
+            
+            const projectName = document.createElement('div');
+            projectName.className = 'gantt-project-name';
+            projectName.textContent = this.truncateText(projet.titre, 30);
+            projectName.title = projet.titre;
+            
+            const projectDates = document.createElement('div');
+            projectDates.className = 'gantt-project-dates';
+            projectDates.innerHTML = `
+                <span><i class="bi bi-play-fill"></i> ${this.formatDate(projet.dateDebut)}</span>
+                <span><i class="bi bi-flag-fill"></i> ${projet.dateFin ? this.formatDate(projet.dateFin) : '?'}</span>
+            `;
+            
+            projectInfo.appendChild(projectName);
+            projectInfo.appendChild(projectDates);
+            ganttRow.appendChild(projectInfo);
+
+            // Timeline et barre de progression
+            const timelineContainer = document.createElement('div');
+            timelineContainer.className = 'gantt-timeline-container';
+            
+            const barContainer = document.createElement('div');
+            barContainer.className = 'gantt-bar-container';
+            
+            const bar = document.createElement('div');
+            bar.className = 'gantt-bar';
+            
+            // Déterminer la classe de couleur en fonction du statut et des dates
+            const today = new Date();
+            const endDate = projet.dateFin ? this.parseDate(projet.dateFin) : null;
+            let barClass = 'in-progress';
+            let statusIndicator = null;
+            let daysText = '';
+
+            if (projet.statut === 'Terminé') {
+                barClass = 'completed';
+                statusIndicator = { type: 'success', icon: 'bi-check-circle', text: 'Terminé' };
+                daysText = 'Terminé';
+            } else if (projet.statut === 'Suspendu') {
+                barClass = 'suspended';
+                statusIndicator = { type: 'secondary', icon: 'bi-pause-circle', text: 'Suspendu' };
+                daysText = 'Suspendu';
+            } else if (endDate) {
+                const daysUntilDeadline = Math.ceil((endDate - today) / (1000 * 60 * 60 * 24));
+                
+                if (daysUntilDeadline < 0) {
+                    barClass = 'danger';
+                    const daysLate = Math.abs(daysUntilDeadline);
+                    daysText = `${daysLate} jour${daysLate > 1 ? 's' : ''} de retard`;
+                    statusIndicator = { 
+                        type: 'danger', 
+                        icon: 'bi-clock', 
+                        text: daysText, 
+                        blink: true 
+                    };
+                } else if (daysUntilDeadline <= 5) {
+                    barClass = 'warning';
+                    daysText = `${daysUntilDeadline} jour${daysUntilDeadline > 1 ? 's' : ''} restant${daysUntilDeadline > 1 ? 's' : ''}`;
+                    statusIndicator = { 
+                        type: 'warning', 
+                        icon: 'bi-exclamation-triangle', 
+                        text: daysText 
+                    };
+                } else {
+                    barClass = 'in-progress';
+                    daysText = `${daysUntilDeadline} jour${daysUntilDeadline > 1 ? 's' : ''} restant${daysUntilDeadline > 1 ? 's' : ''}`;
+                    statusIndicator = { 
+                        type: 'info', 
+                        icon: 'bi-play-circle', 
+                        text: daysText 
+                    };
+                }
+            } else {
+                barClass = 'in-progress';
+                daysText = 'Pas de date fin';
+                statusIndicator = { 
+                    type: 'info', 
+                    icon: 'bi-play-circle', 
+                    text: daysText 
+                };
+            }
+            
+            bar.classList.add(barClass);
+            bar.style.width = `${Math.max(projet.avancement, 5)}%`;
+            
+            const barValue = document.createElement('div');
+            barValue.className = 'gantt-bar-value';
+            barValue.textContent = `${projet.avancement}%`;
+            bar.appendChild(barValue);
+            
+            barContainer.appendChild(bar);
+            timelineContainer.appendChild(barContainer);
+            
+            // Pourcentage
+            const percentage = document.createElement('div');
+            percentage.className = 'gantt-percentage';
+            percentage.textContent = `${projet.avancement}%`;
+            timelineContainer.appendChild(percentage);
+            
+            // Indicateurs de statut avec nombre de jours
+            if (statusIndicator) {
+                const statusContainer = document.createElement('div');
+                statusContainer.className = 'gantt-status-indicators';
+                
+                const indicator = document.createElement('div');
+                indicator.className = `status-indicator ${statusIndicator.type}`;
+                if (statusIndicator.blink) {
+                    indicator.classList.add('danger');
+                }
+                
+                indicator.innerHTML = `
+                    <i class="bi ${statusIndicator.icon}"></i>
+                    <span>${statusIndicator.text}</span>
+                `;
+                
+                statusContainer.appendChild(indicator);
+                timelineContainer.appendChild(statusContainer);
+            }
+            
+            ganttRow.appendChild(timelineContainer);
+            container.appendChild(ganttRow);
+        });
+
+        // Afficher le nombre de projets affichés
+        if (filteredProjets.length > 10) {
+            const countInfo = document.createElement('div');
+            countInfo.className = 'text-center text-muted small mt-2';
+            countInfo.textContent = `${filteredProjets.length} projets affichés - Faites défiler pour voir tous les projets`;
+            container.appendChild(countInfo);
+        }
+    }
+
+    // 🥧 DIAGRAMME CAMEMBERT DES TÂCHES - CORRIGÉ
+    updateTachesPieChart() {
+        console.log('🔄 Mise à jour du camembert des tâches');
+        
+        const filteredTaches = this.getFilteredTaches();
+        const pieChart = document.getElementById('tachesPieChart');
+        const totalCount = document.getElementById('totalTachesCount');
+        const legend = document.getElementById('tachesLegend');
+        
+        // Mettre à jour le total
+        totalCount.textContent = filteredTaches.length;
+        console.log(`📊 Total tâches: ${filteredTaches.length}`);
+
+        if (filteredTaches.length === 0) {
+            console.log('❌ Aucune tâche à afficher');
+            pieChart.style.background = 'conic-gradient(#e5e7eb 0% 100%)';
+            legend.innerHTML = '<div class="empty-chart-message">Aucune tâche correspondant au filtre</div>';
+            return;
+        }
+
+        // Compter les tâches par statut
+        const statuts = {
+            'Débuté': 0,
+            'En cours': 0,
+            'Terminé': 0,
+            'Suspendu': 0
+        };
+
+        filteredTaches.forEach(tache => {
+            if (statuts.hasOwnProperty(tache.statut)) {
+                statuts[tache.statut]++;
+            } else {
+                console.warn(`⚠️ Statut inconnu: ${tache.statut} pour la tâche: ${tache.titre}`);
+            }
+        });
+
+        const total = filteredTaches.length;
+        console.log('📈 Répartition des statuts:', statuts);
+        
+        // Générer le gradient pour le camembert
+        let currentPercent = 0;
+        let gradientString = '';
+        const colors = {
+            'Débuté': 'var(--info-color)',
+            'En cours': 'var(--warning-color)',
+            'Terminé': 'var(--success-color)',
+            'Suspendu': 'var(--danger-color)'
+        };
+
+        // Créer un tableau ordonné pour un affichage cohérent
+        const statutsOrder = ['Débuté', 'En cours', 'Terminé', 'Suspendu'];
+        
+        statutsOrder.forEach(statut => {
+            const count = statuts[statut];
+            if (count > 0) {
+                const percent = (count / total) * 100;
+                if (gradientString) gradientString += ', ';
+                gradientString += `${colors[statut]} ${currentPercent}% ${currentPercent + percent}%`;
+                currentPercent += percent;
+                console.log(`🎨 Ajout segment: ${statut} - ${percent}% (${count} tâches)`);
+            }
+        });
+
+        // Appliquer le dégradé
+        if (gradientString) {
+            pieChart.style.background = `conic-gradient(${gradientString})`;
+            console.log('✅ Dégradé appliqué:', gradientString);
+        } else {
+            pieChart.style.background = 'conic-gradient(#e5e7eb 0% 100%)';
+            console.log('⚠️ Dégradé par défaut appliqué');
+        }
+
+        // Mettre à jour la légende
+        legend.innerHTML = '';
+        let hasData = false;
+        
+        statutsOrder.forEach(statut => {
+            const count = statuts[statut];
+            if (count > 0) {
+                hasData = true;
+                const percent = total > 0 ? Math.round((count / total) * 100) : 0;
+                
+                const legendItem = document.createElement('div');
+                legendItem.className = 'legend-item';
+                
+                legendItem.innerHTML = `
+                    <div class="legend-color" style="background-color: ${colors[statut]};"></div>
+                    <div class="legend-info">
+                        <span class="legend-label">${statut}</span>
+                        <span class="legend-value">${count}</span>
+                    </div>
+                    <span class="legend-percentage">${percent}%</span>
+                `;
+                
+                legend.appendChild(legendItem);
+                console.log(`📝 Légende ajoutée: ${statut} - ${count} tâches (${percent}%)`);
+            }
+        });
+
+        // Si aucun statut n'est trouvé mais qu'il y a des tâches
+        if (!hasData && filteredTaches.length > 0) {
+            const legendItem = document.createElement('div');
+            legendItem.className = 'legend-item';
+            legendItem.innerHTML = `
+                <div class="legend-color" style="background-color: #6b7280;"></div>
+                <div class="legend-info">
+                    <span class="legend-label">Statut inconnu</span>
+                    <span class="legend-value">${filteredTaches.length}</span>
+                </div>
+                <span class="legend-percentage">100%</span>
+            `;
+            legend.appendChild(legendItem);
+            console.log('📝 Légende par défaut ajoutée');
+        }
+
+        console.log('✅ Camembert des tâches mis à jour avec succès');
+    }
+
+    // 🎛️ CONFIGURATION DES FILTRES SÉPARÉS - CORRIGÉ
+    setupFilters() {
+        console.log('⚙️ Configuration des filtres');
+        
+        // Boutons de réinitialisation
+        document.getElementById('resetOverviewFilters').addEventListener('click', () => {
+            this.resetOverviewFilters();
+        });
+
+        document.getElementById('resetDetailFilters').addEventListener('click', () => {
+            this.resetDetailFilters();
+        });
+
+        // Filtres pour la vue d'ensemble
+        ['statutFilter', 'avancementFilter'].forEach(filterId => {
+            document.getElementById(filterId).addEventListener('change', () => {
+                console.log(`🔄 Filtre ${filterId} changé - mise à jour vue d'ensemble`);
+                this.updateOverviewCharts();
+            });
+        });
+
+        // Filtres pour la vue détaillée
+        ['detailStatutFilter', 'detailAvancementFilter'].forEach(filterId => {
+            document.getElementById(filterId).addEventListener('change', () => {
+                console.log(`🔄 Filtre ${filterId} changé - mise à jour vue détaillée`);
+                this.updateDetailCharts();
+            });
+        });
+
+        // Filtre pour les tâches - CORRECTION AVEC DÉBOGAGE
+        const projetFilter = document.getElementById('projetFilter');
+        if (projetFilter) {
+            projetFilter.addEventListener('change', (e) => {
+                console.log('🔄 Filtre projet changé:', e.target.value);
+                console.log('📋 Options disponibles:', Array.from(projetFilter.options).map(opt => ({ value: opt.value, text: opt.text })));
+                this.updateTachesPieChart();
+            });
+            
+            // Forcer le rafraîchissement initial
+            setTimeout(() => {
+                console.log('🔄 Chargement initial du camembert des tâches');
+                this.updateTachesPieChart();
+            }, 500);
+        } else {
+            console.error('❌ Élément projetFilter non trouvé');
+        }
+
+        console.log('✅ Tous les filtres configurés');
+    }
+
+    // 🎨 COULEURS PAR STATUT
+    getColorForStatus(statut) {
+        const colors = {
+            'Débuté': '#964ee3',
+            'En cours': '#f59e0b',
+            'Terminé': '#10b981',
+            'Suspendu': '#ef4444'
+        };
+        return colors[statut] || '#964ee3';
+    }
+
+    // 📅 CORRECTION DU PARSING DES DATES
+    parseDate(dateString) {
+        if (!dateString) return new Date();
+        
+        // Si c'est déjà un objet Date
+        if (dateString instanceof Date) {
+            return dateString;
+        }
+        
+        // Si c'est une chaîne au format YYYY-MM-DD
+        if (typeof dateString === 'string') {
+            // Essayer différents formats de date
+            const date = new Date(dateString);
+            if (!isNaN(date.getTime())) {
+                return date;
+            }
+            
+            // Essayer avec le format français
+            const parts = dateString.split('/');
+            if (parts.length === 3) {
+                return new Date(parts[2], parts[1] - 1, parts[0]);
+            }
+            
+            // Essayer avec le format timestamp
+            const timestamp = Date.parse(dateString);
+            if (!isNaN(timestamp)) {
+                return new Date(timestamp);
+            }
+        }
+        
+        console.warn('Date invalide:', dateString);
+        return new Date();
+    }
+
+    // 📅 FORMATER LES DATES - CORRIGÉ
+    formatDate(dateString) {
+        try {
+            const date = this.parseDate(dateString);
+            return date.toLocaleDateString('fr-FR', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric'
+            });
+        } catch (error) {
+            console.error('Erreur format date:', error, dateString);
+            return 'N/A';
+        }
+    }
+
+    // 🔄 METTRE À JOUR LES GRAPHIQUES DE LA VUE D'ENSEMBLE
+    updateOverviewCharts() {
+        console.log('🔄 Mise à jour des graphiques vue d\'ensemble');
+        this.updateVerticalBarChart();
+    }
+
+    // 🔄 METTRE À JOUR LES GRAPHIQUES DE LA VUE DÉTAILLÉE
+    updateDetailCharts() {
+        console.log('🔄 Mise à jour des graphiques vue détaillée');
+        this.updateHorizontalGanttChart();
+    }
+
+    // ✂️ TRONQUER LE TEXTE POUR LES LABELS
+    truncateText(text, maxLength) {
+        if (!text) return '';
+        if (text.length <= maxLength) return text;
+        return text.substring(0, maxLength - 3) + '...';
+    }
+}
+
+// 🚀 DÉMARRAGE DU SYSTÈME AVEC GESTION D'ERREUR
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('🚀 Démarrage du dashboard utilisateur');
+    try {
+        window.utilisateurDashboardCharts = new UtilisateurDashboardCharts();
+        console.log('✅ Dashboard utilisateur initialisé avec succès');
+    } catch (error) {
+        console.error('❌ Erreur lors de l\'initialisation du dashboard:', error);
+    }
+});
+</script>
+{% endblock %}

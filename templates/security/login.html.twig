@@ -1,0 +1,817 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Connexion{% endblock %}
+
+{% block stylesheets %}
+<style>
+/* Reset et styles de base */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #964ee3 0%, #75165f 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Container principal */
+.auth-container {
+    display: flex;
+    width: 90%;
+    max-width: 900px;
+    min-height: 600px;
+    border-radius: 35px;
+    overflow: hidden;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+}
+
+/* Partie gauche - Bienvenue */
+.auth-pre {
+    position: relative;
+    background: linear-gradient(135deg, #eada70 0%, #fd8617 100%);
+    flex: 1;
+    min-width: 300px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 30px;
+}
+
+/* Sceau en arrière-plan */
+.auth-sceau {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.5;
+    z-index: 1;
+}
+
+.auth-sceau img {
+    width: 80%;
+    height: auto;
+    object-fit: contain;
+}
+
+/* Contenu par-dessus */
+.auth-overlay {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    color: #fff;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.auth-welcome .auth-logo {
+    margin-bottom: 20px;
+}
+
+.auth-logo img {
+    width: 100px;
+    height: 60px;
+    max-width: 100%;
+}
+
+.auth-welcome .auth-logo p {
+    margin-top: 5px;
+    font-size: .65rem;
+    line-height: 1.1;
+    white-space: nowrap;
+    color: white;
+    text-align: center;
+}
+
+/* Bloc de bienvenue */
+.auth-welcome {
+    text-align: center;
+    color: #fff;
+    z-index: 3;
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.24);
+    border-radius: 30px;
+    backdrop-filter: blur(5px);
+}
+
+.auth-welcome h2 {
+    font-size: 24px;
+    margin: 0 0 15px 0;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.auth-welcome p {
+    font-size: 14px;
+    margin: 0;
+    line-height: 1.6;
+    text-align: left;
+}
+
+/* Carte de connexion */
+.auth-card {
+    background: white;
+    flex: 1;
+    min-width: 300px;
+    padding: 40px 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.auth-content {
+    width: 100%;
+    max-width: 320px;
+}
+
+.login-icon {
+    width: 120px;
+    height: 120px;
+    background: linear-gradient(135deg, #964ee3 0%, #75165f 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 25px auto;
+    box-shadow: 0 8px 20px rgba(128, 102, 234, 0.3);
+    border: 4px solid white;
+}
+
+.login-icon i {
+    font-size: 4.5rem;
+    color: white;
+}
+
+/* Effet de brillance au survol */
+.login-icon:hover i {
+    animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+.auth-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.auth-header h1 {
+    color: #1d0933;
+    margin-bottom: 10px;
+    font-weight: 600;
+    font-size: 28px;
+}
+
+.auth-header p {
+    color: #666;
+    font-size: 16px;
+}
+
+/* Formulaire */
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: #333;
+    font-weight: 500;
+    font-size: 14px;
+}
+
+.form-control {
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid #e1e5e9;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: #7566ea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+/* Styles pour le groupe mot de passe avec œil */
+.password-group {
+    position: relative;
+}
+
+.password-input-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.password-input {
+    padding-right: 45px;
+    width: 100%;
+}
+
+.password-toggle {
+    position: absolute;
+    right: 12px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #666;
+    padding: 5px;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.password-toggle:hover {
+    background-color: #f5f5f5;
+    color: #333;
+}
+
+.password-toggle i {
+    font-size: 1.1rem;
+}
+
+.btn-primary {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, #964ee3 0%, #75165f 100%);
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 10px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.btn-primary:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.btn-primary:disabled {
+    opacity: 0.7;
+    cursor: default;
+    transform: none;
+}
+
+/* Footer */
+.auth-footer {
+    text-align: center;
+    margin-top: 25px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+}
+
+.auth-footer p {
+    color: #666;
+    font-size: 14px;
+}
+
+.auth-footer a {
+    color: #7566ea;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s ease;
+}
+
+.auth-footer a:hover {
+    text-decoration: underline;
+    color: #8066ea;
+}
+
+/* Alertes */
+.alert-error {
+    background-color: #fee;
+    border: 1px solid #fcc;
+    color: #c33;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    font-size: 14px;
+    text-align: center;
+}
+
+/* Spinner de chargement */
+.loading-spinner {
+    display: inline-block;
+    width: 1rem;
+    height: 1rem;
+    border: 2px solid #f3f3f3;
+    border-top: 2px solid #964ee3;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Animation shake pour les champs erreur */
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+    20%, 40%, 60%, 80% { transform: translateX(5px); }
+}
+
+.shake {
+    animation: shake 0.5s ease-in-out;
+    border-color: #ff3860 !important;
+}
+
+/* Modal de bienvenue */
+.welcome-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+}
+
+.welcome-modal.show {
+    display: flex;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.modal-content {
+    background: white;
+    padding: 40px;
+    border-radius: 20px;
+    text-align: center;
+    max-width: 400px;
+    width: 90%;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    transform: scale(0.7);
+    opacity: 0;
+    transition: all 0.3s ease;
+}
+
+.welcome-modal.show .modal-content {
+    transform: scale(1);
+    opacity: 1;
+}
+
+.modal-icon {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+}
+
+.modal-icon i {
+    font-size: 2.5rem;
+    color: white;
+}
+
+.modal-content h2 {
+    color: #1d0933;
+    margin-bottom: 15px;
+    font-size: 24px;
+}
+
+.modal-content p {
+    color: #666;
+    margin-bottom: 25px;
+    line-height: 1.5;
+}
+
+.modal-btn {
+    background: linear-gradient(135deg, #964ee3 0%, #75165f 100%);
+    color: white;
+    border: none;
+    padding: 12px 30px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.modal-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .auth-container {
+        flex-direction: column;
+        width: 95%;
+        max-width: 400px;
+        min-height: auto;
+    }
+    
+    .auth-pre {
+        border-radius: 15px 15px 0 0;
+        min-height: 300px;
+        padding: 20px;
+    }
+    
+    .auth-card {
+        border-radius: 0 0 15px 15px;
+        padding: 30px 20px;
+    }
+    
+    .auth-welcome {
+        padding: 15px;
+    }
+    
+    .auth-welcome h2 {
+        font-size: 20px;
+    }
+    
+    .auth-welcome p {
+        font-size: 13px;
+    }
+    
+    .auth-header h1 {
+        font-size: 24px;
+    }
+    
+    .modal-content {
+        padding: 30px 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .auth-container {
+        width: 100%;
+        border-radius: 0;
+        min-height: 100vh;
+    }
+    
+    .auth-pre, .auth-card {
+        border-radius: 0;
+    }
+    
+    .auth-pre {
+        min-height: 250px;
+    }
+    
+    .auth-content {
+        padding: 0 10px;
+    }
+    
+    .auth-logo img {
+        width: 100px;
+    }
+}
+
+/* Animation légère */
+.auth-container {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Modal de vérification */
+.verification-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+}
+
+.verification-modal.show {
+    display: flex;
+    animation: fadeIn 0.3s ease;
+}
+
+.verification-content {
+    background: white;
+    padding: 40px;
+    border-radius: 20px;
+    text-align: center;
+    max-width: 400px;
+    width: 90%;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
+.verification-icon {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, #964ee3 0%, #75165f 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+}
+
+.verification-icon i {
+    font-size: 2.5rem;
+    color: white;
+}
+
+.verification-content h2 {
+    color: #1d0933;
+    margin-bottom: 15px;
+    font-size: 24px;
+}
+
+.verification-content p {
+    color: #666;
+    margin-bottom: 25px;
+    line-height: 1.5;
+}
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="auth-container">
+    <div class="auth-pre">
+        <!-- Image du sceau en arrière-plan -->
+        <div class="auth-sceau">
+            <img src="{{ asset('images/sceau.png') }}" alt="Sceau">
+        </div>
+
+        <!-- Contenu par-dessus -->
+        <div class="auth-overlay">      
+            <div class="auth-welcome">
+                <div class="auth-logo">
+                    <img src="{{ asset('images/logo2.png') }}" alt="Logo">
+                    <p>Ministère de l'Industrialisation et du Commerce</p>
+                </div>
+                
+                <p>
+                    Bienvenue dans l'application de gestion du 
+                    <strong>Plan de Travail Annuel (PTA)</strong> du 
+                    Ministère de l'Industrialisation, du Commerce et de la Consommation.<br><br>
+                    Cette plateforme centralise les projets, tâches et activités, 
+                    facilite le suivi de l'avancement et permet de générer des rapports clairs.
+                </p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="auth-card">
+        <div class="auth-content">
+            <div class="login-icon">
+                <i class="bi bi-person-circle"></i>
+            </div>
+            <div class="auth-header">
+                <h1>Connexion</h1>
+                <p>Connectez-vous à votre compte</p>
+            </div>
+
+            <form method="post" id="loginForm">
+                <div class="form-group">
+                    <label for="username">Email</label>
+                    <input 
+                        type="email" 
+                        value="{{ last_username }}" 
+                        name="_username" 
+                        id="username" 
+                        class="form-control" 
+                        autocomplete="email" 
+                        required 
+                        autofocus
+                        placeholder="votre@email.com"
+                    >
+                </div>
+
+                <div class="form-group password-group">
+                    <label for="password">Mot de passe</label>
+                    <div class="password-input-container">
+                        <input 
+                            type="password" 
+                            name="_password" 
+                            id="password" 
+                            class="form-control password-input" 
+                            autocomplete="current-password" 
+                            required
+                            placeholder="Votre mot de passe"
+                        >
+                        <button type="button" class="password-toggle" id="passwordToggle">
+                            <i class="bi bi-eye-slash"></i>
+                        </button>
+                    </div>
+                </div>
+
+                {% if message %}
+                    <div class="alert-error" id="errorMessage">{{ message }}</div>
+                {% endif %}
+
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+
+                <button type="submit" class="btn-primary" id="loginButton">
+                    <span id="loginText">Se connecter</span>
+                    <div class="loading-spinner" id="loginSpinner" style="display: none;"></div>
+                </button>
+            </form>
+
+            <div class="auth-footer">
+                <p>Pas encore de compte ? <a href="{{ path('app_register') }}">Créer un compte</a></p>
+                <p><a href="{{ path('app_forgot_password') }}">Mot de passe oublié ?</a></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de vérification -->
+<div class="verification-modal" id="verificationModal">
+    <div class="verification-content">
+        <div class="verification-icon">
+            <i class="bi bi-shield-lock"></i>
+        </div>
+        <h2>Vérification en cours</h2>
+        <p>Veuillez patienter pendant la vérification vos identifiants...</p>
+        <div class="loading-spinner" style="width: 40px; height: 40px; margin: 0 auto;"></div>
+    </div>
+</div>
+
+<!-- Modal de bienvenue -->
+<div class="welcome-modal" id="welcomeModal">
+    <div class="modal-content">
+        <div class="modal-icon">
+            <i class="bi bi-check-circle"></i>
+        </div>
+        <h2>Connexion réussie !</h2>
+        <p>Bienvenue dans votre espace personnel.<br>Redirection en cours...</p>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const passwordToggle = document.getElementById('passwordToggle');
+    const passwordInput = document.getElementById('password');
+    const eyeIcon = passwordToggle.querySelector('i');
+    const loginForm = document.getElementById('loginForm');
+    const loginButton = document.getElementById('loginButton');
+    const loginText = document.getElementById('loginText');
+    const loginSpinner = document.getElementById('loginSpinner');
+    const verificationModal = document.getElementById('verificationModal');
+    const welcomeModal = document.getElementById('welcomeModal');
+    const usernameInput = document.getElementById('username');
+    const errorMessage = document.getElementById('errorMessage');
+
+    // Vérifier si on vient d'une tentative de connexion échouée
+    if (errorMessage) {
+        // Animation shake sur les champs en cas d'erreur
+        shakeFields();
+    }
+
+    // Toggle password visibility
+    passwordToggle.addEventListener('click', function() {
+        const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+        passwordInput.setAttribute('type', type);
+        
+        if (type === 'text') {
+            eyeIcon.classList.remove('bi-eye-slash');
+            eyeIcon.classList.add('bi-eye');
+        } else {
+            eyeIcon.classList.remove('bi-eye');
+            eyeIcon.classList.add('bi-eye-slash');
+        }
+    });
+
+    // Gestion de la soumission du formulaire
+    loginForm.addEventListener('submit', function(e) {
+        // Afficher le modal de vérification immédiatement
+        showVerificationModal();
+        
+        // La soumission normale continue vers le serveur
+        // Le serveur décidera si c'est un succès ou une erreur
+    });
+
+    // Fonction pour afficher le modal de vérification
+    function showVerificationModal() {
+        verificationModal.classList.add('show');
+        
+        // Désactiver le bouton pendant la vérification
+        loginButton.disabled = true;
+        loginText.textContent = 'Vérification...';
+        loginSpinner.style.display = 'inline-block';
+    }
+
+    // Fonction pour cacher le modal de vérification
+    function hideVerificationModal() {
+        verificationModal.classList.remove('show');
+    }
+
+    // Fonction pour afficher le modal de bienvenue
+    function showWelcomeModal() {
+        hideVerificationModal();
+        welcomeModal.classList.add('show');
+        
+        // Redirection après 2 secondes
+        setTimeout(() => {
+            window.location.href = "{{ path('app_dashboard_par_role') }}";
+        }, 2000);
+    }
+
+    // Fonction pour secouer les champs en cas d'erreur
+    function shakeFields() {
+        usernameInput.classList.add('shake');
+        passwordInput.classList.add('shake');
+        
+        setTimeout(() => {
+            usernameInput.classList.remove('shake');
+            passwordInput.classList.remove('shake');
+        }, 500);
+    }
+
+    // Fonction pour gérer les erreurs
+    function handleLoginError() {
+        hideVerificationModal();
+        shakeFields();
+        
+        // Réactiver le formulaire
+        loginButton.disabled = false;
+        loginText.textContent = 'Se connecter';
+        loginSpinner.style.display = 'none';
+        
+        // Remettre le focus sur le champ email
+        usernameInput.focus();
+    }
+
+    // Gestion du cache navigateur
+    window.addEventListener('pageshow', function(event) {
+        if (event.persisted || (window.performance && window.performance.navigation.type === 2)) {
+            resetLoginForm();
+        }
+    });
+
+    function resetLoginForm() {
+        loginButton.disabled = false;
+        loginText.textContent = 'Se connecter';
+        loginSpinner.style.display = 'none';
+        hideVerificationModal();
+        welcomeModal.classList.remove('show');
+    }
+
+    // Réinitialiser les animations d'erreur quand l'utilisateur commence à taper
+    [usernameInput, passwordInput].forEach(input => {
+        input.addEventListener('input', function() {
+            this.classList.remove('shake');
+            if (errorMessage) {
+                errorMessage.style.display = 'none';
+            }
+        });
+    });
+
+    // Vérifier si l'utilisateur est déjà connecté (cas rare)
+    {% if app.user %}
+        showWelcomeModal();
+    {% endif %}
+});
+</script>
+{% endblock %}

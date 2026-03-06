@@ -1,0 +1,2346 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Rapport des Projets - MIC{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<style>
+.filters-container .select2-container--bootstrap-5 .select2-selection {
+    min-height: 36px !important;
+    height: 36px !important;
+    padding: 0.375rem !important;
+    font-size: 0.85rem !important;
+}
+
+.filters-container .select2-container--bootstrap-5 .select2-selection--single {
+    height: 36px !important;
+}
+
+.filters-container .select2-container--bootstrap-5 .select2-selection--single .select2-selection__rendered {
+    line-height: 20px !important;
+    padding-left: 0.5rem !important;
+    font-size: 0.85rem !important;
+}
+
+.filters-container .select2-container--bootstrap-5 .select2-selection--single .select2-selection__arrow {
+    height: 34px !important;
+    right: 0.5rem !important;
+}
+
+.filters-container .select2-container--bootstrap-5 .select2-dropdown {
+    font-size: 0.85rem !important;
+}
+
+.filters-container .select2-container--bootstrap-5 .select2-results__option {
+    padding: 0.4rem 0.6rem !important;
+    font-size: 0.85rem !important;
+    min-height: 34px !important;
+}
+
+/* Style spécifique pour le filtre de direction */
+#directionFilter + .select2 .select2-selection {
+    min-height: 36px !important;
+    height: 36px !important;
+}
+
+/* Style pour les selects dans les modaux (garder la taille normale) */
+.modal .select2-container--bootstrap-5 .select2-selection {
+    min-height: 45px !important;
+    height: 45px !important;
+}
+
+.select2-container--bootstrap-5 .select2-selection {
+    min-height: 47px !important;
+    height: 47px !important;
+    padding: 0.675rem !important;
+    border: 1px solid #d1d5db !important;
+    border-radius: 6px !important;
+    font-size: 0.9rem !important;
+    line-height: 1.5 !important;
+    background-color: white !important;
+    transition: all 0.3s ease !important;
+}
+
+.select2-container--bootstrap-5 .select2-selection--single {
+    height: 38px !important;
+}
+
+.select2-container--bootstrap-5 .select2-selection--single .select2-selection__rendered {
+    line-height: 24px !important;
+    padding-left: 0.75rem !important;
+    padding-right: 2.5rem !important;
+    color: #374151 !important;
+}
+
+.select2-container--bootstrap-5 .select2-selection--single .select2-selection__arrow {
+    height: 36px !important;
+    right: 0.5rem !important;
+}
+
+/* Style au survol (hover) */
+.select2-container--bootstrap-5 .select2-selection:hover {
+    border-color: #964ee3 !important;
+    box-shadow: 0 0 0 3px rgba(150, 78, 227, 0.1) !important;
+}
+
+/* Style au focus */
+.select2-container--bootstrap-5.select2-container--focus .select2-selection,
+.select2-container--bootstrap-5.select2-container--open .select2-selection {
+    border-color: #964ee3 !important;
+    box-shadow: 0 0 0 3px rgba(150, 78, 227, 0.1) !important;
+    outline: none !important;
+}
+
+/* Style pour le dropdown */
+.select2-container--bootstrap-5 .select2-dropdown {
+    border: 1px solid #d1d5db !important;
+    border-radius: 6px !important;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1) !important;
+    background-color: white !important;
+}
+
+/* Champ de recherche dans le dropdown */
+.select2-container--bootstrap-5 .select2-search--dropdown .select2-search__field {
+    border: 1px solid #d1d5db !important;
+    border-radius: 4px !important;
+    padding: 0.375rem 0.75rem !important;
+    font-size: 0.9rem !important;
+    height: 38px !important;
+}
+
+.select2-container--bootstrap-5 .select2-search--dropdown .select2-search__field:focus {
+    border-color: #964ee3 !important;
+    box-shadow: 0 0 0 3px rgba(150, 78, 227, 0.1) !important;
+    outline: none !important;
+}
+
+/* Options dans le dropdown */
+.select2-container--bootstrap-5 .select2-results__option {
+    padding: 0.5rem 0.75rem !important;
+    font-size: 0.9rem !important;
+    min-height: 38px !important;
+    display: flex !important;
+    align-items: center !important;
+}
+
+/* Option sélectionnée */
+.select2-container--bootstrap-5 .select2-results__option--selected {
+    background-color: #f3f4f6 !important;
+    color: #374151 !important;
+}
+
+/* Option au survol/surbrillance */
+.select2-container--bootstrap-5 .select2-results__option--highlighted.select2-results__option--selectable {
+    background-color: #3f7ee3 !important;
+    color: white !important;
+}
+
+/* Options désactivées */
+.select2-container--bootstrap-5 .select2-results__option.option-desactive {
+    color: #6b7280 !important;
+    font-style: italic !important;
+    background-color: #f9fafb !important;
+}
+
+.select2-container--bootstrap-5 .select2-results__option.option-desactive.select2-results__option--highlighted {
+    background-color: #f3f4f6 !important;
+    color: #6b7280 !important;
+}
+
+/* Style pour les sélects dans les modaux (z-index corrigé) */
+.modal .select2-container {
+    z-index: 1060 !important;
+}
+
+.modal .select2-dropdown {
+    z-index: 1061 !important;
+}
+
+/* Style pour le placeholder */
+.select2-container--bootstrap-5 .select2-selection--single .select2-selection__placeholder {
+    color: #6b7280 !important;
+    font-size: 0.9rem !important;
+}
+
+/* Style pour les sélects désactivés */
+.select2-container--bootstrap-5 .select2-selection--single[aria-disabled="true"] {
+    background-color: #f1f3f6 !important;
+    border-color: #ced1d6 !important;
+    color: #626771 !important;
+    cursor: default !important;
+}
+
+/* Style pour le clear button */
+.select2-container--bootstrap-5 .select2-selection--single .select2-selection__clear {
+    height: 36px !important;
+    padding: 0 0.5rem !important;
+    color: #6b7280 !important;
+    font-size: 1.2rem !important;
+}
+
+.select2-container--bootstrap-5 .select2-selection--single .select2-selection__clear:hover {
+    color: #ef4444 !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .select2-container--bootstrap-5 .select2-selection {
+        min-height: 36px !important;
+        height: 36px !important;
+        font-size: 0.85rem !important;
+    }
+    
+    .select2-container--bootstrap-5 .select2-selection--single {
+        height: 36px !important;
+    }
+    
+    .select2-container--bootstrap-5 .select2-selection--single .select2-selection__rendered {
+        padding-left: 0.5rem !important;
+        font-size: 0.85rem !important;
+    }
+    
+    .select2-container--bootstrap-5 .select2-results__option {
+        font-size: 0.85rem !important;
+        min-height: 36px !important;
+    }
+}
+    /* [Tous les styles CSS précédents restent identiques] */
+    .rapport-container {
+        background: #fdfdffff;
+        border-radius: 12px;
+        padding: 2rem;
+        box-shadow: rgba(0, 0, 0, 0.13) 0px 3px 8px;
+        margin-bottom: 2rem;
+    }
+
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid #f1f5f9;
+    }
+
+    .section-title {
+        font-size: 1.8rem;
+        font-weight: 600;
+        color: #1f2937;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .selection-container {
+        background: #f8fafc;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.25rem;
+    }
+
+    .form-label {
+        font-weight: 500;
+        color: #374151;
+        margin-bottom: 0.5rem;
+        display: block;
+    }
+
+    .form-control, .form-select {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        background: white;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+    }
+
+    .form-control:focus, .form-select:focus {
+        outline: none;
+        border-color: #964ee3;
+        box-shadow: 0 0 0 3px rgba(150, 78, 227, 0.1);
+    }
+
+    
+
+    .export-buttons {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        margin-top: 2rem;
+    }
+
+    .btn-export {
+        padding: 0.75rem 2rem;
+        border: none;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        min-width: 180px;
+        justify-content: center;
+    }
+
+    .btn-pdf {
+        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        color: white;
+    }
+
+    .btn-excel {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: white;
+    }
+
+    .btn-export:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    .btn-export:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    .loading-spinner {
+        display: inline-block;
+        width: 1rem;
+        height: 1rem;
+        border: 2px solid #f3f3f3;
+        border-top: 2px solid #964ee3;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+
+    .preview-container {
+        background: white;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin-top: 2rem;
+        max-height: none;
+        overflow-y: visible;
+    }
+
+    .direction-header {
+        background: linear-gradient(135deg, #964ee3 0%, #75165f 100%);
+        color: white;
+        padding: 1.5rem;
+        border-radius: 8px;
+        margin-bottom: 2rem;
+        text-align: center;
+    }
+
+    .logo-header {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .logo-placeholder {
+        width: 80px;
+        height: 80px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+    }
+
+    .header-text {
+        text-align: center;
+    }
+
+    .service-section {
+        background: #f8fafc;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .service-header {
+        background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+        padding: 1rem 1.5rem;
+        border-radius: 6px;
+        margin-bottom: 1.5rem;
+        font-weight: 600;
+        color: #ffff;
+        font-size: 1.2rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .service-stats {
+        font-size: 0.9rem;
+        color: #ffff;
+        font-weight: 500;
+    }
+
+    .projet-table-container {
+        background: white;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        overflow: hidden;
+        margin-bottom: 2rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    .projet-header {
+        background: #f6ecfeff;
+        padding: 1.5rem;
+        border-bottom: 1px solid #e5e7eb;
+    }
+
+    .projet-main-info {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .projet-title-section {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .projet-title {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: #1f2937;
+        margin: 0;
+        line-height: 1.3;
+        flex: 1;
+        min-width: 300px;
+    }
+
+    .projet-meta-primary {
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+        flex-wrap: wrap;
+    }
+
+    /* Styles pour les éléments désactivés/suspendus */
+.service-desactive {
+    background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%) !important;
+    border: 1px solid #d1d5db !important;
+    color: #6b7280 !important;
+}
+
+.projet-suspendu {
+    background: #f9fafb !important;
+    border: 1px solid #e5e7eb !important;
+    opacity: 0.8;
+}
+
+.tache-suspendue {
+    background: #f9fafb !important;
+    color: #6b7280 !important;
+}
+
+.status-desactive {
+    background: #f3f4f6 !important;
+    color: #6b7280 !important;
+    border: 1px solid #d1d5db !important;
+}
+
+.status-suspendu {
+    background: #f3f4f6 !important;
+    color: #6b7280 !important;
+    border: 1px solid #d1d5db !important;
+}
+
+/* Style pour les éléments grisés */
+.grised {
+    opacity: 0.7;
+    filter: grayscale(30%);
+}
+
+.service-header-desactive {
+    background: linear-gradient(135deg, #9ca3af 0%, #6b7280 100%) !important;
+    color: #ffffff !important;
+}
+
+.projet-header-suspendu {
+    background: #f3f4f6 !important;
+    border-bottom: 1px solid #e5e7eb !important;
+}
+
+    .meta-item {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        font-size: 0.85rem;
+        color: #4b5563;
+    }
+
+    .meta-item strong {
+        color: #374151;
+        font-weight: 600;
+    }
+
+    .status-badge {
+        padding: 0.35rem 0.8rem;
+        border-radius: 16px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+    }
+
+    .status-debute { background: #dbeafe; color: #1e40af; }
+    .status-encours { background: #fef3c7; color: #d97706; }
+    .status-termine { background: #d1fae5; color: #065f46; }
+    .status-suspendu { background: #f3f4f6; color: #6b7280; }
+
+    .projet-details-compact {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        margin-top: 0.75rem;
+    }
+
+    .description-commentaire-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    @media (max-width: 768px) {
+        .description-commentaire-row {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .info-container {
+        background: white;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .info-header {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 0.75rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid #f1f5f9;
+    }
+
+    .info-title {
+        font-size: 0.8rem;
+        font-weight: 700;
+        color: #964ee3;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin: 0;
+    }
+
+    .info-content {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+    }
+
+    .info-item {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+
+    .info-label {
+        font-size: 0.7rem;
+        color: #6b7280;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        display: flex;
+        align-items: center;
+        gap: 0.3rem;
+    }
+
+    .info-value {
+        font-size: 0.85rem;
+        color: #374151;
+        font-weight: 500;
+    }
+
+    .info-value.budget {
+        font-weight: 700;
+        color: #059669;
+        font-size: 0.9rem;
+    }
+
+    .progress-container {
+        margin-top: 0.25rem;
+    }
+
+    .progress-info {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.2rem;
+    }
+
+    .progress-percent {
+        font-weight: 700;
+        color: #964ee3;
+        font-size: 0.8rem;
+    }
+
+    .progress-bar {
+        width: 100%;
+        height: 5px;
+        background: #e5e7eb;
+        border-radius: 3px;
+        overflow: hidden;
+    }
+
+    .progress-fill {
+        height: 100%;
+        background: linear-gradient(135deg, #964ee3 0%, #75165f 100%);
+        border-radius: 3px;
+        transition: width 0.3s ease;
+    }
+
+    .taches-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .taches-table th {
+        background: #f8fafc;
+        padding: 0.75rem;
+        text-align: left;
+        font-weight: 600;
+        color: #374151;
+        border-bottom: 2px solid #e5e7eb;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+    }
+
+    .taches-table td {
+        padding: 0.75rem;
+        border-bottom: 1px solid #e5e7eb;
+        font-size: 0.8rem;
+    }
+
+    .taches-table tr:hover {
+        background: #f8fafc;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 3rem;
+        color: #6b7280;
+    }
+
+    .empty-state i {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        opacity: 0.5;
+    }
+
+    .stats-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .stat-card {
+        background: white;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 1.5rem;
+        text-align: center;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        transition: transform 0.2s ease;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    .stat-value {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #964ee3;
+        margin-bottom: 0.5rem;
+        line-height: 1;
+    }
+
+    .stat-label {
+        font-size: 0.875rem;
+        color: #6b7280;
+        font-weight: 500;
+    }
+
+    .text-preview {
+        font-size: 0.8rem;
+        line-height: 1.4;
+        color: #4b5563;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .selection-instructions {
+        background: linear-gradient(135deg, #dbeafe 0%, #e0e7ff 100%);
+        border: 1px solid #c7d2fe;
+        border-radius: 8px;
+        padding: 1.25rem;
+        margin-bottom: 1.5rem;
+        border-left: 4px solid #4f46e5;
+    }
+
+    .instructions-title {
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: #3730a3;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .instructions-content {
+        color: #4f46e5;
+        font-size: 0.85rem;
+        line-height: 1.4;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    .alert {
+        border-radius: 8px;
+        border: none;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        margin-bottom: 1rem;
+        padding: 1rem 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .alert-info {
+        background: #3b82f6;
+        color: white;
+        border-left: 4px solid #1d4ed8;
+    }
+
+    .alert i {
+        font-size: 1.2rem;
+        flex-shrink: 0;
+    }
+
+    .no-taches-row {
+        text-align: center;
+        padding: 2rem;
+        color: #6b7280;
+        font-style: italic;
+        background: #f9fafb;
+    }
+
+    .commentaire-section {
+        background: #fefce8;
+        border: 1px solid #fef08a;
+        border-radius: 6px;
+        padding: 0.75rem;
+    }
+
+    .commentaire-label {
+        font-size: 0.75rem;
+        color: #854d0e;
+        font-weight: 600;
+        margin-bottom: 0.3rem;
+        display: flex;
+        align-items: center;
+        gap: 0.3rem;
+    }
+
+    .commentaire-content {
+        font-size: 0.85rem;
+        color: #a16207;
+        line-height: 1.4;
+    }
+
+    .createur-section {
+        background: #f0f9ff;
+        border: 1px solid #bae6fd;
+        border-radius: 6px;
+        padding: 0.75rem;
+    }
+
+    .createur-label {
+        font-size: 0.75rem;
+        color: #0369a1;
+        font-weight: 600;
+        margin-bottom: 0.3rem;
+        display: flex;
+        align-items: center;
+        gap: 0.3rem;
+    }
+
+    .createur-content {
+        font-size: 0.85rem;
+        color: #075985;
+        line-height: 1.4;
+    }
+
+    .responsables-compact-section {
+        background: #f8fafc;
+        border: 1px solid #e5e7eb;
+        border-radius: 6px;
+        padding: 0.75rem;
+    }
+
+    .responsables-compact-label {
+        font-size: 0.75rem;
+        color: #374151;
+        font-weight: 600;
+        margin-bottom: 0.3rem;
+        display: flex;
+        align-items: center;
+        gap: 0.3rem;
+    }
+
+    .responsables-list-compact {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        margin-top: 0.5rem;
+    }
+
+    .responsable-item-compact {
+        display: flex;
+        flex-direction: column;
+        gap: 0.2rem;
+        padding: 0.5rem;
+        background: white;
+        border: 1px solid #e5e7eb;
+        border-radius: 4px;
+        font-size: 0.75rem;
+    }
+
+    .responsable-nom {
+        font-weight: 600;
+        color: #374151;
+    }
+
+    .responsable-details {
+        font-size: 0.7rem;
+        color: #6b7280;
+    }
+
+    .no-responsables-compact {
+        color: #6b7280;
+        font-style: italic;
+        font-size: 0.75rem;
+        text-align: center;
+        padding: 0.5rem;
+    }
+
+    .icon-small {
+        font-size: 0.8rem;
+        opacity: 0.8;
+    }
+
+    .tache-commentaire-cell {
+        max-width: 200px;
+    }
+
+    .tache-commentaire {
+        font-size: 0.75rem;
+        color: #a16207;
+        background: #fefce8;
+        padding: 0.4rem 0.6rem;
+        border-radius: 4px;
+        border-left: 3px solid #f59e0b;
+        line-height: 1.3;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .tache-commentaire:hover {
+        background: #fef3c7;
+        -webkit-line-clamp: unset;
+        max-height: none;
+    }
+
+    .tache-commentaire.empty {
+        color: #9ca3af;
+        font-style: italic;
+        background: #f9fafb;
+        border-left-color: #d1d5db;
+    }
+
+    @media (max-width: 768px) {
+        .projet-title-section {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        
+        .projet-meta-primary {
+            justify-content: flex-start;
+        }
+        
+        .info-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .stats-row {
+            grid-template-columns: repeat(2, 1fr);
+        }
+        
+        .export-buttons {
+            flex-direction: column;
+        }
+        
+        .btn-export {
+            min-width: 100%;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="container-fluid py-4">
+    <div class="rapport-container">
+        <div class="section-header">
+            <div>
+                <h1 class="section-title">
+                    <i class="bi bi-graph-up"></i>
+                    Rapport des Projets
+                </h1>
+                <p class="text-muted mb-0">Générez des rapports détaillés par direction</p>
+            </div>
+        </div>
+
+        <!-- Instructions de sélection -->
+        <div class="selection-instructions" id="selectionInstructions">
+            <div class="instructions-title">
+                <i class="bi bi-info-circle"></i>
+                Instructions
+            </div>
+            <div class="instructions-content">
+                <p class="mb-2">Veuillez sélectionner une direction dans la liste déroulante ci-dessous pour générer le rapport correspondant.</p>
+                <p class="mb-0">Le rapport inclura tous les services, projets et tâches associés à la direction sélectionnée.</p>
+            </div>
+        </div>
+
+        
+
+        <!-- Sélection de la direction -->
+<div class="selection-container">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="directionSelect" class="form-label">Sélectionnez une direction</label>
+                <select class="form-select search-select" id="directionSelect" style="width: 100%" data-allow-clear="true">
+                    <option value="">Chargement des directions...</option>
+                </select>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label class="form-label">Date du rapport</label>
+                <input type="text" class="form-control" id="dateRapport" readonly 
+                       value="{{ "now"|date("d/m/Y") }}">
+            </div>
+        </div>
+    </div>
+</div>
+
+        <div id="rapportResume" style="display: none;">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <i class="bi bi-file-text"></i>
+                    Résumé du rapport
+                </h2>
+            </div>
+        </div>
+
+        <!-- Aperçu du rapport -->
+        <div id="rapportPreview" style="display: none;">
+            <div class="preview-container">
+                <div id="previewContent">
+                    <!-- Le contenu sera généré dynamiquement -->
+                </div>
+            </div>
+
+            <!-- Boutons d'export -->
+            <div class="export-buttons">
+                <button class="btn-export btn-pdf" id="exportPdf" disabled>
+                    <i class="bi bi-file-pdf"></i>
+                    Exporter en PDF
+                </button>
+                {# <button class="btn-export btn-excel" id="exportExcel" disabled>
+                    <i class="bi bi-file-spreadsheet"></i>
+                    Exporter en Excel
+                </button> #}
+            </div>
+        </div>
+
+        <!-- État vide -->
+        <div id="emptyState" class="empty-state">
+            <i class="bi bi-clipboard-data"></i>
+            <h4>Aucune direction sélectionnée</h4>
+            <p class="text-muted">Veuillez sélectionner une direction pour générer le rapport</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+<script>
+
+class RapportManager {
+    constructor() {
+        this.selectedDirection = null;
+        this.directionData = null;
+        this.select2Instance = null;
+        this.isHandlingChange = false;
+        this.init();
+    }
+
+    init() {
+        this.loadDirections();
+        this.setupEventListeners();
+    }
+
+    setupEventListeners() {
+        // Gérer l'export PDF
+        const exportPdf = document.getElementById('exportPdf');
+        if (exportPdf) {
+            exportPdf.addEventListener('click', () => {
+                this.exportToPDF();
+            });
+        }
+    }
+
+    async loadDirections() {
+        try {
+            const response = await fetch('/api/rapport-directions-actives');
+            const data = await response.json();
+            
+            if (data.success) {
+                this.populateDirectionSelect(data.directions);
+                this.initSelect2(); // Initialiser Select2 après le chargement
+            } else {
+                this.showError('Erreur lors du chargement des directions');
+            }
+        } catch (error) {
+            console.error('Erreur chargement directions:', error);
+            this.showError('Erreur de connexion au serveur');
+        }
+    }
+
+    populateDirectionSelect(directions) {
+        const select = document.getElementById('directionSelect');
+        if (!select) return;
+        
+        // Créer les options avec une option vide par défaut avec valeur "aucun"
+        let options = '<option value="aucun">Sélectionnez une direction</option>';
+        
+        directions.forEach(direction => {
+            options += `<option value="${direction.CodeDirection}">${direction.CodeDirection} - ${direction.nomDirection}</option>`;
+        });
+        
+        select.innerHTML = options;
+    }
+
+    initSelect2() {
+        const directionSelect = document.getElementById('directionSelect');
+        if (directionSelect && !this.select2Instance) {
+            this.select2Instance = $(directionSelect).select2({
+                theme: 'bootstrap-5',
+                width: '100%',
+                placeholder: 'Sélectionnez une direction',
+                allowClear: true,
+                language: {
+                    noResults: () => "Aucune direction trouvée",
+                    searching: () => "Recherche en cours..."
+                }
+            }).on('select2:opening', function () {
+                // S'assurer que le dropdown s'affiche correctement
+                setTimeout(() => {
+                    $('.select2-dropdown').css('z-index', '1060');
+                }, 10);
+            });
+
+            // Gérer l'événement change
+            this.select2Instance.on('change', (e) => {
+                const selectedValue = this.select2Instance.val();
+                console.log('Select2 change event - Value:', selectedValue);
+                
+                // Si la valeur est "aucun" ou vide (désélection avec le "x"), réinitialiser
+                if (!selectedValue || selectedValue === '' || selectedValue === 'aucun') {
+                    console.log('Valeur "aucun" ou vide détectée - Réinitialisation du rapport');
+                    this.resetRapport();
+                } else {
+                    this.handleDirectionChange(selectedValue);
+                }
+            });
+
+            // Gérer aussi l'événement select2:clear
+            this.select2Instance.on('select2:clear', () => {
+                console.log('Select2 clear event triggered - Réinitialisation du rapport');
+                this.resetRapport();
+            });
+        }
+    }
+
+    async handleDirectionChange(directionCode) {
+        console.log('handleDirectionChange appelé avec:', directionCode);
+        
+        // Vérifier si la valeur est "aucun" ou vide
+        if (!directionCode || directionCode === '' || directionCode === 'aucun') {
+            this.resetRapport();
+            return;
+        }
+
+        this.showLoading();
+        
+        // Désactiver temporairement le select pendant le chargement
+        if (this.select2Instance) {
+            this.select2Instance.prop('disabled', true);
+        }
+        
+        try {
+            const response = await fetch(`/api/rapport/direction/${directionCode}`);
+            const data = await response.json();
+            
+            if (data.success) {
+                this.directionData = data.direction;
+                this.selectedDirection = directionCode;
+                this.renderPreview();
+                this.enableExportButtons();
+                this.hideInstructions();
+            } else {
+                this.showError(data.message);
+                this.resetRapport();
+            }
+        } catch (error) {
+            console.error('Erreur chargement données direction:', error);
+            this.showError('Erreur lors du chargement des données');
+            this.resetRapport();
+        } finally {
+            // Réactiver le select après chargement
+            if (this.select2Instance) {
+                this.select2Instance.prop('disabled', false);
+            }
+        }
+    }
+
+    renderPreview() {
+        const preview = document.getElementById('rapportPreview');
+        const resume = document.getElementById('rapportResume');
+        const emptyState = document.getElementById('emptyState');
+        const previewContent = document.getElementById('previewContent');
+        
+        // Cacher le résumé
+        if (resume) resume.style.display = 'none';
+        
+        // Afficher l'aperçu et cacher l'état vide
+        if (preview) preview.style.display = 'block';
+        if (emptyState) emptyState.style.display = 'none';
+        
+        if (previewContent) {
+            previewContent.innerHTML = this.generatePreviewHTML();
+        }
+    }
+
+    generatePreviewHTML() {
+        if (!this.directionData) return '';
+
+        const direction = this.directionData;
+        const dateRapport = document.getElementById('dateRapport')?.value || new Date().toLocaleDateString('fr-FR');
+
+        let html = `
+            <div class="direction-header">
+                <div class="logo-header">
+                    <div class="logo-placeholder">
+                        <img src="{{ asset('images/logo2.png') }}" alt="MIC Logo" class="nav-logo">
+                    </div>
+                    <div class="header-text">
+                        <h2 class="mb-1">MINISTÈRE DE L'INDUSTRIE ET DU COMMERCE</h2>
+                        <h4 class="mb-1">Direction: ${this.escapeHtml(direction.nomDirection)} (n°: ${this.escapeHtml(direction.CodeDirection)})</h4>
+                        ${direction.statutDirection !== 'ACTIVE' ? 
+                            `<span class="status-badge status-desactive">
+                                <i class="bi bi-pause-circle"></i> Direction Désactivée
+                            </span>` : ''
+                        }
+                    </div>
+                </div>
+                <p class="mb-0">Rapport des Projets et Tâches - Généré le ${dateRapport}</p>
+            </div>
+        `;
+
+        // Statistiques générales
+        const stats = this.calculateStatistics();
+        html += this.generateStatsHTML(stats);
+
+        // Services et projets
+        if (direction.services && direction.services.length > 0) {
+            direction.services.forEach(service => {
+                html += this.generateServiceHTML(service);
+            });
+        } else {
+            html += `
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle"></i>
+                    Aucun service trouvé pour cette direction
+                </div>
+            `;
+        }
+
+        return html;
+    }
+
+    hidePreview() {
+        const preview = document.getElementById('rapportPreview');
+        const resume = document.getElementById('rapportResume');
+        const emptyState = document.getElementById('emptyState');
+        
+        if (preview) preview.style.display = 'none';
+        if (resume) resume.style.display = 'none';
+        if (emptyState) emptyState.style.display = 'block';
+        
+        this.disableExportButtons();
+        this.showInstructions();
+    }
+
+    hideInstructions() {
+        const instructions = document.getElementById('selectionInstructions');
+        if (instructions) {
+            instructions.style.display = 'none';
+        }
+    }
+
+    showInstructions() {
+        const instructions = document.getElementById('selectionInstructions');
+        if (instructions) {
+            instructions.style.display = 'block';
+        }
+    }
+
+    showLoading() {
+        const previewContent = document.getElementById('previewContent');
+        if (previewContent) {
+            previewContent.innerHTML = `
+                <div class="text-center py-4">
+                    <div class="loading-spinner me-2"></div>
+                    Chargement des données...
+                </div>
+            `;
+        }
+    }
+
+    enableExportButtons() {
+        const exportPdfBtn = document.getElementById('exportPdf');
+        if (exportPdfBtn) {
+            exportPdfBtn.disabled = false;
+        }
+    }
+
+    disableExportButtons() {
+        const exportPdfBtn = document.getElementById('exportPdf');
+        if (exportPdfBtn) {
+            exportPdfBtn.disabled = true;
+        }
+    }
+
+    resetRapport() {
+        console.log('resetRapport appelé');
+        
+        // Réinitialiser l'aperçu
+        this.hidePreview();
+        
+        // Réinitialiser les données
+        this.selectedDirection = null;
+        this.directionData = null;
+        
+        // Remettre la valeur du select à "aucun"
+        if (this.select2Instance) {
+            this.select2Instance.val('aucun').trigger('change');
+        }
+        
+        console.log('Rapport réinitialisé - valeur remise à "aucun"');
+    }
+
+    escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    calculateStatistics() {
+        if (!this.directionData || !this.directionData.services) {
+            return {
+                totalServices: 0,
+                totalProjets: 0,
+                totalTaches: 0,
+                budgetTotal: 0,
+                avancementMoyen: 0,
+                servicesActifs: 0,
+                servicesDesactives: 0,
+                projetsActifs: 0,
+                projetsSuspendus: 0
+            };
+        }
+
+        let totalProjets = 0;
+        let totalTaches = 0;
+        let budgetTotal = 0;
+        let totalAvancement = 0;
+        let projetsAvecAvancement = 0;
+        let servicesActifs = 0;
+        let servicesDesactives = 0;
+        let projetsActifs = 0;
+        let projetsSuspendus = 0;
+
+        this.directionData.services.forEach(service => {
+            if (service.statutService === 'ACTIF') {
+                servicesActifs++;
+            } else if (service.statutService === 'DESACTIVE') {
+                servicesDesactives++;
+            }
+
+            if (service.projets) {
+                totalProjets += service.projets.length;
+                
+                service.projets.forEach(projet => {
+                    budgetTotal += parseFloat(projet.budgetPro) || 0;
+                    
+                    if (projet.StatutPro === 'Suspendu') {
+                        projetsSuspendus++;
+                    } else {
+                        projetsActifs++;
+                    }
+                    
+                    if (projet.taches) {
+                        totalTaches += projet.taches.length;
+                    }
+                    
+                    if (projet.avancementPro !== null && projet.avancementPro !== undefined) {
+                        totalAvancement += projet.avancementPro;
+                        projetsAvecAvancement++;
+                    }
+                });
+            }
+        });
+
+        const avancementMoyen = projetsAvecAvancement > 0 ? 
+            Math.round(totalAvancement / projetsAvecAvancement) : 0;
+
+        return {
+            totalServices: this.directionData.services.length,
+            totalProjets: totalProjets,
+            totalTaches: totalTaches,
+            budgetTotal: budgetTotal,
+            avancementMoyen: avancementMoyen,
+            servicesActifs: servicesActifs,
+            servicesDesactives: servicesDesactives,
+            projetsActifs: projetsActifs,
+            projetsSuspendus: projetsSuspendus
+        };
+    }
+
+    generateStatsHTML(stats) {
+        return `
+            <div class="stats-row">
+                <div class="stat-card">
+                    <div class="stat-value">${stats.totalServices}</div>
+                    <div class="stat-label">Services Total</div>
+                    <div class="stat-subtext">
+                        <span class="text-success">${stats.servicesActifs} actifs</span>
+                        ${stats.servicesDesactives > 0 ? 
+                            `<span class="text-muted"> • ${stats.servicesDesactives} désactivés</span>` : ''
+                        }
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">${stats.totalProjets}</div>
+                    <div class="stat-label">Projets Total</div>
+                    <div class="stat-subtext">
+                        <span class="text-success">${stats.projetsActifs} actifs</span>
+                        ${stats.projetsSuspendus > 0 ? 
+                            `<span class="text-muted"> • ${stats.projetsSuspendus} suspendus</span>` : ''
+                        }
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">${stats.totalTaches}</div>
+                    <div class="stat-label">Tâches Total</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">${this.formatBudget(stats.budgetTotal)}</div>
+                    <div class="stat-label">Budget Total (Ar)</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">${stats.avancementMoyen}%</div>
+                    <div class="stat-label">Avancement Moyen</div>
+                </div>
+            </div>
+        `;
+    }
+
+    generateServiceHTML(service) {
+        const projetsCount = service.projets ? service.projets.length : 0;
+        const tachesCount = service.projets ? service.projets.reduce((total, projet) => 
+            total + (projet.taches ? projet.taches.length : 0), 0) : 0;
+
+        const isServiceDesactive = service.statutService === 'DESACTIVE';
+        const serviceClass = isServiceDesactive ? 'service-desactive grised' : '';
+        const serviceHeaderClass = isServiceDesactive ? 'service-header-desactive' : '';
+
+        let html = `
+            <div class="service-section ${serviceClass}">
+                <div class="service-header ${serviceHeaderClass}">
+                    <div>
+                        <i class="bi bi-diagram-3 me-2"></i>
+                        ${this.escapeHtml(service.nomService)} (n°: ${this.escapeHtml(service.CodeService)})
+                        ${isServiceDesactive ? 
+                            '<span class="status-badge status-desactive ms-2"><i class="bi bi-pause-circle"></i> Service Désactivé</span>' : 
+                            (service.statutService === 'EN_ATTENTE' ? 
+                                '<span class="status-badge status-suspendu ms-2"><i class="bi bi-clock"></i> En Attente</span>' : '')
+                        }
+                    </div>
+                    <div class="service-stats">
+                        ${projetsCount} projet(s) • ${tachesCount} tâche(s)
+                    </div>
+                </div>
+        `;
+
+        if (service.projets && service.projets.length > 0) {
+            service.projets.forEach(projet => {
+                html += this.generateProjetHTML(projet, isServiceDesactive);
+            });
+        } else {
+            html += `
+                <div class="projet-table-container ${isServiceDesactive ? 'grised' : ''}">
+                    <div class="projet-header ${isServiceDesactive ? 'projet-header-suspendu' : ''}">
+                        <div class="projet-title-section">
+                            <div class="projet-title">Aucun projet</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        html += `</div>`;
+        return html;
+    }
+
+    generateProjetHTML(projet, isServiceDesactive = false) {
+        const isProjetSuspendu = projet.StatutPro === 'Suspendu';
+        const statutClass = this.getStatutClass(projet.StatutPro);
+        const avancement = projet.avancementPro || 0;
+        const tachesCount = projet.taches ? projet.taches.length : 0;
+        
+        const projetContainerClass = isProjetSuspendu || isServiceDesactive ? 'projet-suspendu grised' : '';
+        const projetHeaderClass = isProjetSuspendu || isServiceDesactive ? 'projet-header-suspendu' : '';
+        
+        let html = `
+            <div class="projet-table-container ${projetContainerClass}">
+                <div class="projet-header ${projetHeaderClass}">
+                    <div class="projet-main-info">
+                        <div class="projet-title-section">
+                            <div class="projet-title">${this.escapeHtml(projet.titrePro)}</div>
+                            <div class="projet-meta-primary">
+                                <div class="meta-item">
+                                    <i class="bi bi-hash icon-small"></i>
+                                    <strong>N°:</strong> ${this.escapeHtml(projet.numProjet)}
+                                </div>
+                                <div class="meta-item">
+                                    <i class="bi bi-list-task icon-small"></i>
+                                    <strong>Tâches:</strong> ${tachesCount}
+                                </div>
+                                <div class="meta-item">
+                                    <span class="status-badge ${statutClass}">
+                                        <i class="bi bi-circle-fill" style="font-size: 0.4rem;"></i>
+                                        ${projet.StatutPro}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="projet-details-compact">
+                            <!-- Description et Commentaire sur la même ligne -->
+                            <div class="description-commentaire-row">
+                                <!-- Description -->
+                                <div class="info-container ${isProjetSuspendu || isServiceDesactive ? 'grised' : ''}">
+                                    <div class="info-header">
+                                        <i class="bi bi-text-paragraph icon-small"></i>
+                                        <h4 class="info-title">Description du Projet</h4>
+                                    </div>
+                                    <div class="info-content">
+                                        <div class="info-value">
+                                            ${projet.descriptionPro ? this.escapeHtml(projet.descriptionPro) : 'Aucune description fournie'}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Commentaire -->
+                                <div class="info-container ${isProjetSuspendu || isServiceDesactive ? 'grised' : ''}" 
+                                     style="${projet.commentairePro ? 'background: #fefce8; border-color: #fef08a;' : ''}">
+                                    <div class="info-header">
+                                        <i class="bi bi-chat-left-text icon-small"></i>
+                                        <h4 class="info-title" style="${projet.commentairePro ? 'color: #854d0e;' : ''}">Commentaire</h4>
+                                    </div>
+                                    <div class="info-content">
+                                        <div class="info-value" style="${projet.commentairePro ? 'color: #a16207;' : ''}">
+                                            ${projet.commentairePro ? this.escapeHtml(projet.commentairePro) : 'Aucun commentaire'}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Informations Générales -->
+                            <div class="info-container ${isProjetSuspendu || isServiceDesactive ? 'grised' : ''}">
+                                <div class="info-header">
+                                    <i class="bi bi-info-circle icon-small"></i>
+                                    <h4 class="info-title">Informations Générales</h4>
+                                </div>
+                                <div class="info-grid">
+                                    <div class="info-item">
+                                        <span class="info-label">
+                                            <i class="bi bi-calendar-range icon-small"></i>
+                                            Date de Début
+                                        </span>
+                                        <span class="info-value">
+                                            ${this.formatDate(projet.dateDebutPro)}
+                                        </span>
+                                    </div>
+                                    <div class="info-item">
+                                        <span class="info-label">
+                                            <i class="bi bi-calendar-check icon-small"></i>
+                                            Date de Fin
+                                        </span>
+                                        <span class="info-value">
+                                            ${projet.dateFinPro ? this.formatDate(projet.dateFinPro) : 'Non définie'}
+                                        </span>
+                                    </div>
+                                    <div class="info-item">
+                                        <span class="info-label">
+                                            <i class="bi bi-cash-coin icon-small"></i>
+                                            Budget Alloué
+                                        </span>
+                                        <span class="info-value budget">
+                                            ${this.formatBudget(projet.budgetPro)} Ar
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Avancement -->
+                            <div class="info-container ${isProjetSuspendu || isServiceDesactive ? 'grised' : ''}">
+                                <div class="info-header">
+                                    <i class="bi bi-graph-up icon-small"></i>
+                                    <h4 class="info-title">État d'Avancement</h4>
+                                </div>
+                                <div class="info-content">
+                                    <div class="info-item">
+                                        <span class="info-label">
+                                            <i class="bi bi-speedometer2 icon-small"></i>
+                                            Progression Globale
+                                        </span>
+                                        <div class="info-value">
+                                            <div class="progress-container">
+                                                <div class="progress-info">
+                                                    <span class="progress-percent">${avancement}%</span>
+                                                </div>
+                                                <div class="progress-bar">
+                                                    <div class="progress-fill" style="width: ${avancement}%"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Équipe -->
+                            <div class="info-container ${isProjetSuspendu || isServiceDesactive ? 'grised' : ''}">
+                                <div class="info-header">
+                                    <i class="bi bi-people icon-small"></i>
+                                    <h4 class="info-title">Équipe du Projet</h4>
+                                </div>
+                                <div class="info-grid">
+                                    ${projet.createur ? `
+                                        <div class="info-item">
+                                            <span class="info-label">
+                                                <i class="bi bi-person-plus icon-small"></i>
+                                                Créateur
+                                            </span>
+                                            <div class="createur-section ${isProjetSuspendu || isServiceDesactive ? 'grised' : ''}">
+                                                <div class="createur-content">
+                                                    ${this.escapeHtml(projet.createur.NomPer)} ${projet.createur.PrenomPer ? this.escapeHtml(projet.createur.PrenomPer) : ''}
+                                                    ${projet.createur.ImPer ? `(IM: ${this.escapeHtml(projet.createur.ImPer)})` : ''}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ` : ''}
+
+                                    <div class="info-item">
+                                        <span class="info-label">
+                                            <i class="bi bi-person-gear icon-small"></i>
+                                            Responsables
+                                        </span>
+                                        <div class="responsables-compact-section ${isProjetSuspendu || isServiceDesactive ? 'grised' : ''}">
+                                            ${projet.personnels && projet.personnels.length > 0 ? `
+                                                <div class="responsables-list-compact">
+                                                    ${projet.personnels.map(personnel => `
+                                                        <div class="responsable-item-compact ${isProjetSuspendu || isServiceDesactive ? 'grised' : ''}">
+                                                            <div class="responsable-nom">
+                                                                ${this.escapeHtml(personnel.NomPer)} ${personnel.PrenomPer ? this.escapeHtml(personnel.PrenomPer) : ''}
+                                                            </div>
+                                                            <div class="responsable-details">
+                                                                ${personnel.ImPer ? `IM: ${this.escapeHtml(personnel.ImPer)}` : ''}
+                                                                ${personnel.EmailPer ? ` • ${this.escapeHtml(personnel.EmailPer)}` : ''}
+                                                            </div>
+                                                        </div>
+                                                    `).join('')}
+                                                </div>
+                                            ` : `
+                                                <div class="no-responsables-compact">
+                                                    <i class="bi bi-person-x icon-small"></i>
+                                                    Aucun responsable assigné
+                                                </div>
+                                            `}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+        `;
+
+        // Tâches du projet
+        html += this.generateTachesHTML(projet.taches, isProjetSuspendu || isServiceDesactive);
+
+        html += `</div>`; // Fermeture du projet-table-container
+        return html;
+    }
+
+    generateTachesHTML(taches, isParentSuspendu = false) {
+        let html = `
+            <div style="padding: 1.25rem;">
+                <h5 style="margin-bottom: 1rem; color: #374151; display: flex; align-items: center; gap: 0.5rem; font-size: 1.1rem;">
+                    <i class="bi bi-list-task"></i>
+                    Liste des Tâches
+                    ${isParentSuspendu ? '<span class="status-badge status-desactive ms-2"><small>Projet Suspendu/Service Désactivé</small></span>' : ''}
+                </h5>
+                <table class="taches-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 70px;">#</th>
+                            <th style="width: 180px;">Titre</th>
+                            <th>Description</th>
+                            <th class="tache-commentaire-cell">Commentaire</th>
+                            <th style="width: 140px;">Période</th>
+                            <th style="width: 110px;">Avancement</th>
+                            <th style="width: 90px;">Statut</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+        `;
+
+        if (taches && taches.length > 0) {
+            taches.forEach(tache => {
+                const isTacheSuspendue = tache.statutTache === 'Suspendu';
+                const statutClass = this.getStatutClass(tache.statutTache);
+                const avancement = tache.avancementTache || 0;
+                
+                const tacheRowClass = isTacheSuspendue || isParentSuspendu ? 'tache-suspendue grised' : '';
+                
+                html += `
+                    <tr class="${tacheRowClass}">
+                        <td><strong>${tache.numTache}</strong></td>
+                        <td>${this.escapeHtml(tache.titreTache)}</td>
+                        <td>
+                            <div class="text-preview ${!tache.descriptionTache ? 'empty' : ''}">
+                                ${tache.descriptionTache ? this.escapeHtml(tache.descriptionTache) : 'Aucune description'}
+                            </div>
+                        </td>
+                        <td class="tache-commentaire-cell">
+                            <div class="tache-commentaire ${!tache.commentaireTache ? 'empty' : ''} ${isTacheSuspendue || isParentSuspendu ? 'grised' : ''}" 
+                                 onclick="this.classList.toggle('expanded')">
+                                ${tache.commentaireTache ? this.escapeHtml(tache.commentaireTache) : 'Aucun commentaire'}
+                            </div>
+                        </td>
+                        <td>
+                            <div>
+                                <div><small><strong>Début:</strong> ${this.formatDate(tache.dateDebutTache)}</small></div>
+                                <div><small><strong>Fin:</strong> ${tache.dateFinTache ? this.formatDate(tache.dateFinTache) : '-'}</small></div>
+                            </div>
+                        </td>
+                        <td>
+                            <div>
+                                <span style="font-size: 0.8rem;">${avancement}%</span>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: ${avancement}%"></div>
+                                </div>
+                            </div>
+                        </td>
+                        <td><span class="status-badge ${statutClass}">${tache.statutTache}</span></td>
+                    </tr>
+                `;
+            });
+        } else {
+            const noTachesClass = isParentSuspendu ? 'grised' : '';
+            html += `
+                <tr>
+                    <td colspan="7" class="no-taches-row ${noTachesClass}">
+                        <i class="bi bi-list-task me-2"></i>
+                        Aucune tâche définie pour ce projet
+                    </td>
+                </tr>
+            `;
+        }
+
+        html += `
+                    </tbody>
+                </table>
+            </div>
+        `;
+        return html;
+    }
+
+    formatDate(dateString) {
+        if (!dateString) return 'N/A';
+        try {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('fr-FR');
+        } catch (error) {
+            return 'N/A';
+        }
+    }
+
+    formatBudget(budget) {
+        if (!budget) return '0';
+        const amount = parseFloat(budget);
+        return amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+    }
+
+    getStatutClass(statut) {
+        const classes = {
+            'Débuté': 'status-debute',
+            'En cours': 'status-encours',
+            'Terminé': 'status-termine',
+            'Suspendu': 'status-suspendu',
+            'DESACTIVE': 'status-desactive'
+        };
+        return classes[statut] || 'status-debute';
+    }
+
+    showError(message) {
+        const alert = document.createElement('div');
+        alert.className = 'alert alert-danger alert-dismissible fade show';
+        alert.innerHTML = `
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            ${this.escapeHtml(message)}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+        
+        const container = document.querySelector('.rapport-container');
+        if (container) {
+            container.insertBefore(alert, container.firstChild);
+            
+            setTimeout(() => {
+                if (alert.parentNode) {
+                    alert.classList.remove('show');
+                    setTimeout(() => {
+                        if (alert.parentNode) {
+                            alert.parentNode.removeChild(alert);
+                        }
+                    }, 150);
+                }
+            }, 5000);
+        }
+    }
+
+    exportToPDF() {
+        if (!this.directionData) {
+            this.showError('Aucune donnée à exporter');
+            return;
+        }
+
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF('p', 'mm', 'a4');
+        const dateRapport = document.getElementById('dateRapport')?.value || new Date().toLocaleDateString('fr-FR');
+        const direction = this.directionData;
+
+        // Fonctions utilitaires
+        const ensureString = (value) => {
+            if (value === null || value === undefined) return '';
+            if (typeof value === 'number') return value.toString();
+            if (typeof value === 'boolean') return value ? 'Oui' : 'Non';
+            return String(value);
+        };
+
+        const safeText = (text, x, y, options = {}) => {
+            try {
+                const safeText = ensureString(text);
+                doc.text(safeText, x, y, options);
+            } catch (error) {
+                console.error('Erreur lors de l\'ajout du texte:', text, error);
+                doc.text('Erreur', x, y, options);
+            }
+        };
+
+        const addMultilineText = (text, x, y, maxWidth, lineHeight = 4, fontSize = 6) => {
+            doc.setFontSize(fontSize);
+            const lines = doc.splitTextToSize(ensureString(text), maxWidth);
+            safeText(lines, x, y);
+            return lines.length * lineHeight;
+        };
+
+        const checkNewPage = (neededSpace = 20) => {
+            if (yPosition > 280 - neededSpace) {
+                doc.addPage();
+                yPosition = 20;
+                return true;
+            }
+            return false;
+        };
+
+        const addVerticalSpace = (space = 5) => {
+            yPosition += space;
+        };
+
+        // Couleurs
+        const colors = {
+            primary: [150, 78, 227],
+            secondary: [117, 22, 95],
+            blue: [59, 130, 246],
+            gray: [107, 114, 128],
+            lightGray: [243, 244, 246],
+            darkGray: [55, 65, 81],
+            border: [229, 231, 235]
+        };
+
+        let yPosition = 10;
+
+        // ==================== EN-TÊTE DU DOCUMENT ====================
+        const drawHeader = () => {
+            // Bannière principale
+            doc.setFillColor(colors.primary[0], colors.primary[1], colors.primary[2]);
+            doc.roundedRect(10, yPosition, 190, 25, 3, 3, 'F');
+            
+            // Logo et texte de l'en-tête
+            doc.setFontSize(16);
+            doc.setFont('helvetica', 'bold');
+            doc.setTextColor(255, 255, 255);
+            safeText('MINISTÈRE DE L\'INDUSTRIE ET DU COMMERCE', 105, yPosition + 10, { align: 'center' });
+
+            doc.setFontSize(10);
+            safeText(`Direction: ${ensureString(direction.nomDirection)} (n°: ${ensureString(direction.CodeDirection)})`, 105, yPosition + 16, { align: 'center' });
+            
+            if (direction.statutDirection !== 'ACTIVE') {
+                doc.setFontSize(8);
+                doc.setTextColor(255, 255, 255, 128);
+                safeText('(Direction Désactivée)', 105, yPosition + 20, { align: 'center' });
+            }
+
+            yPosition += 30;
+
+            // Date du rapport
+            doc.setFontSize(9);
+            doc.setTextColor(colors.gray[0], colors.gray[1], colors.gray[2]);
+            safeText(`Rapport généré le ${dateRapport}`, 105, yPosition, { align: 'center' });
+            
+            yPosition += 15;
+        };
+
+        // ==================== STATISTIQUES ====================
+        const drawStatistics = () => {
+            const stats = this.calculateStatistics();
+            
+            // Titre section
+            doc.setFontSize(12);
+            doc.setFont('helvetica', 'bold');
+            doc.setTextColor(colors.darkGray[0], colors.darkGray[1], colors.darkGray[2]);
+            safeText('RÉSUMÉ DU RAPPORT', 105, yPosition, { align: 'center' });
+            yPosition += 8;
+
+            // Cartes de statistiques
+            const statCards = [
+                { 
+                    value: ensureString(stats.totalServices), 
+                    label: 'Services Total' 
+                },
+                { 
+                    value: ensureString(stats.totalProjets), 
+                    label: 'Projets Total' 
+                },
+                { 
+                    value: ensureString(stats.totalTaches), 
+                    label: 'Tâches Total' 
+                },
+                { 
+                    value: this.formatBudget(stats.budgetTotal), 
+                    label: 'Budget Total' 
+                },
+                { 
+                    value: `${ensureString(stats.avancementMoyen)}%`, 
+                    label: 'Avancement Moyen' 
+                }
+            ];
+
+            const cardWidth = 36;
+            const cardHeight = 18;
+            const horizontalSpacing = 2;
+            const startX = 10;
+            
+            statCards.forEach((card, index) => {
+                const x = startX + index * (cardWidth + horizontalSpacing);
+                const y = yPosition;
+
+                // Fond de la carte
+                doc.setFillColor(255, 255, 255);
+                doc.setDrawColor(colors.border[0], colors.border[1], colors.border[2]);
+                doc.setLineWidth(0.3);
+                doc.roundedRect(x, y, cardWidth, cardHeight, 2, 2, 'FD');
+                
+                // Valeur
+                doc.setFontSize(10);
+                doc.setFont('helvetica', 'bold');
+                doc.setTextColor(colors.primary[0], colors.primary[1], colors.primary[2]);
+                safeText(ensureString(card.value), x + cardWidth/2, y + 7, { align: 'center' });
+                
+                // Label
+                doc.setFontSize(7);
+                doc.setFont('helvetica', 'normal');
+                doc.setTextColor(colors.darkGray[0], colors.darkGray[1], colors.darkGray[2]);
+                safeText(card.label, x + cardWidth/2, y + 12, { align: 'center' });
+            });
+
+            yPosition += 25;
+        };
+
+        // ==================== SERVICES ET PROJETS ====================
+        const drawServicesAndProjects = () => {
+            if (!direction.services || direction.services.length === 0) {
+                doc.setFontSize(10);
+                doc.setFont('helvetica', 'italic');
+                doc.setTextColor(colors.gray[0], colors.gray[1], colors.gray[2]);
+                safeText('Aucun service trouvé pour cette direction', 15, yPosition);
+                yPosition += 10;
+                return;
+            }
+
+            direction.services.forEach(service => {
+                checkNewPage(40);
+                drawServiceHeader(service);
+                
+                if (service.projets && service.projets.length > 0) {
+                    service.projets.forEach(projet => {
+                        checkNewPage(80);
+                        drawProject(projet, service.statutService === 'DESACTIVE');
+                        addVerticalSpace(15); // Espace entre projets
+                    });
+                } else {
+                    drawNoProjects();
+                }
+                addVerticalSpace(20); // Espace après un service
+            });
+        };
+
+        const drawServiceHeader = (service) => {
+            const isServiceDesactive = service.statutService === 'DESACTIVE';
+            const serviceHeaderColor = isServiceDesactive ? colors.gray : colors.blue;
+
+            // En-tête du service
+            doc.setFillColor(serviceHeaderColor[0], serviceHeaderColor[1], serviceHeaderColor[2]);
+            doc.roundedRect(10, yPosition, 190, 8, 2, 2, 'F');
+            
+            // Texte du service
+            doc.setFontSize(10);
+            doc.setFont('helvetica', 'bold');
+            doc.setTextColor(255, 255, 255);
+            
+            let serviceText = `${ensureString(service.nomService)} (n°: ${ensureString(service.CodeService)})`;
+            if (isServiceDesactive) serviceText += ' [DÉSACTIVÉ]';
+            
+            safeText(serviceText, 15, yPosition + 5);
+            
+            yPosition += 12;
+            addVerticalSpace(5); // Espace après l'en-tête du service
+        };
+
+        const drawProject = (projet, isServiceDesactive) => {
+            const isProjetSuspendu = projet.StatutPro === 'Suspendu';
+            
+            // Titre du projet avec fond
+            doc.setFillColor(248, 250, 252);
+            doc.roundedRect(10, yPosition, 190, 8, 1, 1, 'F');
+            
+            doc.setFontSize(10);
+            doc.setFont('helvetica', 'bold');
+            const textColor = isProjetSuspendu || isServiceDesactive ? colors.gray : colors.darkGray;
+            doc.setTextColor(textColor[0], textColor[1], textColor[2]);
+            
+            let projetText = `${ensureString(projet.titrePro)}`;
+            if (isProjetSuspendu) projetText += ' [SUSPENDU]';
+            
+            safeText(projetText, 15, yPosition + 5);
+            
+            // Informations rapides
+            doc.setFontSize(7);
+            doc.setFont('helvetica', 'normal');
+            safeText(`N°: ${ensureString(projet.numProjet)} | Tâches: ${projet.taches ? ensureString(projet.taches.length) : '0'} | Statut: ${ensureString(projet.StatutPro)}`, 185, yPosition + 5, { align: 'right' });
+            
+            yPosition += 12;
+            addVerticalSpace(8);
+
+            // Détails du projet en colonnes
+            drawProjectDetails(projet, isProjetSuspendu, isServiceDesactive);
+        };
+
+        const drawProjectDetails = (projet, isProjetSuspendu, isServiceDesactive) => {
+            const startY = yPosition;
+
+            // === COLONNE GAUCHE ===
+            let leftY = startY;
+
+            // Description
+            doc.setFontSize(8);
+            doc.setFont('helvetica', 'bold');
+            doc.setTextColor(colors.primary[0], colors.primary[1], colors.primary[2]);
+            safeText('DESCRIPTION', 15, leftY);
+            leftY += 5;
+            
+            doc.setFontSize(7);
+            doc.setFont('helvetica', 'normal');
+            doc.setTextColor(colors.darkGray[0], colors.darkGray[1], colors.darkGray[2]);
+            const description = ensureString(projet.descriptionPro || 'Aucune description fournie');
+            const descHeight = addMultilineText(description, 15, leftY, 85, 3.5);
+            
+            leftY += descHeight + 10;
+
+            // Informations générales
+            doc.setFontSize(8);
+            doc.setFont('helvetica', 'bold');
+            doc.setTextColor(colors.primary[0], colors.primary[1], colors.primary[2]);
+            safeText('INFORMATIONS', 15, leftY);
+            leftY += 5;
+            
+            doc.setFontSize(7);
+            doc.setFont('helvetica', 'normal');
+            doc.setTextColor(colors.darkGray[0], colors.darkGray[1], colors.darkGray[2]);
+            
+            safeText(`Début: ${this.formatDate(projet.dateDebutPro)}`, 15, leftY);
+            leftY += 4.5;
+            
+            if (projet.dateFinPro) {
+                safeText(`Fin: ${this.formatDate(projet.dateFinPro)}`, 15, leftY);
+                leftY += 4.5;
+            }
+            
+            safeText(`Budget: ${this.formatBudget(projet.budgetPro)} Ar`, 15, leftY);
+            leftY += 4.5;
+
+            // Avancement (juste le pourcentage - sans barre de progression)
+            const avancement = projet.avancementPro || 0;
+            safeText(`Avancement: ${avancement}%`, 15, leftY);
+            leftY += 8; // Réduit l'espace puisque pas de barre
+
+            // === COLONNE DROITE ===
+            const rightColX = 110;
+            let rightY = startY;
+
+            // Commentaire
+            doc.setFontSize(8);
+            doc.setFont('helvetica', 'bold');
+            doc.setTextColor(colors.primary[0], colors.primary[1], colors.primary[2]);
+            safeText('COMMENTAIRE', rightColX, rightY);
+            rightY += 5;
+            
+            doc.setFontSize(7);
+            doc.setFont('helvetica', 'normal');
+            const commentColor = projet.commentairePro ? [161, 98, 7] : colors.gray;
+            doc.setTextColor(commentColor[0], commentColor[1], commentColor[2]);
+            const commentaire = ensureString(projet.commentairePro || 'Aucun commentaire');
+            const commentHeight = addMultilineText(commentaire, rightColX, rightY, 85, 3.5);
+            
+            rightY += commentHeight + 12;
+
+            // Équipe
+            doc.setFontSize(8);
+            doc.setFont('helvetica', 'bold');
+            doc.setTextColor(colors.primary[0], colors.primary[1], colors.primary[2]);
+            safeText('ÉQUIPE', rightColX, rightY);
+            rightY += 5;
+
+            doc.setFontSize(7);
+            doc.setFont('helvetica', 'normal');
+            doc.setTextColor(colors.darkGray[0], colors.darkGray[1], colors.darkGray[2]);
+            
+            // Créateur
+            if (projet.createur) {
+                safeText('Créateur:', rightColX, rightY);
+                doc.setFont('helvetica', 'bold');
+                safeText(`${ensureString(projet.createur.NomPer)} ${ensureString(projet.createur.PrenomPer || '')}`, rightColX + 18, rightY);
+                rightY += 4;
+                
+                if (projet.createur.ImPer) {
+                    doc.setFont('helvetica', 'normal');
+                    doc.setFontSize(6);
+                    safeText(`IM: ${ensureString(projet.createur.ImPer)}`, rightColX + 18, rightY);
+                    rightY += 4;
+                }
+                doc.setFontSize(7);
+            }
+
+            rightY += 3;
+
+            // Responsables
+            if (projet.personnels && projet.personnels.length > 0) {
+                doc.setFont('helvetica', 'normal');
+                safeText('Responsables:', rightColX, rightY);
+                rightY += 4;
+                
+                projet.personnels.forEach((personnel) => {
+                    if (rightY > 250) {
+                        rightY += 4;
+                        return;
+                    }
+                    
+                    doc.setFont('helvetica', 'bold');
+                    safeText(`• ${ensureString(personnel.NomPer)} ${ensureString(personnel.PrenomPer || '')}`, rightColX + 5, rightY);
+                    
+                    if (personnel.ImPer) {
+                        doc.setFont('helvetica', 'normal');
+                        doc.setFontSize(6);
+                        safeText(`(IM: ${ensureString(personnel.ImPer)})`, rightColX + 60, rightY);
+                        doc.setFontSize(7);
+                    }
+                    
+                    rightY += 4.5;
+                });
+            } else {
+                safeText('Aucun responsable assigné', rightColX, rightY);
+                rightY += 4;
+            }
+
+            // Prendre la plus grande hauteur des deux colonnes
+            yPosition = Math.max(leftY, rightY) + 8;
+
+            // Tâches
+            checkNewPage(40);
+            drawProjectTasks(projet.taches, isProjetSuspendu || isServiceDesactive);
+        };
+
+        const drawProjectTasks = (taches, isParentInactive) => {
+            // Ligne de séparation
+            doc.setDrawColor(colors.border[0], colors.border[1], colors.border[2]);
+            doc.line(10, yPosition, 200, yPosition);
+            yPosition += 10;
+
+            // Titre section tâches
+            doc.setFontSize(9);
+            doc.setFont('helvetica', 'bold');
+            doc.setTextColor(colors.primary[0], colors.primary[1], colors.primary[2]);
+            safeText('TÂCHES DU PROJET', 15, yPosition);
+            yPosition += 8;
+
+            // En-tête du tableau
+            doc.setFillColor(248, 250, 252);
+            doc.rect(10, yPosition, 190, 6, 'F');
+            doc.setDrawColor(colors.border[0], colors.border[1], colors.border[2]);
+            doc.setLineWidth(0.3);
+            
+            // Bordures verticales
+            doc.line(20, yPosition, 20, yPosition + 6);  // #
+            doc.line(50, yPosition, 50, yPosition + 6);  // Tâche (plus large)
+            doc.line(120, yPosition, 120, yPosition + 6); // Description
+            doc.line(150, yPosition, 150, yPosition + 6); // Commentaire
+            doc.line(165, yPosition, 165, yPosition + 6); // Avanc.
+            doc.line(180, yPosition, 180, yPosition + 6); // Statut
+            
+            doc.setFontSize(7);
+            doc.setFont('helvetica', 'bold');
+            doc.setTextColor(colors.darkGray[0], colors.darkGray[1], colors.darkGray[2]);
+            
+            // En-têtes de colonnes
+            safeText('#', 15, yPosition + 4);
+            safeText('TÂCHE', 35, yPosition + 4);
+            safeText('DESCRIPTION', 85, yPosition + 4);
+            safeText('COMMENTAIRE', 135, yPosition + 4);
+            safeText('AVANC.', 157, yPosition + 4);
+            safeText('STATUT', 172, yPosition + 4);
+            
+            yPosition += 7;
+
+            // Lignes des tâches
+            if (taches && taches.length > 0) {
+                taches.forEach((tache, index) => {
+                    checkNewPage(20); // Plus d'espace pour le texte multiligne
+
+                    const isTacheSuspendue = tache.statutTache === 'Suspendu';
+                    const textColor = isTacheSuspendue || isParentInactive ? colors.gray : colors.darkGray;
+
+                    // Fond alterné pour les lignes
+                    if (index % 2 === 0) {
+                        doc.setFillColor(253, 253, 254);
+                        doc.rect(10, yPosition, 190, 10, 'F'); // Hauteur augmentée
+                    }
+
+                    // Numéro de tâche
+                    doc.setFontSize(6);
+                    doc.setFont('helvetica', 'bold');
+                    doc.setTextColor(textColor[0], textColor[1], textColor[2]);
+                    safeText(ensureString(tache.numTache), 15, yPosition + 4);
+                    
+                    // Titre de la tâche (nom complet avec retour à la ligne)
+                    const titre = ensureString(tache.titreTache);
+                    doc.setFont('helvetica', 'normal');
+                    doc.setFontSize(6);
+                    const titreLines = doc.splitTextToSize(titre, 40); // Largeur limitée à 40mm
+                    safeText(titreLines, 25, yPosition + 4);
+                    
+                    // Description
+                    const description = ensureString(tache.descriptionTache || '---');
+                    const descLines = doc.splitTextToSize(description, 50); // Largeur limitée à 50mm
+                    safeText(descLines, 55, yPosition + 4);
+                    
+                    // Commentaire
+                    const commentaireTache = ensureString(tache.commentaireTache || '---');
+                    const commentColorTache = tache.commentaireTache ? [161, 98, 7] : colors.gray;
+                    doc.setTextColor(commentColorTache[0], commentColorTache[1], commentColorTache[2]);
+                    const commentLines = doc.splitTextToSize(commentaireTache, 25); // Largeur limitée à 25mm
+                    safeText(commentLines, 125, yPosition + 4);
+                    doc.setTextColor(textColor[0], textColor[1], textColor[2]);
+                    
+                    // Avancement (juste le pourcentage)
+                    const tacheAvancement = tache.avancementTache || 0;
+                    safeText(`${ensureString(tacheAvancement)}%`, 157, yPosition + 4);
+                    
+                    // Statut
+                    safeText(ensureString(tache.statutTache), 172, yPosition + 4);
+                    
+                    // Ligne séparatrice
+                    doc.setDrawColor(colors.border[0], colors.border[1], colors.border[2]);
+                    doc.line(10, yPosition + 10, 200, yPosition + 10);
+                    
+                    yPosition += 12; // Plus d'espace entre les lignes pour le texte multiligne
+                });
+            } else {
+                // Aucune tâche
+                doc.setFillColor(255, 255, 255);
+                doc.rect(10, yPosition, 190, 8, 'F');
+                
+                doc.setFontSize(7);
+                doc.setFont('helvetica', 'italic');
+                doc.setTextColor(colors.gray[0], colors.gray[1], colors.gray[2]);
+                safeText('Aucune tâche définie pour ce projet', 105, yPosition + 5, { align: 'center' });
+                
+                doc.setDrawColor(colors.border[0], colors.border[1], colors.border[2]);
+                doc.line(10, yPosition + 8, 200, yPosition + 8);
+                
+                yPosition += 10;
+            }
+
+            yPosition += 10;
+        };
+
+        const drawNoProjects = () => {
+            doc.setFontSize(8);
+            doc.setFont('helvetica', 'italic');
+            doc.setTextColor(colors.gray[0], colors.gray[1], colors.gray[2]);
+            safeText('Aucun projet dans ce service', 15, yPosition);
+            yPosition += 12;
+        };
+
+        // ==================== PIED DE PAGE ====================
+        const drawFooter = () => {
+            const pageCount = doc.internal.getNumberOfPages();
+            for (let i = 1; i <= pageCount; i++) {
+                doc.setPage(i);
+                doc.setFontSize(7);
+                doc.setFont('helvetica', 'normal');
+                doc.setTextColor(colors.gray[0], colors.gray[1], colors.gray[2]);
+                safeText(`Page ${i}/${pageCount}`, 105, 287, { align: 'center' });
+                safeText(`Rapport généré le ${dateRapport} - Ministère de l'Industrie et du Commerce`, 105, 290, { align: 'center' });
+            }
+        };
+
+        // ==================== EXÉCUTION PRINCIPALE ====================
+        try {
+            drawHeader();
+            drawStatistics();
+            drawServicesAndProjects();
+            drawFooter();
+
+            // Sauvegarder le PDF
+            doc.save(`Rapport PTA - ${direction.nomDirection} - ${dateRapport.replace(/\//g, '-')}.pdf`);
+            
+        } catch (error) {
+            console.error('Erreur lors de la génération du PDF:', error);
+            this.showError('Erreur lors de la génération du PDF');
+        }
+    }
+}
+
+// Initialisation
+document.addEventListener('DOMContentLoaded', function() {
+    window.rapportManager = new RapportManager();
+    
+    // Forcer le bon rendu de Select2 après chargement
+    setTimeout(() => {
+        const directionSelect = document.getElementById('directionSelect');
+        if (directionSelect && directionSelect.innerHTML.includes('Chargement')) {
+            // Si le select montre encore "Chargement", on le met à jour avec la valeur "aucun"
+            directionSelect.innerHTML = '<option value="aucun">Sélectionnez une direction</option>';
+            if (window.rapportManager && window.rapportManager.select2Instance) {
+                window.rapportManager.select2Instance.destroy();
+                window.rapportManager.initSelect2();
+            }
+        }
+    }, 1000);
+});
+</script>
+{% endblock %}

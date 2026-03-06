@@ -1,0 +1,895 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Aide et Guide{% endblock %}
+
+{% block stylesheets %}
+    <style>
+        :root {
+            --primary-color: #964ee3;
+            --secondary-color: #75165f;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --info-color: #3b82f6;
+            --danger-color: #ef4444;
+        }
+        
+        body {
+            background: #f8fafc;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #374151;
+        }
+        
+        .guide-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .guide-header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        
+        .guide-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .guide-subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        .role-section {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            border-left: 5px solid;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .role-section:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        }
+        
+        .role-admin {
+            border-left-color: var(--primary-color);
+        }
+        
+        .role-createur {
+            border-left-color: var(--info-color);
+        }
+        
+        .role-utilisateur {
+            border-left-color: var(--success-color);
+        }
+        
+        .role-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #f1f5f9;
+        }
+        
+        .role-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            font-size: 1.5rem;
+            background: #f1f5f9;
+            color: #374151;
+            border: 2px solid #e5e7eb;
+        }
+        
+        .role-title {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin: 0;
+        }
+        
+        .role-description {
+            color: #6b7280;
+            font-size: 1.1rem;
+        }
+        
+        .section-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin: 2rem 0 1rem 0;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #f1f5f9;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .feature-card {
+            background: #f8fafc;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            border-left: 4px solid #e5e7eb;
+            transition: all 0.3s ease;
+        }
+        
+        .feature-card:hover {
+            background: #f1f5f9;
+            transform: translateX(5px);
+            border-left-color: var(--primary-color);
+        }
+        
+        .feature-icon {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: #374151;
+        }
+        
+        .feature-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #1f2937;
+        }
+        
+        .feature-description {
+            color: #6b7280;
+            margin-bottom: 0;
+        }
+        
+        .code-block {
+            background: #1f2937;
+            color: #e5e7eb;
+            padding: 1rem;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            margin: 1rem 0;
+            font-size: 0.9rem;
+            border-left: 4px solid var(--primary-color);
+        }
+        
+        .alert-custom {
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-left: 4px solid;
+            background: #f8fafc;
+        }
+        
+        .alert-info1 {
+            border-left-color: var(--info-color);
+            background: #ffffffff;
+        }
+        
+        .alert-warning1 {
+            border-left-color: var(--warning-color);
+            background: #ffffffff;
+        }
+        
+        .alert-success1 {
+            border-left-color: var(--success-color);
+            background: #ffffffff;
+        }
+        
+        .badge-role {
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            background: #6b7280;
+            color: white;
+        }
+        
+        .badge-admin {
+            background: var(--primary-color);
+        }
+        
+        .badge-createur {
+            background: var(--info-color);
+        }
+        
+        .badge-utilisateur {
+            background: var(--success-color);
+        }
+        
+        .quick-nav {
+            position: sticky;
+            top: 7rem;
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        
+        .quick-nav-title {
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .quick-nav-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .quick-nav-item {
+            margin-bottom: 0.5rem;
+        }
+        
+        .quick-nav-link {
+            color: #6b7280;
+            text-decoration: none;
+            padding: 0.5rem 0.75rem;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .quick-nav-link:hover {
+            background: #f1f5f9;
+            color: var(--primary-color);
+            transform: translateX(5px);
+        }
+        
+        .quick-nav-link.active {
+            background: var(--primary-color);
+            color: white;
+        }
+        
+        .icon-neutral {
+            color: #6b7280;
+        }
+        
+        @media (max-width: 768px) {
+            .guide-container {
+                padding: 1rem;
+            }
+            
+            .guide-title {
+                font-size: 2rem;
+            }
+            
+            .role-header {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .role-icon {
+                margin-right: 0;
+                margin-bottom: 1rem;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <div class="guide-container">
+        <!-- En-tête -->
+        <div class="guide-header">
+            <h1 class="guide-title">GUIDE COMPLET D'UTILISATION</h1>
+            <p class="guide-subtitle">Système de Gestion MIC - Ministère de l'Industrialisation et du Commerce</p>
+        </div>
+
+        <div class="row">
+            <!-- Navigation rapide -->
+            <div class="col-lg-3">
+                <div class="quick-nav">
+                    <h3 class="quick-nav-title">
+                        <i class="bi bi-list"></i>
+                        Navigation Rapide
+                    </h3>
+                    <ul class="quick-nav-list">
+                        <li class="quick-nav-item">
+                            <a href="#admin" class="quick-nav-link active">
+                                <i class="bi bi-person-gear"></i>
+                                Administrateur
+                            </a>
+                        </li>
+                        <li class="quick-nav-item">
+                            <a href="#createur" class="quick-nav-link">
+                                <i class="bi bi-clipboard-plus"></i>
+                                Créateur de Projet
+                            </a>
+                        </li>
+                        <li class="quick-nav-item">
+                            <a href="#utilisateur" class="quick-nav-link">
+                                <i class="bi bi-person"></i>
+                                Utilisateur Simple
+                            </a>
+                        </li>
+                        <li class="quick-nav-item">
+                            <a href="#commun" class="quick-nav-link">
+                                <i class="bi bi-share"></i>
+                                Fonctions Communes
+                            </a>
+                        </li>
+                        <li class="quick-nav-item">
+                            <a href="#support" class="quick-nav-link">
+                                <i class="bi bi-question-circle"></i>
+                                Support & Aide
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Contenu principal -->
+            <div class="col-lg-9">
+                <!-- Section Administrateur -->
+                <div id="admin" class="role-section role-admin">
+                    <div class="role-header">
+                        <div class="role-icon">
+                            <i class="bi bi-person-gear"></i>
+                        </div>
+                        <div>
+                            <h2 class="role-title">GUIDE ADMINISTRATEUR</h2>
+                            <p class="role-description">Gestion complète du système et des utilisateurs</p>
+                        </div>
+                    </div>
+
+                    <h3 class="section-title">
+                        <i class="bi bi-people"></i>
+                        1. GESTION DES UTILISATEURS ET RÔLES
+                    </h3>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="feature-card">
+                                <div class="feature-icon">
+                                    <i class="bi bi-person-add"></i>
+                                </div>
+                                <h4 class="feature-title">Validation des nouveaux utilisateurs</h4>
+                                <p class="feature-description">
+                                    <i class="bi bi-inbox"></i> Nouvelle inscription : Approuvez ou rejetez les demandes d'accès depuis votre tableau de bord
+                                </p>
+                                <p class="feature-description">
+                                    <i class="bi bi-person-badge"></i> Attribution des rôles : Choisissez entre Utilisateur, Créateur de projet ou Administrateur
+                                </p>
+                                <p class="feature-description">
+                                    <i class="bi bi-envelope"></i> Notification automatique : Les utilisateurs reçoivent un email de confirmation
+                                </p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="feature-card">
+                                <div class="feature-icon">
+                                    <i class="bi bi-arrow-repeat"></i>
+                                </div>
+                                <h4 class="feature-title">Modification des rôles</h4>
+                                <p class="feature-description">
+                                    <i class="bi bi-arrow-left-right"></i> Flexibilité totale : Modifiez les rôles à tout moment selon les besoins
+                                </p>
+                                <p class="feature-description">
+                                    <i class="bi bi-lightning"></i> Impact immédiat : Les permissions se mettent à jour instantanément
+                                </p>
+                                {# <p class="feature-description">
+                                    <i class="bi bi-clock-history"></i> Historique : Consultez l'historique des changements de rôles
+                                </p> #}
+                            </div>
+                        </div>
+                    </div>
+
+                    <h3 class="section-title">
+                        <i class="bi bi-building"></i>
+                        2. GESTION COMPLÈTE DES DIRECTIONS
+                    </h3>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="bi bi-plus-circle"></i>
+                        </div>
+                        <h4 class="feature-title">Création d'une direction</h4>
+                        <div class="code-block">
+                            Formulaire de création :
+                            ✓ Code direction (unique, format libre)
+                            ✓ Nom de la direction (ex: "Direction des Ressources Humaines")
+                            ✓ Directeur (optionnel - sélection parmi les personnels disponibles)
+                        </div>
+                        <div class="alert-custom alert-info1">
+                            <i class="bi bi-building"></i> <strong>Structure hiérarchique :</strong> Les directions sont le niveau supérieur de l'organigramme<br>
+                            <i class="bi bi-person"></i> <strong>Directeur unique :</strong> Un personnel ne peut diriger qu'une seule direction active<br>
+                            <i class="bi bi-key"></i> <strong>Code immuable :</strong> Le code direction ne pourra plus être modifié après création
+                        </div>
+                    </div>
+
+                    <h3 class="section-title">
+                        <i class="bi bi-diagram-3"></i>
+                        3. GESTION COMPLÈTE DES SERVICES
+                    </h3>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="bi bi-gear"></i>
+                        </div>
+                        <h4 class="feature-title">Création d'un service</h4>
+                        <div class="code-block">
+                            Champs obligatoires :
+                            ✓ Code service (unique)
+                            ✓ Nom du service
+                            ✓ Direction (doit être active)
+                            ✓ Chef de service (optionnel)
+                        </div>
+                        <div class="alert-custom alert-warning1">
+                            <i class="bi bi-link"></i> <strong>Rattachement obligatoire :</strong> Un service doit appartenir à une direction active<br>
+                            <i class="bi bi-person"></i> <strong>Chef de service :</strong> Optionnel à la création - le service sera 'EN ATTENTE' sans chef<br>
+                            <i class="bi bi-arrow-repeat"></i> <strong>Cohérence :</strong> Le service hérite de la direction sélectionnée
+                        </div>
+                    </div>
+
+                    <h3 class="section-title">
+                        <i class="bi bi-people"></i>
+                        4. GESTION COMPLÈTE DU PERSONNEL
+                    </h3>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="bi bi-person-plus"></i>
+                        </div>
+                        <h4 class="feature-title">Création et modification</h4>
+                        <div class="code-block">
+                            Informations requises :
+                            ✓ Immatricule (6 chiffres, format XXX XXX, unique)
+                            ✓ Nom et prénom
+                            ✓ Email (unique)
+                            ✓ Téléphone (optionnel)
+                            ✓ Service de rattachement
+                            ✓ Rôle dans l'application
+                        </div>
+                        <div class="alert-custom alert-info1">
+                            <i class="bi bi-robot"></i> <strong>Intelligence métier :</strong> La fonction (Directeur/Chef_service/Agent) est déterminée automatiquement<br>
+                            <i class="bi bi-shield-check"></i> <strong>Rôle applicatif :</strong> Définit les permissions dans le système
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section Créateur de Projet -->
+                <div id="createur" class="role-section role-createur">
+                    <div class="role-header">
+                        <div class="role-icon">
+                            <i class="bi bi-clipboard-plus"></i>
+                        </div>
+                        <div>
+                            <h2 class="role-title">GUIDE CRÉATEUR DE PROJET</h2>
+                            <p class="role-description">Création et gestion des projets</p>
+                        </div>
+                    </div>
+
+                    <h3 class="section-title">
+                        <i class="bi bi-plus-circle"></i>
+                        1. CRÉATION DE PROJET
+                    </h3>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="bi bi-clipboard-plus"></i>
+                        </div>
+                        <h4 class="feature-title">Formulaire de création</h4>
+                        <div class="code-block">
+                            Champs obligatoires :
+                            ✓ Titre du projet (clair et descriptif)
+                            ✓ Description détaillée
+                            ✓ Budget alloué (format numérique)
+                            ✓ Date de début (datepicker)
+                            ✓ Date de fin (datepicker)
+                            ✓ Direction concernée
+                            ✓ Service concerné
+                            ✓ Responsable(s) du projet
+                        </div>
+                        <div class="alert-custom alert-info1">
+                            <i class="bi bi-currency-dollar"></i> <strong>Budget :</strong> Indiquez le montant alloué en Ariary<br>
+                            <i class="bi bi-calendar"></i> <strong>Planning :</strong> Les dates définissent la durée automatique du projet<br>
+                            <i class="bi bi-people"></i> <strong>Équipe :</strong> Sélectionnez un ou plusieurs responsables
+                        </div>
+                    </div>
+
+                    <h3 class="section-title">
+                        <i class="bi bi-diagram-3"></i>
+                        2. STRUCTURATION DU PROJET
+                    </h3>
+
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="feature-card">
+                                <div class="feature-icon">
+                                    <i class="bi bi-list-check"></i>
+                                </div>
+                                <h4 class="feature-title">Définition des actions</h4>
+                                <p class="feature-description">
+                                    <i class="bi bi-clipboard-check"></i> Plan d'action : Listez toutes les actions à réaliser
+                                </p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="feature-card">
+                                <div class="feature-icon">
+                                    <i class="bi bi-person-check"></i>
+                                </div>
+                                <h4 class="feature-title">Assignation des responsables</h4>
+                                <p class="feature-description">
+                                    <i class="bi bi-geo-alt"></i> Responsables : Assignez chaque action à un membre de l'équipe
+                                </p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="feature-card">
+                                <div class="feature-icon">
+                                    <i class="bi bi-calendar-event"></i>
+                                </div>
+                                <h4 class="feature-title">Échéancier</h4>
+                                <p class="feature-description">
+                                    <i class="bi bi-clock"></i> Échéancier : Définissez des dates pour chaque action
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h3 class="section-title">
+                        <i class="bi bi-graph-up"></i>
+                        3. SUIVI ET PILOTAGE
+                    </h3>
+
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="feature-card">
+                                <div class="feature-icon">
+                                    <i class="bi bi-speedometer2"></i>
+                                </div>
+                                <h4 class="feature-title">Tableau de bord</h4>
+                                <p class="feature-description">
+                                    <i class="bi bi-eye"></i> Vue globale : Statut de tous vos projets
+                                </p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="feature-card">
+                                <div class="feature-icon">
+                                    <i class="bi bi-sliders"></i>
+                                </div>
+                                <h4 class="feature-title">Contrôles</h4>
+                                <p class="feature-description">
+                                    <i class="bi bi-gear"></i> Modifiez les paramètres de vos projets
+                                </p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="feature-card">
+                                <div class="feature-icon">
+                                    <i class="bi bi-bar-chart"></i>
+                                </div>
+                                <h4 class="feature-title">Indicateurs</h4>
+                                <p class="feature-description">
+                                    <i class="bi bi-graph-up"></i> Avancement, budget, délais
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section Utilisateur Simple -->
+                <div id="utilisateur" class="role-section role-utilisateur">
+                    <div class="role-header">
+                        <div class="role-icon">
+                            <i class="bi bi-person"></i>
+                        </div>
+                        <div>
+                            <h2 class="role-title">GUIDE UTILISATEUR SIMPLE</h2>
+                            <p class="role-description">Participation aux projets et gestion des tâches</p>
+                        </div>
+                    </div>
+
+                    <h3 class="section-title">
+                        <i class="bi bi-eye"></i>
+                        1. PARTICIPATION AUX PROJETS
+                    </h3>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="bi bi-layout-text-window"></i>
+                        </div>
+                        <h4 class="feature-title">Vue personnalisée</h4>
+                        <p class="feature-description">
+                            <i class="bi bi-eye"></i> Focus : Vous ne voyez que les projets qui vous concernent
+                        </p>
+                        <p class="feature-description">
+                            <i class="bi bi-check-square"></i> Tâches assignées : Liste claire de vos responsabilités
+                        </p>
+                        <p class="feature-description">
+                            <i class="bi bi-phone"></i> Interface simplifiée : Concentrez-vous sur l'essentiel
+                        </p>
+                    </div>
+
+                    <h3 class="section-title">
+                        <i class="bi bi-check-square"></i>
+                        2. GESTION DE VOS TÂCHES
+                    </h3>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="bi bi-arrow-clockwise"></i>
+                        </div>
+                        <h4 class="feature-title">Mise à jour de l'avancement</h4>
+                        <div class="code-block">
+                            Actions possibles :
+                            ✓ Changer le statut : "Non commencée" → "En cours" → "Terminée"
+                            ✓ Modifier le pourcentage d'avancement (0-100%)
+                            ✓ Ajouter des commentaires
+                            ✓ Signaler des blocages
+                        </div>
+                        <div class="alert-custom alert-success1">
+                            <i class="bi bi-arrow-repeat"></i> <strong>Mises à jour régulières :</strong> Maintenez l'information à jour<br>
+                            <i class="bi bi-chat"></i> <strong>Communication :</strong> Signalez les difficultés rapidement<br>
+                            <i class="bi bi-check-circle"></i> <strong>Clarté :</strong> Utilisez des statuts cohérents
+                        </div>
+                    </div>
+
+                    <h3 class="section-title">
+                        <i class="bi bi-people"></i>
+                        3. COLLABORATION
+                    </h3>
+
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="feature-card">
+                                <div class="feature-icon">
+                                    <i class="bi bi-chat"></i>
+                                </div>
+                                <h4 class="feature-title">Communication d'équipe</h4>
+                                <p class="feature-description">
+                                    <i class="bi bi-chat"></i> Commentaires : Partagez des informations avec l'équipe
+                                </p>
+                            </div>
+                        </div>
+                        {# <div class="col-md-4">
+                            <div class="feature-card">
+                                <div class="feature-icon">
+                                    <i class="bi bi-bell"></i>
+                                </div>
+                                <h4 class="feature-title">Notifications</h4>
+                                <p class="feature-description">
+                                    <i class="bi bi-bell"></i> Recevez les annonces importantes
+                                </p>
+                            </div>
+                        </div> #}
+                        <div class="col-md-4">
+                            <div class="feature-card">
+                                <div class="feature-icon">
+                                    <i class="bi bi-eye"></i>
+                                </div>
+                                <h4 class="feature-title">Visibilité</h4>
+                                <p class="feature-description">
+                                    <i class="bi bi-people"></i> Voyez qui travaille sur quoi
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section Fonctions Communes -->
+                <div id="commun" class="role-section">
+                    <div class="role-header">
+                        <div class="role-icon">
+                            <i class="bi bi-share"></i>
+                        </div>
+                        <div>
+                            <h2 class="role-title">GUIDE GESTION DES PROJETS (Commun)</h2>
+                            <p class="role-description">Fonctionnalités accessibles à tous les rôles</p>
+                        </div>
+                    </div>
+
+                    <h3 class="section-title">
+                        <i class="bi bi-graph-up"></i>
+                        1. STATUTS ET INDICATEURS
+                    </h3>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="bi bi-arrow-repeat"></i>
+                        </div>
+                        <h4 class="feature-title">Cycle de vie d'un projet</h4>
+                        <div class="code-block">
+                            Statuts disponibles :
+                            • "Débuté" - Projet créé, aucune tâche active
+                            • "En cours" - Au moins une tâche en progression
+                            • "Terminé" - Toutes les tâches finalisées
+                        </div>
+                    </div>
+
+                    <h3 class="section-title">
+                        <i class="bi bi-funnel"></i>
+                        2. RECHERCHE ET FILTRES
+                    </h3>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="bi bi-search"></i>
+                        </div>
+                        <h4 class="feature-title">Filtres disponibles</h4>
+                        <div class="code-block">
+                            Combinaison possible :
+                            ✓ Par direction/service
+                            ✓ Par responsable
+                            ✓ Par statut
+                            ✓ Par période (datepicker)
+                            ✓ Par mot-clé
+                        </div>
+                        <div class="alert-custom alert-info1">
+                            <i class="bi bi-geo-alt"></i> <strong>Filtres combinés :</strong> Affinez précisément vos résultats<br>
+                            <i class="bi bi-arrow-clockwise"></i> <strong>Réinitialisation :</strong> Bouton pour tout effacer<br>
+                            <i class="bi bi-save"></i> <strong>Sauvegarde :</strong> Vos filtres peuvent être mémorisés
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section Support -->
+                <div id="support" class="role-section">
+                    <div class="role-header">
+                        <div class="role-icon">
+                            <i class="bi bi-question-circle"></i>
+                        </div>
+                        <div>
+                            <h2 class="role-title">SUPPORT ET AIDE</h2>
+                            <p class="role-description">Ressources disponibles et bonnes pratiques</p>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="feature-card">
+                                <div class="feature-icon">
+                                    <i class="bi bi-book"></i>
+                                </div>
+                                <h4 class="feature-title">Ressources disponibles</h4>
+                                <p class="feature-description">
+                                    <i class="bi bi-book"></i> Guide en ligne : Documentation complète toujours accessible
+                                </p>
+                                <p class="feature-description">
+                                    <i class="bi bi-camera-video"></i> Tutoriels vidéo : Démonstrations pas à pas
+                                </p>
+                                <p class="feature-description">
+                                    <i class="bi bi-headset"></i> Support technique : Contactez l'administrateur système
+                                </p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="feature-card">
+                                <div class="feature-icon">
+                                    <i class="bi bi-lightbulb"></i>
+                                </div>
+                                <h4 class="feature-title">Bonnes pratiques</h4>
+                                <p class="feature-description">
+                                    <i class="bi bi-save"></i> Sauvegarde : Le système sauvegarde automatiquement vos données
+                                </p>
+                                <p class="feature-description">
+                                    <i class="bi bi-search"></i> Recherche : Utilisez les filtres pour trouver rapidement
+                                </p>
+                                <p class="feature-description">
+                                    <i class="bi bi-phone"></i> Responsive : L'interface s'adapte à tous les appareils
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    {# <div class="alert-custom alert-warning1 mt-4">
+                        <h5><i class="bi bi-exclamation-triangle"></i> Procédures importantes</h5>
+                        <div class="row mt-3">
+                            <div class="col-md-4">
+                                <span class="badge badge-admin">Administrateurs</span>
+                                <ul class="mt-2">
+                                    <li><i class="bi bi-shield-check"></i> Sécurité : Vérifiez les identités avant validation des comptes</li>
+                                    <li><i class="bi bi-file-text"></i> Documentation : Maintenez à jour les fiches de poste</li>
+                                    <li><i class="bi bi-clipboard-check"></i> Audit : Revoyez régulièrement les permissions</li>
+                                </ul>
+                            </div>
+                            <div class="col-md-4">
+                                <span class="badge badge-createur">Créateurs</span>
+                                <ul class="mt-2">
+                                    <li><i class="bi bi-calendar"></i> Planning : Estimez réalistement les délais</li>
+                                    <li><i class="bi bi-people"></i> Équipe : Assurez-vous des disponibilités des ressources</li>
+                                    <li><i class="bi bi-currency-dollar"></i> Budget : Suivez rigoureusement les dépenses</li>
+                                </ul>
+                            </div>
+                            <div class="col-md-4">
+                                <span class="badge badge-utilisateur">Utilisateurs</span>
+                                <ul class="mt-2">
+                                    <li><i class="bi bi-arrow-clockwise"></i> Actualisation : Mettez à jour régulièrement vos tâches</li>
+                                    <li><i class="bi bi-chat"></i> Communication : Signalez rapidement les problèmes</li>
+                                    <li><i class="bi bi-check-circle"></i> Qualité : Respectez les échéances convenues</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div> #}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Navigation rapide smooth scroll
+        document.querySelectorAll('.quick-nav-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // Retirer la classe active de tous les liens
+                document.querySelectorAll('.quick-nav-link').forEach(l => l.classList.remove('active'));
+                
+                // Ajouter la classe active au lien cliqué
+                this.classList.add('active');
+                
+                // Scroll vers la section cible
+                const targetId = this.getAttribute('href');
+                const targetSection = document.querySelector(targetId);
+                
+                if (targetSection) {
+                    targetSection.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Mise à jour de la navigation active lors du scroll
+        window.addEventListener('scroll', function() {
+            const sections = document.querySelectorAll('.role-section');
+            const navLinks = document.querySelectorAll('.quick-nav-link');
+            
+            let currentSection = '';
+            
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop - 100;
+                const sectionHeight = section.clientHeight;
+                
+                if (window.scrollY >= sectionTop && window.scrollY < sectionTop + sectionHeight) {
+                    currentSection = '#' + section.getAttribute('id');
+                }
+            });
+            
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === currentSection) {
+                    link.classList.add('active');
+                }
+            });
+        });
+
+        // Animation des cartes au chargement
+        document.addEventListener('DOMContentLoaded', function() {
+            const cards = document.querySelectorAll('.feature-card');
+            cards.forEach((card, index) => {
+                setTimeout(() => {
+                    card.style.opacity = '0';
+                    card.style.transform = 'translateY(20px)';
+                    card.style.transition = 'all 0.5s ease';
+                    
+                    setTimeout(() => {
+                        card.style.opacity = '1';
+                        card.style.transform = 'translateY(0)';
+                    }, 100);
+                }, index * 100);
+            });
+        });
+    </script>
+{% endblock %}

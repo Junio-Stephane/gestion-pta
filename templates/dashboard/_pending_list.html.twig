@@ -1,0 +1,1002 @@
+{% if pending_users_list is not empty %}
+<div class="table-responsive-container">
+    <div class="table-responsive">
+        <table class="inscriptions-table">
+            <thead>
+                <tr>
+                    <th>Utilisateur</th>
+                    <th class="mobile-hidden">Immatricule</th>
+                    <th class="mobile-hidden">Email</th>
+                    <th>Date demande</th>
+                    <th>Temps écoulé</th>
+                    <th>Statut</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in pending_users_list %}
+                <tr id="user-row-{{ user.imPer }}" 
+                    class="{% if highlight_user_im == user.imPer %}highlighted-user{% endif %}"
+                    data-user-im="{{ user.imPer }}">
+                    <td>
+                        <div class="user-info-cell">
+                            <div class="user-avatar">
+                                {{ user.nomPer|first|upper }}{{ user.prenomPer|first|upper }}
+                            </div>
+                            <div class="user-details">
+                                <h4>{{ user.nomPer }} {{ user.prenomPer }}</h4>
+                                <p class="mobile-visible">{{ user.imPer }}</p>
+                                <p class="mobile-visible email-mobile">{{ user.emailPer }}</p>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="mobile-hidden">{{ user.imPer }}</td>
+                    <td class="mobile-hidden">{{ user.emailPer }}</td>
+                    <td>
+                        <span class="date-display">{{ user.dateCreationPer|date('d/m/Y H:i') }}</span>
+                    </td>
+                    <td>
+                        <span class="time-ago-badge" title="Demande reçue il y a {{ user.timeAgo }}">
+                            {{ user.timeAgo }}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="status-badge status-pending">En attente</span>
+                    </td>
+                    <td>
+                        <div class="actions">
+                            <form action="{{ path('app_admin_user_approve', {'id': user.imPer}) }}" method="POST" class="role-form" id="approve-form-{{ user.imPer }}">
+                                <select name="role" class="role-select" required id="role-select-{{ user.imPer }}">
+                                    <option value="">Choisir un rôle *</option>
+                                    <option value="ROLE_UTILISATEUR">Simple utilisateur</option>
+                                    <option value="ROLE_CREATEUR_DE_PROJET">Créateur de projet</option>
+                                    <option value="ROLE_ADMIN">Administrateur</option>
+                                </select>
+                                <button type="button" class="btn btn-success approve-btn" data-user-im="{{ user.imPer }}" data-user-name="{{ user.prenomPer }} {{ user.nomPer }}" disabled id="approve-btn-{{ user.imPer }}">
+                                    <i class="bi bi-check-lg"></i> <span class="btn-text">Autoriser</span>
+                                </button>
+                            </form>
+                            <form action="{{ path('app_admin_user_reject', {'id': user.imPer}) }}" method="POST" id="reject-form-{{ user.imPer }}">
+                                <button type="button" class="btn btn-danger reject-btn" data-user-im="{{ user.imPer }}" data-user-name="{{ user.prenomPer }} {{ user.nomPer }}">
+                                    <i class="bi bi-x-lg"></i> <span class="btn-text">Refuser</span>
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Version mobile en cartes -->
+<div class="mobile-cards-container">
+    {% for user in pending_users_list %}
+    <div class="user-card {% if highlight_user_im == user.imPer %}highlighted-user{% endif %}" 
+     id="user-card-{{ user.imPer }}" 
+     data-user-im="{{ user.imPer }}">
+        
+        <div class="card-header">
+            <div class="user-avatar">
+                {{ user.prenomPer|first|upper }}{{ user.nomPer|first|upper }}
+            </div>
+            <div class="user-info">
+                <h4>{{ user.prenomPer }} {{ user.nomPer }}</h4>
+                <p class="user-im">{{ user.imPer }}</p>
+            </div>
+            <span class="status-badge status-pending">En attente</span>
+        </div>
+
+        <div class="card-body">
+            <div class="info-row">
+                <i class="bi bi-envelope"></i>
+                <span>{{ user.emailPer }}</span>
+            </div>
+            <div class="info-row">
+                <i class="bi bi-calendar"></i>
+                <span>{{ user.dateCreationPer|date('d/m/Y H:i') }}</span>
+            </div>
+            <div class="info-row">
+                <i class="bi bi-clock"></i>
+                <span class="time-ago-badge">{{ user.timeAgo }}</span>
+            </div>
+        </div>
+
+        <div class="card-actions">
+            <form action="{{ path('app_admin_user_approve', {'id': user.imPer}) }}" method="POST" class="role-form-mobile" id="approve-form-mobile-{{ user.imPer }}">
+                <select name="role" class="role-select-mobile" required id="role-select-mobile-{{ user.imPer }}">
+                    <option value="">Choisir un rôle *</option>
+                    <option value="ROLE_UTILISATEUR">Utilisateur</option>
+                    <option value="ROLE_CREATEUR_DE_PROJET">Créateur de projet</option>
+                    <option value="ROLE_ADMIN">Administrateur</option>
+                </select>
+                <div class="action-buttons-mobile">
+                    <button type="button" class="btn btn-success approve-btn-mobile" data-user-im="{{ user.imPer }}" data-user-name="{{ user.prenomPer }} {{ user.nomPer }}" disabled id="approve-btn-mobile-{{ user.imPer }}">
+                        <i class="bi bi-check-lg"></i> Valider
+                    </button>
+                    <button type="button" class="btn btn-danger reject-btn-mobile" data-user-im="{{ user.imPer }}" data-user-name="{{ user.prenomPer }} {{ user.nomPer }}">
+                        <i class="bi bi-x-lg"></i> Refuser
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Modal d'approbation -->
+<div class="modal fade" id="approveModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="bi bi-check-circle"></i>Confirmer l'approbation</h5>
+                <button type="button" class="btn-close-custom" data-bs-dismiss="modal" aria-label="Close">
+                    <i class="bi bi-x"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Êtes-vous sûr de vouloir approuver l'utilisateur <strong id="approveUserName"></strong> ?</p>
+                <p class="text-muted small">Un email de confirmation sera envoyé à l'utilisateur.</p>
+                <div id="approveRoleInfo" class="mt-2 p-2 bg-light rounded">
+                    <strong>Rôle attribué :</strong> <span id="selectedRoleText"></span>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btnG btn-secondary" data-bs-dismiss="modal" id="cancelApproveBtn">Annuler</button>
+                <button type="button" class="btnG btn-success btn-with-spinner" id="confirmApprove">
+                    <div class="loading-spinner"></div>
+                    <i class="bi bi-check-circle"></i>
+                    <span class="btn-text">Confirmer l'approbation</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de rejet -->
+<div class="modal fade" id="rejectModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="bi bi-x-circle"></i>Confirmer le rejet</h5>
+                <button type="button" class="btn-close-custom" data-bs-dismiss="modal" aria-label="Close">
+                    <i class="bi bi-x"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Êtes-vous sûr de vouloir rejeter l'utilisateur <strong id="rejectUserName"></strong> ?</p>
+                <p class="text-muted small">Un email de notification sera envoyé à l'utilisateur.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btnG btn-secondary" data-bs-dismiss="modal" id="cancelRejectBtn">Annuler</button>
+                <button type="button" class="btnG btn-danger btn-with-spinner" id="confirmReject">
+                    <div class="loading-spinner"></div>
+                    <i class="bi bi-x-circle"></i>
+                    <span class="btn-text">Confirmer le rejet</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Styles responsive */
+.table-responsive-container {
+    width: 100%;
+    overflow: hidden;
+}
+
+.table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Cache certains éléments sur mobile */
+.mobile-hidden {
+    display: table-cell;
+}
+
+.mobile-visible {
+    display: none;
+}
+
+.email-mobile {
+    font-size: 0.8rem;
+    color: #6b7280;
+}
+
+/* Version mobile - cartes */
+.mobile-cards-container {
+    display: none;
+    gap: 1rem;
+    flex-direction: column;
+}
+
+.user-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    border-left: 4px solid var(--warning-color);
+}
+
+.card-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.card-header .user-info {
+    flex: 1;
+}
+
+.card-header .user-info h4 {
+    margin: 0 0 0.25rem 0;
+    font-size: 1rem;
+}
+
+.card-header .user-im {
+    margin: 0;
+    font-size: 0.8rem;
+    color: #6b7280;
+}
+
+.card-body {
+    margin-bottom: 1.5rem;
+}
+
+.info-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+    font-size: 0.9rem;
+}
+
+.info-row i {
+    width: 16px;
+    color: #6b7280;
+}
+
+.role-form-mobile {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.role-select-mobile {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 0.9rem;
+}
+
+.action-buttons-mobile {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.action-buttons-mobile .btn {
+    flex: 1;
+    justify-content: center;
+    padding: 0.75rem;
+}
+
+/* Spinner pour les boutons de confirmation */
+.btn-with-spinner {
+    position: relative;
+}
+
+.btn-with-spinner .loading-spinner {
+    display: none;
+    width: 1rem;
+    height: 1rem;
+    border: 2px solid #f3f3f3;
+    border-top: 2px solid #964ee3;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-right: 0.5rem;
+    vertical-align: middle;
+}
+
+.btn-with-spinner.loading .loading-spinner {
+    display: inline-block;
+}
+
+.btn-with-spinner.loading {
+    pointer-events: none;
+    opacity: 0.8;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Styles pour la validation des rôles */
+.role-select.is-invalid,
+.role-select-mobile.is-invalid {
+    border-color: #dc3545;
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+}
+
+.role-select.is-valid,
+.role-select-mobile.is-valid {
+    border-color: #198754;
+    box-shadow: 0 0 0 0.2rem rgba(25, 135, 84, 0.25);
+}
+
+/* Animation de shake */
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+    20%, 40%, 60%, 80% { transform: translateX(5px); }
+}
+
+.shake-animation {
+    animation: shake 0.5s ease-in-out;
+}
+
+.approve-btn:disabled,
+.approve-btn-mobile:disabled {
+    background-color: #9ca3af;
+    border-color: #9ca3af;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+    .inscriptions-table {
+        min-width: 1000px;
+    }
+}
+
+@media (max-width: 768px) {
+    .table-responsive {
+        display: none;
+    }
+    
+    .mobile-cards-container {
+        display: flex;
+    }
+    
+    .mobile-hidden {
+        display: none;
+    }
+    
+    .mobile-visible {
+        display: block;
+    }
+    
+    .btn-text {
+        display: inline;
+    }
+    
+    .actions {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .role-form {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .role-select {
+        min-width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .user-card {
+        padding: 1rem;
+    }
+    
+    .card-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+    }
+    
+    .card-header .status-badge {
+        align-self: flex-start;
+    }
+    
+    .action-buttons-mobile {
+        flex-direction: column;
+    }
+    
+    .info-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.25rem;
+    }
+}
+
+/* Améliorations pour très petits écrans */
+@media (max-width: 360px) {
+    .user-card {
+        padding: 0.75rem;
+    }
+    
+    .user-avatar {
+        width: 35px;
+        height: 35px;
+        font-size: 0.8rem;
+    }
+    
+    .card-header .user-info h4 {
+        font-size: 0.9rem;
+    }
+}
+
+/* Animation pour les transitions */
+.user-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.user-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+/* Highlight pour les cartes */
+.user-card.highlighted-user {
+    background: linear-gradient(90deg, rgba(150, 78, 227, 0.05) 0%, transparent 100%);
+    border-left: 4px solid var(--primary-color);
+}
+</style>
+
+<script>
+// SYSTÈME DE GESTION DES MODALS POUR LA LISTE DES PENDING - VERSION RESPONSIVE
+// SYSTÈME DE GESTION DES MODALS POUR LA LISTE DES PENDING - VERSION RESPONSIVE
+class PendingListModalSystem {
+    constructor() {
+        this.currentApproveForm = null;
+        this.currentRejectForm = null;
+        this.isMobile = window.innerWidth <= 768;
+        this.init();
+        this.setupResponsive();
+    }
+
+    setupResponsive() {
+        window.addEventListener('resize', () => {
+            this.isMobile = window.innerWidth <= 768;
+        });
+    }
+
+    init() {
+        console.log('🎯 Initialisation système modals pending list responsive');
+        this.initRoleValidation();
+        this.setupModalDelegation();
+        this.setupFormDelegation();
+        this.setupMutationObserver();
+        this.checkForHighlight();
+    }
+    
+    // NETTOYAGE
+    cleanup() {
+        console.log('🧹 Nettoyage du système de modals');
+        // Pas besoin de nettoyer car on utilise la délégation
+    }
+    
+    // DÉLÉGATION POUR LES MODALS
+    setupModalDelegation() {
+        // Gestion des clics sur les boutons de confirmation
+        document.addEventListener('click', (e) => {
+            // Confirmation approbation
+            if (e.target.matches('#confirmApprove, #confirmApprove *')) {
+                e.preventDefault();
+                this.handleConfirmApprove();
+                return;
+            }
+            
+            // Confirmation rejet
+            if (e.target.matches('#confirmReject, #confirmReject *')) {
+                e.preventDefault();
+                this.handleConfirmReject();
+                return;
+            }
+            
+            // Annulation approbation
+            if (e.target.matches('#cancelApproveBtn, #cancelApproveBtn *')) {
+                e.preventDefault();
+                this.handleCancelModal('approveModal');
+                return;
+            }
+            
+            // Annulation rejet
+            if (e.target.matches('#cancelRejectBtn, #cancelRejectBtn *')) {
+                e.preventDefault();
+                this.handleCancelModal('rejectModal');
+                return;
+            }
+            
+            // Fermeture modals (X)
+            if (e.target.matches('.btn-close-custom, .btn-close-custom *')) {
+                e.preventDefault();
+                const modal = e.target.closest('.modal');
+                if (modal) {
+                    this.handleCancelModal(modal.id);
+                }
+                return;
+            }
+        });
+        
+        // Gestion des événements Bootstrap modal
+        document.addEventListener('hidden.bs.modal', (e) => {
+            const modal = e.target;
+            this.handleModalHidden(modal);
+        });
+    }
+    
+    // DÉLÉGATION POUR LES FORMULAIRES
+    setupFormDelegation() {
+        // Gestion des clics sur les boutons d'action
+        document.addEventListener('click', (e) => {
+            // Approbation desktop/mobile
+            if (e.target.matches('.approve-btn, .approve-btn-mobile, .approve-btn *, .approve-btn-mobile *')) {
+                e.preventDefault();
+                const btn = e.target.closest('.approve-btn, .approve-btn-mobile');
+                const version = btn.classList.contains('approve-btn-mobile') ? 'mobile' : 'desktop';
+                this.handleApproveAction(btn, version);
+                return;
+            }
+            
+            // Rejet desktop/mobile
+            if (e.target.matches('.reject-btn, .reject-btn-mobile, .reject-btn *, .reject-btn-mobile *')) {
+                e.preventDefault();
+                const btn = e.target.closest('.reject-btn, .reject-btn-mobile');
+                const version = btn.classList.contains('reject-btn-mobile') ? 'mobile' : 'desktop';
+                this.handleRejectAction(btn, version);
+                return;
+            }
+        });
+        
+        // Gestion des changements de rôle
+        document.addEventListener('change', (e) => {
+            if (e.target.matches('.role-select, .role-select-mobile')) {
+                const version = e.target.matches('.role-select-mobile') ? 'mobile' : 'desktop';
+                this.toggleApproveButton(e.target, version);
+            }
+        });
+    }
+    
+    // MUTATION OBSERVER
+    setupMutationObserver() {
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
+                    // Vérifier si de nouveaux éléments de formulaire ont été ajoutés
+                    mutation.addedNodes.forEach((node) => {
+                        if (node.nodeType === 1) {
+                            // Réinitialiser la validation des rôles
+                            this.initRoleValidationForNode(node);
+                        }
+                    });
+                }
+            });
+        });
+        
+        const container = document.getElementById('pendingListContainer');
+        if (container) {
+            observer.observe(container, {
+                childList: true,
+                subtree: true
+            });
+            this.observer = observer;
+        }
+    }
+    
+    // INITIALISATION DE LA VALIDATION DES RÔLES
+    initRoleValidation() {
+        console.log('🔄 Initialisation validation des rôles');
+        
+        // Validation initiale pour tous les selects
+        document.querySelectorAll('.role-select').forEach(select => {
+            this.validateSingleSelect(select, 'desktop');
+        });
+        
+        document.querySelectorAll('.role-select-mobile').forEach(select => {
+            this.validateSingleSelect(select, 'mobile');
+        });
+    }
+    
+    initRoleValidationForNode(node) {
+        const selects = node.querySelectorAll ? 
+            node.querySelectorAll('.role-select, .role-select-mobile') : [];
+        
+        selects.forEach(select => {
+            const version = select.classList.contains('role-select-mobile') ? 'mobile' : 'desktop';
+            this.validateSingleSelect(select, version);
+        });
+    }
+    
+    validateSingleSelect(select, version) {
+        const selectId = select.id;
+        const userIm = selectId.replace('role-select-', '').replace('role-select-mobile-', '');
+        const approveBtnId = version === 'mobile' ? 
+            `approve-btn-mobile-${userIm}` : `approve-btn-${userIm}`;
+        const approveBtn = document.getElementById(approveBtnId);
+        
+        if (approveBtn) {
+            const isValid = select.value !== '';
+            this.updateRoleSelectState(select, isValid);
+            this.updateApproveButtonState(approveBtn, isValid);
+        }
+    }
+    
+    // 🎯 METTRE À JOUR L'ÉTAT DU SELECT
+    updateRoleSelectState(selectElement, isValid) {
+        if (isValid) {
+            selectElement.classList.remove('is-invalid');
+            selectElement.classList.add('is-valid');
+        } else {
+            selectElement.classList.remove('is-valid');
+            selectElement.classList.add('is-invalid');
+        }
+    }
+
+    // 🎯 METTRE À JOUR L'ÉTAT DU BOUTON VALIDER
+    updateApproveButtonState(button, enabled) {
+        if (button) {
+            button.disabled = !enabled;
+        }
+    }
+
+    // 🎯 ACTIVER/DÉSACTIVER BOUTON APPROUVAL
+    toggleApproveButton(selectElement, version) {
+        const selectId = selectElement.id;
+        const userIm = selectId.replace('role-select-', '').replace('role-select-mobile-', '');
+        
+        // Obtenir le bon bouton selon la version
+        const approveBtnId = version === 'mobile' 
+            ? `approve-btn-mobile-${userIm}`
+            : `approve-btn-${userIm}`;
+        
+        const approveBtn = document.getElementById(approveBtnId);
+        
+        if (approveBtn) {
+            if (selectElement.value) {
+                approveBtn.disabled = false;
+                selectElement.classList.remove('is-invalid');
+                selectElement.classList.add('is-valid');
+            } else {
+                approveBtn.disabled = true;
+                selectElement.classList.remove('is-valid');
+                selectElement.classList.add('is-invalid');
+            }
+        }
+    }
+
+    // GESTION DES ACTIONS
+    handleConfirmApprove() {
+        const btn = document.getElementById('confirmApprove');
+        if (!btn) {
+            console.error('❌ Bouton confirmApprove non trouvé');
+            return;
+        }
+        
+        this.showLoading(btn);
+        this.disableCancelButtons(true);
+        
+        setTimeout(() => {
+            if (this.currentApproveForm) {
+                console.log('✅ Confirmation approbation soumise');
+                this.currentApproveForm.submit();
+            } else {
+                console.error('❌ Formulaire d\'approbation non trouvé');
+                this.hideLoading(btn);
+                this.disableCancelButtons(false);
+            }
+        }, 500);
+    }
+    
+    handleConfirmReject() {
+        const btn = document.getElementById('confirmReject');
+        if (!btn) {
+            console.error('❌ Bouton confirmReject non trouvé');
+            return;
+        }
+        
+        this.showLoading(btn);
+        this.disableCancelButtons(true);
+        
+        setTimeout(() => {
+            if (this.currentRejectForm) {
+                console.log('❌ Confirmation rejet soumise');
+                this.currentRejectForm.submit();
+            } else {
+                console.error('❌ Formulaire de rejet non trouvé');
+                this.hideLoading(btn);
+                this.disableCancelButtons(false);
+            }
+        }, 500);
+    }
+    
+    handleCancelModal(modalId) {
+        const modal = document.getElementById(modalId);
+        if (!modal) {
+            console.error(`❌ Modal ${modalId} non trouvé`);
+            return;
+        }
+        
+        const bsModal = bootstrap.Modal.getInstance(modal);
+        if (bsModal) {
+            bsModal.hide();
+        }
+    }
+    
+    handleModalHidden(modal) {
+        const modalId = modal.id;
+        
+        // Réinitialiser l'état des boutons quand le modal se ferme
+        if (modalId === 'approveModal') {
+            const approveBtn = document.getElementById('confirmApprove');
+            if (approveBtn) {
+                this.hideLoading(approveBtn);
+                this.disableCancelButtons(false);
+            }
+            this.currentApproveForm = null;
+        } else if (modalId === 'rejectModal') {
+            const rejectBtn = document.getElementById('confirmReject');
+            if (rejectBtn) {
+                this.hideLoading(rejectBtn);
+                this.disableCancelButtons(false);
+            }
+            this.currentRejectForm = null;
+        }
+    }
+
+    // 🎯 AFFICHER LE SPINNER DE CHARGEMENT
+    showLoading(button) {
+        if (button) {
+            button.classList.add('loading');
+            button.disabled = true;
+        }
+    }
+
+    // 🎯 CACHER LE SPINNER DE CHARGEMENT
+    hideLoading(button) {
+        if (button) {
+            button.classList.remove('loading');
+            button.disabled = false;
+        }
+    }
+
+    // 🎯 DÉSACTIVER/RÉACTIVER LES BOUTONS ANNULER
+    disableCancelButtons(disabled) {
+        const cancelApproveBtn = document.getElementById('cancelApproveBtn');
+        const cancelRejectBtn = document.getElementById('cancelRejectBtn');
+        
+        if (cancelApproveBtn) cancelApproveBtn.disabled = disabled;
+        if (cancelRejectBtn) cancelRejectBtn.disabled = disabled;
+    }
+
+    // 🎯 GESTION ACTION APPROUVAL
+    handleApproveAction(button, version) {
+        if (button.disabled) {
+            this.showRoleRequiredAlert(button, version);
+            return;
+        }
+        
+        const userIm = button.getAttribute('data-user-im');
+        const userName = button.getAttribute('data-user-name');
+        console.log(`📝 Tentative approbation: ${userName} (${userIm})`);
+        this.handleApprove(userIm, userName, version);
+    }
+
+    // 🎯 GESTION ACTION REJET
+    handleRejectAction(button, version) {
+        const userIm = button.getAttribute('data-user-im');
+        const userName = button.getAttribute('data-user-name');
+        console.log(`📝 Tentative rejet: ${userName} (${userIm})`);
+        this.handleReject(userIm, userName, version);
+    }
+
+    // ⚠️ ALERTE RÔLE REQUIS
+    showRoleRequiredAlert(button, version) {
+        const userIm = button.getAttribute('data-user-im');
+        const select = document.getElementById(`role-select-${version === 'mobile' ? 'mobile-' : ''}${userIm}`);
+        
+        if (!select) return;
+        
+        // Animation de shake sur le select
+        select.classList.add('shake-animation');
+        select.focus();
+        
+        setTimeout(() => {
+            select.classList.remove('shake-animation');
+        }, 500);
+        
+        console.log('⚠️ Rôle requis pour valider');
+    }
+
+    // ✅ GESTION APPROBATION
+    handleApprove(userIm, userName, version) {
+        const formId = version === 'mobile' ? `approve-form-mobile-${userIm}` : `approve-form-${userIm}`;
+        const form = document.getElementById(formId);
+        
+        if (!form) {
+            console.error(`❌ Formulaire non trouvé: ${formId}`);
+            return;
+        }
+        
+        const roleSelect = form.querySelector(version === 'mobile' ? '.role-select-mobile' : '.role-select');
+        
+        if (!roleSelect) {
+            console.error(`❌ Sélecteur de rôle non trouvé pour: ${userIm}`);
+            return;
+        }
+
+        // Double vérification
+        if (!roleSelect.value) {
+            const btnId = version === 'mobile' ? `approve-btn-mobile-${userIm}` : `approve-btn-${userIm}`;
+            this.showRoleRequiredAlert(document.getElementById(btnId), version);
+            return;
+        }
+
+        this.currentApproveForm = form;
+        
+        // Réinitialiser l'état du bouton avant d'ouvrir le modal
+        const approveBtn = document.getElementById('confirmApprove');
+        if (approveBtn) {
+            this.hideLoading(approveBtn);
+            this.disableCancelButtons(false);
+        }
+        
+        // Mise à jour du modal avec les infos utilisateur
+        const approveUserName = document.getElementById('approveUserName');
+        const selectedRoleText = document.getElementById('selectedRoleText');
+        
+        if (approveUserName) approveUserName.textContent = userName;
+        
+        const selectedOption = roleSelect.options[roleSelect.selectedIndex];
+        if (selectedRoleText) selectedRoleText.textContent = selectedOption.text;
+        
+        // Ouvrir le modal
+        const modalElement = document.getElementById('approveModal');
+        if (modalElement) {
+            const modal = new bootstrap.Modal(modalElement);
+            modal.show();
+            
+            console.log(`✅ Modal approbation ouvert pour: ${userName}`);
+        } else {
+            console.error('❌ Modal approbation non trouvé');
+        }
+    }
+
+    // ❌ GESTION REJET
+    handleReject(userIm, userName, version) {
+        const formId = version === 'mobile' ? `reject-form-mobile-${userIm}` : `reject-form-${userIm}`;
+        const form = document.getElementById(formId);
+        
+        if (!form) {
+            console.error(`❌ Formulaire de rejet non trouvé: ${formId}`);
+            return;
+        }
+        
+        this.currentRejectForm = form;
+        
+        // Réinitialiser l'état du bouton avant d'ouvrir le modal
+        const rejectBtn = document.getElementById('confirmReject');
+        if (rejectBtn) {
+            this.hideLoading(rejectBtn);
+            this.disableCancelButtons(false);
+        }
+        
+        // Mise à jour du modal avec les infos utilisateur
+        const rejectUserName = document.getElementById('rejectUserName');
+        if (rejectUserName) rejectUserName.textContent = userName;
+        
+        // Ouvrir le modal
+        const modalElement = document.getElementById('rejectModal');
+        if (modalElement) {
+            const modal = new bootstrap.Modal(modalElement);
+            modal.show();
+            
+            console.log(`❌ Modal rejet ouvert pour: ${userName}`);
+        } else {
+            console.error('❌ Modal rejet non trouvé');
+        }
+    }
+
+    // 🎯 VÉRIFIER SI UN UTILISATEUR DOIT ÊTRE MIS EN ÉVIDENCE
+    checkForHighlight() {
+        const highlightedRow = document.querySelector('.highlighted-user');
+        const highlightedCard = document.querySelector('.user-card.highlighted-user');
+        
+        if (highlightedRow) {
+            highlightedRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        
+        if (highlightedCard) {
+            highlightedCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        
+        if (highlightedRow || highlightedCard) {
+            console.log('🎯 Utilisateur mis en évidence détecté');
+        }
+    }
+}
+
+// 🚀 DÉMARRAGE DU SYSTÈME MODALS
+document.addEventListener('DOMContentLoaded', () => {
+    // Délai court pour s'assurer que le DOM est complètement chargé
+    setTimeout(() => {
+        if (!window.pendingListModalSystem) {
+            console.log('🚀 Création nouvelle instance PendingListModalSystem');
+            window.pendingListModalSystem = new PendingListModalSystem();
+        } else {
+            console.log('🔄 Réinitialisation PendingListModalSystem existant');
+            window.pendingListModalSystem.init();
+        }
+    }, 100);
+});
+
+// Réinitialiser les événements après un rafraîchissement AJAX
+if (typeof window.dashboardRefreshSystem !== 'undefined') {
+    const originalRefresh = window.dashboardRefreshSystem.refreshPendingList;
+    window.dashboardRefreshSystem.refreshPendingList = async function() {
+        await originalRefresh.call(this);
+        // Réinitialiser le système après le rafraîchissement AJAX
+        if (window.pendingListModalSystem) {
+            console.log('🔄 Rafraîchissement AJAX détecté, réinitialisation système modals');
+            window.pendingListModalSystem.init();
+        }
+    };
+}
+
+// Réinitialisation des modals Bootstrap après rafraîchissement
+function reinitializeBootstrapModals() {
+    const modalIds = ['approveModal', 'rejectModal'];
+    
+    modalIds.forEach(modalId => {
+        const modalElement = document.getElementById(modalId);
+        if (modalElement) {
+            // Détruire l'ancienne instance si elle existe
+            const oldInstance = bootstrap.Modal.getInstance(modalElement);
+            if (oldInstance) {
+                oldInstance.dispose();
+            }
+            
+            // Créer une nouvelle instance
+            new bootstrap.Modal(modalElement, {
+                backdrop: 'static',
+                keyboard: false
+            });
+            
+            console.log(`✅ Modal ${modalId} réinitialisé`);
+        }
+    });
+}
+
+// Exporter la fonction pour qu'elle soit accessible depuis d'autres fichiers
+if (typeof window !== 'undefined') {
+    window.reinitializeBootstrapModals = reinitializeBootstrapModals;
+}
+
+// Écouter les changements dynamiques
+document.addEventListener('change', (e) => {
+    // Si un select de rôle change
+    if (e.target.matches('.role-select, .role-select-mobile')) {
+        const system = window.pendingListModalSystem;
+        if (system) {
+            const version = e.target.matches('.role-select-mobile') ? 'mobile' : 'desktop';
+            system.toggleApproveButton(e.target, version);
+        }
+    }
+});
+</script>
+
+{% else %}
+<div class="empty-state">
+    <i class="bi bi-check-circle"></i>
+    <h3>Aucune demande en attente</h3>
+    <p>Toutes les inscriptions ont été traitées</p>
+</div>
+{% endif %}

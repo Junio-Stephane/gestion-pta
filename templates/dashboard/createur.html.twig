@@ -1,0 +1,2151 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Tableau de Bord - Créateur de Projet{% endblock %}
+
+{% block stylesheets %}
+<style>
+:root {
+    --primary-color: #964ee3;
+    --secondary-color: #75165f;
+    --success-color: #10b981;
+    --warning-color: #f59e0b;
+    --danger-color: #ef4444;
+    --info-color: #3b82f6;
+    --dark-color: #1f2937;
+    --light-color: #f8fafc;
+}
+
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+/* Message de bienvenue créateur */
+.welcome-container-creator {
+    background: linear-gradient(135deg, #964ee3 0%, #8336a7ff 100%);
+    color: white;
+    padding: 2.5rem;
+    border-radius: 20px;
+    margin-bottom: 2rem;
+    box-shadow: 0 12px 30px rgba(124, 52, 219, 0.3);
+    position: relative;
+    overflow: hidden;
+}
+
+.welcome-container-creator::before {
+    content: '';
+    position: absolute;
+    top: -100%;
+    right: -100%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0) 60%);
+    transform: rotate(25deg);
+    animation: shine 8s infinite linear;
+}
+
+@keyframes shine {
+    0% { transform: rotate(25deg) translateX(-100%); }
+    100% { transform: rotate(25deg) translateX(100%); }
+}
+
+.welcome-content-creator {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2.5rem;
+    position: relative;
+    z-index: 2;
+}
+
+.welcome-text-creator {
+    flex: 1;
+}
+
+.welcome-text-creator h1 {
+    margin: 0 0 1rem 0;
+    font-size: 2rem;
+    font-weight: 700;
+    color: white;
+    line-height: 1.2;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.welcome-text-creator p {
+    margin: 0 0 1.5rem 0;
+    opacity: 0.95;
+    font-size: 1.1rem;
+    line-height: 1.6;
+    max-width: 700px;
+    font-weight: 400;
+}
+
+.welcome-features-creator {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.feature-badge {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    padding: 0.6rem 1.2rem;
+    border-radius: 25px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.feature-badge:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+}
+
+.welcome-actions-creator {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.action-btn-creator {
+    background: rgba(255, 255, 255, 0.25);
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 12px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.95rem;
+    backdrop-filter: blur(10px);
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.action-btn-creator:hover {
+    background: rgba(255, 255, 255, 0.35);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    color: white;
+}
+
+.action-btn-creator.primary {
+    background: var(--success-color);
+    border-color: var(--success-color);
+}
+
+.action-btn-creator.primary:hover {
+    background: #0da271;
+    border-color: #0da271;
+}
+
+.welcome-icon-creator {
+    font-size: 4rem;
+    opacity: 0.9;
+    flex-shrink: 0;
+    animation: float-creator 4s ease-in-out infinite;
+    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
+}
+
+@keyframes float-creator {
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    50% { transform: translateY(-15px) rotate(5deg); }
+}
+
+/* Responsive pour le message de bienvenue créateur */
+@media (max-width: 1024px) {
+    .welcome-content-creator {
+        gap: 2rem;
+    }
+    
+    .welcome-text-creator h1 {
+        font-size: 1.75rem;
+    }
+    
+    .welcome-text-creator p {
+        font-size: 1.05rem;
+    }
+    
+    .welcome-icon-creator {
+        font-size: 3.5rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .welcome-container-creator {
+        padding: 2rem 1.5rem;
+    }
+    
+    .welcome-content-creator {
+        flex-direction: column;
+        text-align: center;
+        gap: 1.5rem;
+    }
+    
+    .welcome-text-creator h1 {
+        font-size: 1.5rem;
+    }
+    
+    .welcome-text-creator p {
+        font-size: 1rem;
+    }
+    
+    .welcome-features-creator {
+        justify-content: center;
+    }
+    
+    .welcome-actions-creator {
+        justify-content: center;
+    }
+    
+    .welcome-icon-creator {
+        font-size: 3rem;
+        order: -1;
+    }
+}
+
+@media (max-width: 480px) {
+    .welcome-container-creator {
+        padding: 1.5rem 1.25rem;
+    }
+    
+    .welcome-text-creator h1 {
+        font-size: 1.3rem;
+    }
+    
+    .welcome-text-creator p {
+        font-size: 0.95rem;
+    }
+    
+    .feature-badge {
+        padding: 0.5rem 1rem;
+        font-size: 0.85rem;
+    }
+    
+    .action-btn-creator {
+        padding: 0.6rem 1.2rem;
+        font-size: 0.9rem;
+    }
+    
+    .welcome-icon-creator {
+        font-size: 2.5rem;
+    }
+}
+
+/* Section Grid Compact pour Personnel */
+.section-grid-compact {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 0;
+}
+
+.dashboard-section {
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
+    margin-bottom: 1.5rem;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #f1f5f9;
+}
+
+.section-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--dark-color);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.section-title i {
+    color: var(--primary-color);
+}
+
+/* Stat Cards Compact */
+.stat-card-compact {
+    background: #d28eef58;
+    padding: 1.25rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    border-left: 4px solid var(--primary-color);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-card-compact:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+}
+
+.stat-card-compact.success { border-left-color: var(--success-color); }
+.stat-card-compact.warning { border-left-color: var(--warning-color); }
+.stat-card-compact.danger { border-left-color: var(--danger-color); }
+.stat-card-compact.info { border-left-color: var(--info-color); }
+.stat-card-compact.secondary { border-left-color: var(--secondary-color); }
+
+.stat-header-compact {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.75rem;
+}
+
+.stat-icon-compact {
+    width: 45px;
+    height: 45px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    color: white;
+    flex-shrink: 0;
+}
+
+.stat-card-compact .stat-icon-compact { background: var(--primary-color); }
+.stat-card-compact.success .stat-icon-compact { background: var(--success-color); }
+.stat-card-compact.warning .stat-icon-compact { background: var(--warning-color); }
+.stat-card-compact.danger .stat-icon-compact { background: var(--danger-color); }
+.stat-card-compact.info .stat-icon-compact { background: var(--info-color); }
+.stat-card-compact.secondary .stat-icon-compact { background: var(--secondary-color); }
+
+.stat-content-compact h3 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--dark-color);
+    margin: 0;
+    line-height: 1;
+}
+
+.stat-label-compact {
+    color: #6b7280;
+    font-size: 0.8rem;
+    margin: 0.25rem 0 0 0;
+    font-weight: 500;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 3rem;
+    color: #6b7280;
+}
+
+.empty-state i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+
+/* Styles pour les graphiques */
+.charts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1rem;
+}
+
+.chart-container {
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
+    transition: all 0.3s ease;
+}
+
+.chart-container:hover {
+    transform: translateY(-5px);
+    box-shadow: rgba(0, 0, 0, 0.15) 0px 8px 24px;
+}
+
+.chart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.chart-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--dark-color);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.chart-title i {
+    color: var(--primary-color);
+}
+
+/* DIAGRAMME EN BÂTONS VERTICAL CLASSIQUE */
+.bar-chart-container {
+    position: relative;
+    width: 100%;
+    height: 450px;
+    display: flex;
+    flex-direction: column;
+}
+
+.chart-area-with-labels {
+    flex: 1;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-around;
+    padding: 20px 20px 80px 50px;
+    border-left: 2px solid #e5e7eb;
+    border-bottom: 2px solid #e5e7eb;
+    position: relative;
+    min-height: 250px;
+}
+
+.bar-column {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100%;
+    position: relative;
+    flex: 1;
+    max-width: 80px;
+    min-width: 50px;
+}
+
+.bar-wrapper {
+    flex: 1;
+    width: 100%;
+    display: flex;
+    align-items: flex-end;
+    position: relative;
+    min-height: 50px;
+}
+
+.bar {
+    width: 35px;
+    background: var(--primary-color);
+    border-radius: 6px 6px 0 0;
+    transition: all 0.3s ease;
+    position: relative;
+    cursor: pointer;
+    margin: 0 auto;
+    min-height: 3px;
+}
+
+.bar.zero-progress {
+    background: var(--info-color);
+    min-height: 3px;
+    opacity: 0.7;
+}
+
+.bar:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(150, 78, 227, 0.3);
+    filter: brightness(1.1);
+}
+
+.bar-label {
+    position: absolute;
+    bottom: -70px;
+    left: 50%;
+    transform: translateX(-50%) rotate(-45deg);
+    transform-origin: top left;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--dark-color);
+    text-align: left;
+    white-space: nowrap;
+    padding: 4px 6px;
+    max-width: 120px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 3px;
+    z-index: 5;
+    line-height: 1.2;
+}
+
+.bar-label:hover {
+    background: white;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    z-index: 20;
+    max-width: 200px;
+}
+
+.bar-value {
+    position: absolute;
+    top: -25px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--dark-color);
+    color: white;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    opacity: 0;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    z-index: 10;
+}
+
+.bar:hover .bar-value {
+    opacity: 1;
+}
+
+.y-axis {
+    position: absolute;
+    left: 0;
+    top: 20px;
+    bottom: 80px;
+    width: 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    font-size: 0.75rem;
+    color: #6b7280;
+    text-align: center;
+}
+
+.x-axis-label {
+    position: absolute;
+    left: 40px;
+    right: 0;
+    bottom: 0;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-top: 1px solid #e5e7eb;
+    font-size: 0.8rem;
+    color: #6b7280;
+    font-weight: 500;
+}
+
+/* DIAGRAMME HORIZONTAL AMÉLIORÉ POUR CREATEUR */
+.horizontal-gantt-container {
+    width: 100%;
+    max-height: 600px;
+    overflow-y: auto;
+    padding: 1rem 0;
+    border: 1px solid #f1f5f9;
+    border-radius: 8px;
+    background: #fafafa;
+}
+
+/* Scrollbar styling */
+.horizontal-gantt-container::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+.horizontal-gantt-container::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 4px;
+}
+
+.horizontal-gantt-container::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 4px;
+}
+
+.horizontal-gantt-container::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+.gantt-row {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    border-bottom: 1px solid #f1f5f9;
+    gap: 1rem;
+    transition: background-color 0.2s ease;
+    min-width: min-content;
+}
+
+.gantt-row:hover {
+    background-color: #f8fafc;
+}
+
+.gantt-row:last-child {
+    border-bottom: none;
+}
+
+/* Styles spécifiques pour les projets d'autres créateurs */
+.gantt-project-info.other-creator {
+    border-left: 3px solid var(--warning-color);
+    padding-left: 0.5rem;
+    background: linear-gradient(90deg, rgba(245, 158, 11, 0.05) 0%, transparent 100%);
+}
+
+.gantt-project-info.my-creator {
+    border-left: 3px solid var(--success-color);
+    padding-left: 0.5rem;
+    background: linear-gradient(90deg, rgba(16, 185, 129, 0.05) 0%, transparent 100%);
+}
+
+.creator-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.7rem;
+    padding: 0.2rem 0.5rem;
+    background: var(--warning-color);
+    color: white;
+    border-radius: 4px;
+    margin-top: 0.25rem;
+    font-weight: 500;
+}
+
+.creator-badge.my-project {
+    background: var(--success-color);
+}
+
+.creator-badge i {
+    font-size: 0.6rem;
+}
+
+.project-ownership-indicator {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--success-color);
+}
+
+.project-ownership-indicator.other {
+    background: var(--warning-color);
+}
+
+/* Amélioration de l'affichage des informations projet */
+.gantt-project-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 0.5rem;
+}
+
+.gantt-project-main-info {
+    flex: 1;
+}
+
+.gantt-project-owner {
+    font-size: 0.7rem;
+    color: var(--warning-color);
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    margin-top: 0.25rem;
+}
+
+.gantt-project-owner.my-project {
+    color: var(--success-color);
+}
+
+.gantt-project-info {
+    width: 250px;
+    min-width: 250px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    flex-shrink: 0;
+    position: relative;
+}
+
+.gantt-project-name {
+    font-weight: 600;
+    color: var(--dark-color);
+    font-size: 0.9rem;
+    line-height: 1.3;
+}
+
+.gantt-project-dates {
+    font-size: 0.75rem;
+    color: #6b7280;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.gantt-timeline-container {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    min-height: 40px;
+    min-width: 500px;
+}
+
+.gantt-bar-container {
+    flex: 1;
+    height: 25px;
+    background: #f1f5f9;
+    border-radius: 12px;
+    overflow: hidden;
+    position: relative;
+    min-width: 300px;
+}
+
+.gantt-bar {
+    height: 100%;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: 8px;
+    min-width: 5px;
+}
+
+/* Couleurs des barres - Suppression des dégradés */
+.gantt-bar.in-progress {
+    background: var(--info-color);
+}
+
+.gantt-bar.completed {
+    background: var(--success-color);
+}
+
+.gantt-bar.warning {
+    background: var(--warning-color);
+}
+
+.gantt-bar.danger {
+    background: var(--danger-color);
+}
+
+.gantt-bar.suspended {
+    background: #6b7280;
+}
+
+.gantt-bar-value {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: white;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+}
+
+.gantt-percentage {
+    width: 50px;
+    text-align: right;
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--dark-color);
+    flex-shrink: 0;
+}
+
+.gantt-status-indicators {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+/* Indicateurs avec icônes */
+.status-indicator {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.8rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 12px;
+    background: #f8fafc;
+    white-space: nowrap;
+}
+
+.status-indicator.warning {
+    background: #fffbeb;
+    color: #d97706;
+    border: 1px solid #fed7aa;
+}
+
+.status-indicator.danger {
+    background: #fef2f2;
+    color: #dc2626;
+    border: 1px solid #fecaca;
+    animation: blink 2s infinite;
+}
+
+.status-indicator.info {
+    background: #eff6ff;
+    color: #1e40af;
+}
+
+.status-indicator.success {
+    background: #ecfdf5;
+    color: #065f46;
+}
+
+@keyframes blink {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0.5; }
+}
+
+/* Légende améliorée */
+.gantt-legend {
+    display: flex;
+    gap: 1.5rem;
+    margin-top: 1rem;
+    padding: 1rem;
+    background: #ffff;
+    border-radius: 8px;
+    flex-wrap: wrap;
+}
+
+.legend-items {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.legend-items.extended {
+    gap: 0.75rem;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.8rem;
+    color: var(--dark-color);
+    padding: 0.5rem;
+    border-radius: 6px;
+    background: white;
+    white-space: nowrap;
+}
+
+.legend-item.creator {
+    border: 1px solid #e5e7eb;
+}
+
+.legend-color {
+    width: 16px;
+    height: 16px;
+    border-radius: 4px;
+}
+
+.legend-color.in-progress { background: var(--info-color); }
+.legend-color.completed { background: var(--success-color); }
+.legend-color.warning { background: var(--warning-color); }
+.legend-color.danger { background: var(--danger-color); }
+.legend-color.suspended { background: #6b7280; }
+.legend-color.my-project { background: var(--success-color); }
+.legend-color.other-project { background: var(--warning-color); }
+
+/* Diagramme camembert */
+.pie-chart-wrapper {
+    position: relative;
+    width: 200px;
+    height: 200px;
+    margin: 0 auto;
+}
+
+.pie-chart {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    position: relative;
+    background: conic-gradient(
+        var(--info-color) 0% 25%,
+        var(--success-color) 25% 50%,
+        var(--warning-color) 50% 75%,
+        var(--danger-color) 75% 100%
+    );
+    animation: rotatePie 2s ease-out;
+}
+
+@keyframes rotatePie {
+    from {
+        transform: rotate(-90deg) scale(0.8);
+        opacity: 0;
+    }
+    to {
+        transform: rotate(0deg) scale(1);
+        opacity: 1;
+    }
+}
+
+.chart-center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 80px;
+    height: 80px;
+    background: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.total-count {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--dark-color);
+    text-align: center;
+}
+
+.total-label {
+    font-size: 0.7rem;
+    color: #6b7280;
+    margin-top: 0.25rem;
+}
+
+.chart-legend {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.legend-item:hover {
+    background: #f8fafc;
+    transform: translateX(5px);
+}
+
+.legend-color {
+    width: 16px;
+    height: 16px;
+    border-radius: 4px;
+    flex-shrink: 0;
+}
+
+.legend-info {
+    flex: 1;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.legend-label {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--dark-color);
+}
+
+.legend-value {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #6b7280;
+}
+
+.legend-percentage {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--dark-color);
+    background: #f1f5f9;
+    padding: 0.2rem 0.5rem;
+    border-radius: 12px;
+}
+
+/* Filtres */
+.filters {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    align-items: end;
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    min-width: 150px;
+}
+
+.filter-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--dark-color);
+}
+
+.filter-select {
+    padding: 0.5rem;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    background: white;
+    font-size: 0.8rem;
+    min-width: 100%;
+    cursor: pointer;
+}
+
+.filter-select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(150, 78, 227, 0.1);
+}
+
+/* Style pour le bouton Réinitialiser */
+.btn-reset-filters {
+    background: #6b7280;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    height: fit-content;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    white-space: nowrap;
+}
+
+.btn-reset-filters:hover {
+    background: #4b5563;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.empty-chart-message {
+    text-align: center;
+    padding: 3rem;
+    color: #6b7280;
+    font-style: italic;
+}
+
+/* Badge pour indicateur visuel */
+/* .ownership-badge {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--success-color);
+} */
+
+.ownership-badge.other {
+    background: var(--warning-color);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .charts-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .bar-chart-container {
+        height: 400px;
+    }
+    
+    .chart-area-with-labels {
+        height: 300px;
+        padding: 15px 15px 70px 40px;
+    }
+    
+    .bar {
+        width: 25px;
+    }
+    
+    .bar-label {
+        font-size: 10px;
+        bottom: -60px;
+        max-width: 100px;
+    }
+    
+    .gantt-project-info {
+        width: 200px;
+        min-width: 200px;
+    }
+    
+    .gantt-bar-container {
+        min-width: 200px;
+    }
+    
+    .gantt-timeline-container {
+        min-width: 400px;
+    }
+    
+    .filters {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .filter-group {
+        min-width: auto;
+    }
+    
+    .gantt-legend {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .gantt-timeline-container {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+    
+    .gantt-status-indicators {
+        align-self: flex-end;
+    }
+}
+
+@media (max-width: 480px) {
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .charts-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .pie-chart-wrapper {
+        width: 150px;
+        height: 150px;
+    }
+    
+    .chart-center {
+        width: 60px;
+        height: 60px;
+    }
+    
+    .total-count {
+        font-size: 1.2rem;
+    }
+    
+    .bar-chart-container {
+        height: 350px;
+    }
+    
+    .chart-area-with-labels {
+        height: 250px;
+        padding: 10px 10px 60px 35px;
+    }
+    
+    .bar {
+        width: 20px;
+    }
+    
+    .bar-label {
+        font-size: 9px;
+        bottom: -50px;
+        max-width: 80px;
+        padding: 2px 4px;
+    }
+    
+    .gantt-project-info {
+        width: 150px;
+        min-width: 150px;
+    }
+    
+    .gantt-bar-container {
+        min-width: 150px;
+    }
+    
+    .gantt-timeline-container {
+        min-width: 300px;
+    }
+    
+    .gantt-status-indicators {
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+}
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="dashboard-container">
+    
+    <div class="welcome-container-creator">
+        <div class="welcome-content-creator">
+            <div class="welcome-text-creator">
+                <h1>Bienvenue dans votre espace Créateur de projets</h1>
+                <p>
+                    Vous pouvez gérer vos projets, suivre leur avancement, créer des tâches et coordonner les équipes.
+                    Utilisez votre tableau de bord pour garder une vision claire sur votre planification.
+                </p>
+                
+                <div class="welcome-features-creator">
+                    <div class="feature-badge">
+                        <i class="bi bi-folder-plus"></i>
+                        Gestion de projets
+                    </div>
+                    <div class="feature-badge">
+                        <i class="bi bi-graph-up"></i>
+                        Suivi d'avancement
+                    </div>
+                    <div class="feature-badge">
+                        <i class="bi bi-list-task"></i>
+                        Création de tâches
+                    </div>
+                    <div class="feature-badge">
+                        <i class="bi bi-people"></i>
+                        Coordination d'équipes
+                    </div>
+                </div>
+            </div>
+            <div class="welcome-icon-creator">
+                <i class="bi bi-kanban"></i>
+            </div>
+        </div>
+    </div>
+
+    <div class="dashboard-section">
+        <div class="section-header">
+            <h2 class="section-title">
+                <i class="bi bi-people"></i>
+                Aperçu global des projets (tous les projets)
+            </h2>
+        </div>
+
+        <!-- Statistiques -->
+    <div class="section-grid-compact">
+        <div class="stat-card-compact">
+            <div class="stat-header-compact">
+                <div class="stat-content-compact">
+                    <h3>{{ total_tous_projets }}</h3>
+                    <p class="stat-label-compact">Total des projets</p>
+                </div>
+                <div class="stat-icon-compact">
+                    <i class="bi bi-folder"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="stat-card-compact info">
+            <div class="stat-header-compact">
+                <div class="stat-content-compact">
+                    <h3>{{ started_projets }}</h3>
+                    <p class="stat-label-compact">Projets débutés</p>
+                </div>
+                <div class="stat-icon-compact">
+                    <i class="bi bi-play-circle"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="stat-card-compact warning">
+            <div class="stat-header-compact">
+                <div class="stat-content-compact">
+                    <h3>{{ in_progress_projets }}</h3>
+                    <p class="stat-label-compact">Projets en cours</p>
+                </div>
+                <div class="stat-icon-compact">
+                    <i class="bi bi-clock"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="stat-card-compact danger">
+            <div class="stat-header-compact">
+                <div class="stat-content-compact">
+                    <h3>{{ suspended_projets }}</h3>
+                    <p class="stat-label-compact">Projets suspendus</p>
+                </div>
+                <div class="stat-icon-compact">
+                    <i class="bi bi-x-circle"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="stat-card-compact success">
+            <div class="stat-header-compact">
+                <div class="stat-content-compact">
+                    <h3>{{ completed_projets }}</h3>
+                    <p class="stat-label-compact">Projets terminés</p>
+                </div>
+                <div class="stat-icon-compact">
+                    <i class="bi bi-check-circle"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    </div>
+    
+
+    <!-- Graphiques - Vue d'ensemble de mes projets -->
+    <div class="dashboard-section">
+        <div class="section-header">
+            <h2 class="section-title">
+                <i class="bi bi-bar-chart"></i>
+                Vue d'ensemble de mes projets
+            </h2>
+        </div>
+
+        <!-- Filtres POUR LA VUE D'ENSEMBLE SEULEMENT -->
+        <div class="filters" id="overviewFilters">
+            <div class="filter-group">
+                <label class="filter-label">Statut</label>
+                <select class="filter-select" id="statutFilter">
+                    <option value="all">Tous les statuts</option>
+                    <option value="active">Actifs seulement</option>
+                    <option value="Débuté">Débuté</option>
+                    <option value="En cours">En cours</option>
+                    <option value="Terminé">Terminé</option>
+                    <option value="Suspendu">Suspendu</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label class="filter-label">Avancement</label>
+                <select class="filter-select" id="avancementFilter">
+                    <option value="all">Tous les avancements</option>
+                    <option value="0">0% (Non débuté)</option>
+                    <option value="1-25">1-25% (Débuté)</option>
+                    <option value="26-50">26-50% (En progression)</option>
+                    <option value="51-75">51-75% (Avancé)</option>
+                    <option value="76-99">76-99% (Bientôt terminé)</option>
+                    <option value="100">100% (Terminé)</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label class="filter-label">Service</label>
+                <select class="filter-select" id="serviceFilter">
+                    <option value="all">Tous les services</option>
+                    {% for nomService, codeService in services_uniques %}
+                        <option value="{{ nomService }}">{{ nomService }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <button class="btn-reset-filters" id="resetOverviewFilters">
+                <i class="bi bi-arrow-clockwise"></i> Réinitialiser
+            </button>
+        </div>
+
+        <div class="charts-grid">
+            <!-- DIAGRAMME EN BÂTONS VERTICAL AVEC LABELS À 45° -->
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h3 class="chart-title">
+                        <i class="bi bi-bar-chart-line"></i>
+                        Avancement par projet
+                    </h3>
+                </div>
+                <div class="bar-chart-container">
+                    <div class="y-axis">
+                        <span>100%</span>
+                        <span>75%</span>
+                        <span>50%</span>
+                        <span>25%</span>
+                        <span>0%</span>
+                    </div>
+                    <div class="chart-area-with-labels" id="verticalBarChart">
+                        <!-- Les barres seront générées par JavaScript -->
+                    </div>
+                    <div class="x-axis-label">Projets</div>
+                </div>
+            </div>
+
+            <!-- Diagramme camembert -->
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h3 class="chart-title">
+                        <i class="bi bi-pie-chart"></i>
+                        Répartition par statut
+                    </h3>
+                </div>
+                <div class="pie-chart-wrapper">
+                    <div class="pie-chart" id="statutPieChart"></div>
+                    <div class="chart-center">
+                        <div class="total-count">{{ total_projets }}</div>
+                        <div class="total-label">Total</div>
+                    </div>
+                </div>
+                <div class="chart-legend">
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: var(--info-color);"></div>
+                        <div class="legend-info">
+                            <span class="legend-label">Débuté</span>
+                            <span class="legend-value">{{ projets_debut }}</span>
+                        </div>
+                        <span class="legend-percentage" id="debutPercent">
+                            {% if total_projets > 0 %}{{ (projets_debut / total_projets * 100)|round }}%{% else %}0%{% endif %}
+                        </span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: var(--warning-color);"></div>
+                        <div class="legend-info">
+                            <span class="legend-label">En cours</span>
+                            <span class="legend-value">{{ projets_en_cours }}</span>
+                        </div>
+                        <span class="legend-percentage" id="coursPercent">
+                            {% if total_projets > 0 %}{{ (projets_en_cours / total_projets * 100)|round }}%{% else %}0%{% endif %}
+                        </span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: var(--success-color);"></div>
+                        <div class="legend-info">
+                            <span class="legend-label">Terminé</span>
+                            <span class="legend-value">{{ projets_termines }}</span>
+                        </div>
+                        <span class="legend-percentage" id="terminePercent">
+                            {% if total_projets > 0 %}{{ (projets_termines / total_projets * 100)|round }}%{% else %}0%{% endif %}
+                        </span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: var(--danger-color);"></div>
+                        <div class="legend-info">
+                            <span class="legend-label">Suspendu</span>
+                            <span class="legend-value">{{ projets_suspendus }}</span>
+                        </div>
+                        <span class="legend-percentage" id="suspenduPercent">
+                            {% if total_projets > 0 %}{{ (projets_suspendus / total_projets * 100)|round }}%{% else %}0%{% endif %}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Vue détaillée des projets avec Timeline et avancement -->
+    <div class="dashboard-section">
+        <div class="section-header">
+            <h2 class="section-title">
+                <i class="bi bi-calendar-range"></i>
+                Vue détaillée des projets
+            </h2>
+        </div>
+
+        <!-- Filtres INDÉPENDANTS pour la vue détaillée -->
+        <div class="filters" id="detailFilters">
+            <div class="filter-group">
+                <label class="filter-label">Type de projets</label>
+                <select class="filter-select" id="projetTypeFilter">
+                    <option value="mes_projets">Mes projets seulement</option>
+                    <option value="tous_projets">Tous les projets</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label class="filter-label">Statut</label>
+                <select class="filter-select" id="detailStatutFilter">
+                    <option value="all">Tous les statuts</option>
+                    <option value="active">Actifs seulement</option>
+                    <option value="Débuté">Débuté</option>
+                    <option value="En cours">En cours</option>
+                    <option value="Terminé">Terminé</option>
+                    <option value="Suspendu">Suspendu</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label class="filter-label">Avancement</label>
+                <select class="filter-select" id="detailAvancementFilter">
+                    <option value="all">Tous les avancements</option>
+                    <option value="0">0% (Non débuté)</option>
+                    <option value="1-25">1-25% (Débuté)</option>
+                    <option value="26-50">26-50% (En progression)</option>
+                    <option value="51-75">51-75% (Avancé)</option>
+                    <option value="76-99">76-99% (Bientôt terminé)</option>
+                    <option value="100">100% (Terminé)</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label class="filter-label">Service</label>
+                <select class="filter-select" id="detailServiceFilter">
+                    <option value="all">Tous les services</option>
+                    {% for nomService, codeService in services_uniques %}
+                        <option value="{{ nomService }}">{{ nomService }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <button class="btn-reset-filters" id="resetDetailFilters">
+                <i class="bi bi-arrow-clockwise"></i> Réinitialiser
+            </button>
+        </div>
+
+        <div class="chart-container">
+            <div class="chart-header">
+                <h3 class="chart-title">
+                    <i class="bi bi-bar-chart-steps"></i>
+                    Timeline et avancement
+                </h3>
+            </div>
+            
+            <!-- Légende améliorée avec indicateurs de créateur -->
+            <div class="gantt-legend">
+                <div class="legend-items extended">
+                    <div class="legend-item">
+                        <div class="legend-color in-progress"></div>
+                        <span><i class="bi bi-play-circle"></i> En cours</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color completed"></div>
+                        <span><i class="bi bi-check-circle"></i> Terminé</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color warning"></div>
+                        <span><i class="bi bi-exclamation-triangle"></i> Proche échéance</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color danger"></div>
+                        <span><i class="bi bi-clock"></i> En retard</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color suspended"></div>
+                        <span><i class="bi bi-pause-circle"></i> Suspendu</span>
+                    </div>
+                    <div class="legend-item creator">
+                        <div class="legend-color my-project"></div>
+                        <span><i class="bi bi-person-check"></i> Mes projets</span>
+                    </div>
+                    <div class="legend-item creator">
+                        <div class="legend-color other-project"></div>
+                        <span><i class="bi bi-people"></i> Autres créateurs</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="horizontal-gantt-container" id="horizontalGanttChart">
+                <!-- Le diagramme horizontal sera généré par JavaScript -->
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+class CreateurDashboardCharts {
+    constructor() {
+        this.mesProjetsData = {{ donnees_avancement_mes_projets|json_encode|raw }};
+        this.tousProjetsData = {{ donnees_avancement_tous_projets|json_encode|raw }};
+        this.statutsData = {{ donnees_statuts|json_encode|raw }};
+        this.currentProjetType = 'mes_projets'; // Par défaut : mes projets
+        this.init();
+    }
+
+    init() {
+        console.log('📊 Initialisation dashboard créateur avec données:', this.getCurrentData());
+        this.updateOverviewCharts();
+        this.updateDetailCharts();
+        this.setupFilters();
+        this.setupChartInteractions();
+    }
+
+    // 🎯 OBTENIR LES DONNÉES COURANTES (MES PROJETS OU TOUS LES PROJETS)
+    getCurrentData() {
+        return this.currentProjetType === 'mes_projets' 
+            ? this.mesProjetsData 
+            : this.tousProjetsData;
+    }
+
+    // 🎯 FILTRER LES PROJETS POUR LA VUE D'ENSEMBLE
+    getFilteredOverviewProjets() {
+        const statutFilter = document.getElementById('statutFilter').value;
+        const avancementFilter = document.getElementById('avancementFilter').value;
+        const serviceFilter = document.getElementById('serviceFilter').value;
+        
+        let filteredProjets = this.mesProjetsData; // Vue d'ensemble utilise toujours mes projets
+
+        // Filtre par statut
+        if (statutFilter === 'active') {
+            filteredProjets = filteredProjets.filter(p => 
+                p.statut === 'Débuté' || p.statut === 'En cours'
+            );
+        } else if (statutFilter !== 'all') {
+            filteredProjets = filteredProjets.filter(p => p.statut === statutFilter);
+        }
+
+        // Filtre par avancement
+        if (avancementFilter !== 'all') {
+            filteredProjets = filteredProjets.filter(projet => {
+                const avancement = projet.avancement;
+                
+                switch (avancementFilter) {
+                    case '0':
+                        return avancement === 0;
+                    case '1-25':
+                        return avancement >= 1 && avancement <= 25;
+                    case '26-50':
+                        return avancement >= 26 && avancement <= 50;
+                    case '51-75':
+                        return avancement >= 51 && avancement <= 75;
+                    case '76-99':
+                        return avancement >= 76 && avancement <= 99;
+                    case '100':
+                        return avancement === 100;
+                    default:
+                        return true;
+                }
+            });
+        }
+
+        // Filtre par service
+        if (serviceFilter !== 'all') {
+            filteredProjets = filteredProjets.filter(p => p.service === serviceFilter);
+        }
+
+        console.log('Projets vue d\'ensemble filtrés:', filteredProjets.length);
+        return filteredProjets;
+    }
+
+    // 🎯 FILTRER LES PROJETS POUR LA VUE DÉTAILLÉE
+    getFilteredDetailProjets() {
+        const statutFilter = document.getElementById('detailStatutFilter').value;
+        const avancementFilter = document.getElementById('detailAvancementFilter').value;
+        const serviceFilter = document.getElementById('detailServiceFilter').value;
+        
+        let filteredProjets = this.getCurrentData(); // Vue détaillée utilise le type sélectionné
+
+        // Filtre par statut
+        if (statutFilter === 'active') {
+            filteredProjets = filteredProjets.filter(p => 
+                p.statut === 'Débuté' || p.statut === 'En cours'
+            );
+        } else if (statutFilter !== 'all') {
+            filteredProjets = filteredProjets.filter(p => p.statut === statutFilter);
+        }
+
+        // Filtre par avancement
+        if (avancementFilter !== 'all') {
+            filteredProjets = filteredProjets.filter(projet => {
+                const avancement = projet.avancement;
+                
+                switch (avancementFilter) {
+                    case '0':
+                        return avancement === 0;
+                    case '1-25':
+                        return avancement >= 1 && avancement <= 25;
+                    case '26-50':
+                        return avancement >= 26 && avancement <= 50;
+                    case '51-75':
+                        return avancement >= 51 && avancement <= 75;
+                    case '76-99':
+                        return avancement >= 76 && avancement <= 99;
+                    case '100':
+                        return avancement === 100;
+                    default:
+                        return true;
+                }
+            });
+        }
+
+        // Filtre par service
+        if (serviceFilter !== 'all') {
+            filteredProjets = filteredProjets.filter(p => p.service === serviceFilter);
+        }
+
+        console.log('Projets vue détaillée filtrés:', filteredProjets.length);
+        return filteredProjets;
+    }
+
+    // 🔄 RÉINITIALISER LES FILTRES VUE D'ENSEMBLE
+    resetOverviewFilters() {
+        document.getElementById('statutFilter').value = 'all';
+        document.getElementById('avancementFilter').value = 'all';
+        document.getElementById('serviceFilter').value = 'all';
+        
+        this.updateOverviewCharts();
+        
+        const resetBtn = document.getElementById('resetOverviewFilters');
+        const originalText = resetBtn.innerHTML;
+        resetBtn.innerHTML = '<i class="bi bi-check"></i> Réinitialisé !';
+        resetBtn.style.background = 'var(--success-color)';
+        
+        setTimeout(() => {
+            resetBtn.innerHTML = originalText;
+            resetBtn.style.background = '';
+        }, 1500);
+    }
+
+    // 🔄 RÉINITIALISER LES FILTRES VUE DÉTAILLÉE
+// Dans la classe CreateurDashboardCharts, modifiez la méthode resetDetailFilters :
+
+// 🔄 RÉINITIALISER LES FILTRES VUE DÉTAILLÉE - INCLUT LE TYPE DE PROJETS
+resetDetailFilters() {
+    document.getElementById('detailStatutFilter').value = 'all';
+    document.getElementById('detailAvancementFilter').value = 'all';
+    document.getElementById('detailServiceFilter').value = 'all';
+    document.getElementById('projetTypeFilter').value = 'mes_projets'; // Réinitialiser le type de projets
+    
+    // Mettre à jour la variable courante
+    this.currentProjetType = 'mes_projets';
+    
+    this.updateDetailCharts();
+    
+    const resetBtn = document.getElementById('resetDetailFilters');
+    const originalText = resetBtn.innerHTML;
+    resetBtn.innerHTML = '<i class="bi bi-check"></i> Réinitialisé !';
+    resetBtn.style.background = 'var(--success-color)';
+    
+    setTimeout(() => {
+        resetBtn.innerHTML = originalText;
+        resetBtn.style.background = '';
+    }, 1500);
+}
+
+    // 📊 DIAGRAMME EN BÂTONS VERTICAL AVEC COULEURS UNIES (VUE D'ENSEMBLE)
+    updateVerticalBarChart() {
+        const filteredProjets = this.getFilteredOverviewProjets();
+        const chartArea = document.getElementById('verticalBarChart');
+        
+        chartArea.innerHTML = '';
+
+        if (filteredProjets.length === 0) {
+            const emptyMessage = document.createElement('div');
+            emptyMessage.className = 'empty-chart-message';
+            emptyMessage.textContent = 'Aucun projet correspondant aux filtres';
+            chartArea.appendChild(emptyMessage);
+            return;
+        }
+
+        filteredProjets.forEach(projet => {
+            const barColumn = document.createElement('div');
+            barColumn.className = 'bar-column';
+            
+            const barWrapper = document.createElement('div');
+            barWrapper.className = 'bar-wrapper';
+            
+            const barValue = document.createElement('div');
+            barValue.className = 'bar-value';
+            barValue.textContent = `${projet.avancement}%`;
+            
+            const bar = document.createElement('div');
+            bar.className = 'bar';
+            
+            const barHeight = Math.max(projet.avancement, 3);
+            bar.style.height = `${barHeight}%`;
+            
+            if (projet.avancement === 0) {
+                bar.classList.add('zero-progress');
+            } else {
+                // Utilisation de couleur unie
+                const color = this.getColorForStatus(projet.statut);
+                bar.style.background = color;
+            }
+            
+            bar.appendChild(barValue);
+            barWrapper.appendChild(bar);
+            
+            const barLabel = document.createElement('div');
+            barLabel.className = 'bar-label';
+            
+            if (projet.titre.length > 25) {
+                barLabel.classList.add('long-text');
+            }
+            
+            barLabel.textContent = projet.titre;
+            barLabel.title = `${projet.titre} (${projet.avancement}%) - ${projet.statut}`;
+            
+            barColumn.appendChild(barWrapper);
+            barColumn.appendChild(barLabel);
+            chartArea.appendChild(barColumn);
+        });
+    }
+
+    // 📊 DIAGRAMME HORIZONTAL AMÉLIORÉ (TIMELINE) - VUE DÉTAILLÉE
+    updateHorizontalGanttChart() {
+        const filteredProjets = this.getFilteredDetailProjets();
+        const container = document.getElementById('horizontalGanttChart');
+        
+        container.innerHTML = '';
+
+        if (filteredProjets.length === 0) {
+            const emptyMessage = document.createElement('div');
+            emptyMessage.className = 'empty-chart-message';
+            emptyMessage.textContent = 'Aucun projet correspondant aux filtres';
+            container.appendChild(emptyMessage);
+            return;
+        }
+
+        // Trier les projets par date de début
+        const projetsTries = [...filteredProjets].sort((a, b) => {
+            const dateA = this.parseDate(a.dateDebut);
+            const dateB = this.parseDate(b.dateDebut);
+            return dateA - dateB;
+        });
+
+        projetsTries.forEach(projet => {
+            const ganttRow = document.createElement('div');
+            ganttRow.className = 'gantt-row';
+            
+            // Informations du projet
+            const projectInfo = document.createElement('div');
+            projectInfo.className = 'gantt-project-info';
+            
+            // Appliquer un style différent selon si c'est mon projet ou non
+            if (this.currentProjetType === 'tous_projets') {
+                projectInfo.classList.add(projet.estMonProjet ? 'my-creator' : 'other-creator');
+            } else {
+                projectInfo.classList.add('my-creator');
+            }
+            
+            const projectHeader = document.createElement('div');
+            projectHeader.className = 'gantt-project-header';
+            
+            const projectMainInfo = document.createElement('div');
+            projectMainInfo.className = 'gantt-project-main-info';
+            
+            const projectName = document.createElement('div');
+            projectName.className = 'gantt-project-name';
+            projectName.textContent = this.truncateText(projet.titre, 30);
+            projectName.title = projet.titre;
+            
+            // Indicateur de propriété (petit point coloré)
+            const ownershipBadge = document.createElement('div');
+            
+            if (this.currentProjetType === 'tous_projets' && !projet.estMonProjet) {
+                ownershipBadge.classList.add('other');
+            }
+            
+            projectMainInfo.appendChild(projectName);
+            
+            
+            projectHeader.appendChild(projectMainInfo);
+            projectInfo.appendChild(projectHeader);
+
+            const projectDates = document.createElement('div');
+            projectDates.className = 'gantt-project-dates';
+            
+            // Afficher les dates avec indicateur de création
+            let datesHTML = `<span><i class="bi bi-play-fill"></i> ${this.formatDate(projet.dateDebut)}</span>`;
+            if (projet.dateFin) {
+                datesHTML += `<span><i class="bi bi-flag-fill"></i> ${this.formatDate(projet.dateFin)}</span>`;
+            }
+            
+            // Badge créateur si ce n'est pas mon projet (seulement pour "tous les projets")
+            if (this.currentProjetType === 'tous_projets' && !projet.estMonProjet) {
+                datesHTML += `<div class="creator-badge">
+                    <i class="bi bi-person"></i>
+                    ${this.truncateText(projet.createur, 20)}
+                </div>`;
+            } else if (this.currentProjetType === 'tous_projets' && projet.estMonProjet) {
+                datesHTML += `<div class="creator-badge my-project">
+                    <i class="bi bi-person-check"></i>
+                    Mon projet
+                </div>`;
+            }
+            
+            projectDates.innerHTML = datesHTML;
+            projectInfo.appendChild(projectDates);
+            ganttRow.appendChild(projectInfo);
+
+            // Timeline et barre de progression
+            const timelineContainer = document.createElement('div');
+            timelineContainer.className = 'gantt-timeline-container';
+            
+            const barContainer = document.createElement('div');
+            barContainer.className = 'gantt-bar-container';
+            
+            const bar = document.createElement('div');
+            bar.className = 'gantt-bar';
+            
+            // Déterminer la classe de couleur en fonction du statut et des dates
+            const today = new Date();
+            const endDate = projet.dateFin ? this.parseDate(projet.dateFin) : null;
+            let barClass = 'in-progress';
+            let statusIndicator = null;
+            let daysText = '';
+
+            if (projet.statut === 'Terminé') {
+                barClass = 'completed';
+                statusIndicator = { type: 'success', icon: 'bi-check-circle', text: 'Terminé' };
+                daysText = 'Terminé';
+            } else if (projet.statut === 'Suspendu') {
+                barClass = 'suspended';
+                statusIndicator = { type: 'secondary', icon: 'bi-pause-circle', text: 'Suspendu' };
+                daysText = 'Suspendu';
+            } else if (endDate) {
+                const daysUntilDeadline = Math.ceil((endDate - today) / (1000 * 60 * 60 * 24));
+                
+                if (daysUntilDeadline < 0) {
+                    barClass = 'danger';
+                    const daysLate = Math.abs(daysUntilDeadline);
+                    daysText = `${daysLate} jour${daysLate > 1 ? 's' : ''} de retard`;
+                    statusIndicator = { 
+                        type: 'danger', 
+                        icon: 'bi-clock', 
+                        text: daysText, 
+                        blink: true 
+                    };
+                } else if (daysUntilDeadline <= 5 || projet.deadlineApproche) {
+                    barClass = 'warning';
+                    daysText = `${daysUntilDeadline} jour${daysUntilDeadline > 1 ? 's' : ''} restant${daysUntilDeadline > 1 ? 's' : ''}`;
+                    statusIndicator = { 
+                        type: 'warning', 
+                        icon: 'bi-exclamation-triangle', 
+                        text: daysText 
+                    };
+                } else {
+                    barClass = 'in-progress';
+                    daysText = `${daysUntilDeadline} jour${daysUntilDeadline > 1 ? 's' : ''} restant${daysUntilDeadline > 1 ? 's' : ''}`;
+                    statusIndicator = { 
+                        type: 'info', 
+                        icon: 'bi-play-circle', 
+                        text: daysText 
+                    };
+                }
+            } else {
+                barClass = 'in-progress';
+                daysText = 'Pas de date fin';
+                statusIndicator = { 
+                    type: 'info', 
+                    icon: 'bi-play-circle', 
+                    text: daysText 
+                };
+            }
+            
+            bar.classList.add(barClass);
+            bar.style.width = `${Math.max(projet.avancement, 5)}%`;
+            
+            const barValue = document.createElement('div');
+            barValue.className = 'gantt-bar-value';
+            barValue.textContent = `${projet.avancement}%`;
+            bar.appendChild(barValue);
+            
+            barContainer.appendChild(bar);
+            timelineContainer.appendChild(barContainer);
+            
+            // Pourcentage
+            const percentage = document.createElement('div');
+            percentage.className = 'gantt-percentage';
+            percentage.textContent = `${projet.avancement}%`;
+            timelineContainer.appendChild(percentage);
+            
+            // Indicateurs de statut avec nombre de jours
+            if (statusIndicator) {
+                const statusContainer = document.createElement('div');
+                statusContainer.className = 'gantt-status-indicators';
+                
+                const indicator = document.createElement('div');
+                indicator.className = `status-indicator ${statusIndicator.type}`;
+                if (statusIndicator.blink) {
+                    indicator.classList.add('danger');
+                }
+                
+                indicator.innerHTML = `
+                    <i class="bi ${statusIndicator.icon}"></i>
+                    <span>${statusIndicator.text}</span>
+                `;
+                
+                statusContainer.appendChild(indicator);
+                timelineContainer.appendChild(statusContainer);
+            }
+            
+            ganttRow.appendChild(timelineContainer);
+            container.appendChild(ganttRow);
+        });
+
+        // Afficher le nombre de projets affichés
+        if (filteredProjets.length > 10) {
+            const countInfo = document.createElement('div');
+            countInfo.className = 'text-center text-muted small mt-2';
+            countInfo.textContent = `${filteredProjets.length} projets affichés - Faites défiler pour voir tous les projets`;
+            container.appendChild(countInfo);
+        }
+    }
+
+    // 🥧 DIAGRAMME CAMEMBERT (VUE D'ENSEMBLE)
+    updatePieChart() {
+        const filteredProjets = this.getFilteredOverviewProjets();
+        const pieChart = document.getElementById('statutPieChart');
+        const totalCount = document.querySelector('.chart-center .total-count');
+        
+        totalCount.textContent = filteredProjets.length;
+
+        if (filteredProjets.length === 0) {
+            pieChart.style.background = 'conic-gradient(#e5e7eb 0% 100%)';
+            document.querySelectorAll('.legend-percentage').forEach(el => {
+                el.textContent = '0%';
+            });
+            return;
+        }
+
+        const statutsFiltres = {
+            'Débuté': 0,
+            'En cours': 0,
+            'Terminé': 0,
+            'Suspendu': 0
+        };
+
+        filteredProjets.forEach(projet => {
+            if (statutsFiltres.hasOwnProperty(projet.statut)) {
+                statutsFiltres[projet.statut]++;
+            }
+        });
+
+        const total = filteredProjets.length;
+        
+        document.getElementById('debutPercent').textContent = total > 0 ? Math.round((statutsFiltres['Débuté'] / total) * 100) + '%' : '0%';
+        document.getElementById('coursPercent').textContent = total > 0 ? Math.round((statutsFiltres['En cours'] / total) * 100) + '%' : '0%';
+        document.getElementById('terminePercent').textContent = total > 0 ? Math.round((statutsFiltres['Terminé'] / total) * 100) + '%' : '0%';
+        document.getElementById('suspenduPercent').textContent = total > 0 ? Math.round((statutsFiltres['Suspendu'] / total) * 100) + '%' : '0%';
+
+        let currentPercent = 0;
+        let gradientString = '';
+
+        const colors = {
+            'Débuté': 'var(--info-color)',
+            'En cours': 'var(--warning-color)',
+            'Terminé': 'var(--success-color)',
+            'Suspendu': 'var(--danger-color)'
+        };
+
+        Object.entries(statutsFiltres).forEach(([statut, count]) => {
+            if (count > 0) {
+                const percent = (count / total) * 100;
+                if (gradientString) gradientString += ', ';
+                gradientString += `${colors[statut]} ${currentPercent}% ${currentPercent + percent}%`;
+                currentPercent += percent;
+            }
+        });
+
+        pieChart.style.background = `conic-gradient(${gradientString})`;
+    }
+
+    // 🎛️ CONFIGURATION DES FILTRES SÉPARÉS
+    setupFilters() {
+        // Boutons de réinitialisation
+        document.getElementById('resetOverviewFilters').addEventListener('click', () => {
+            this.resetOverviewFilters();
+        });
+
+        document.getElementById('resetDetailFilters').addEventListener('click', () => {
+            this.resetDetailFilters();
+        });
+
+        // Filtres pour la vue d'ensemble
+        ['statutFilter', 'avancementFilter', 'serviceFilter'].forEach(filterId => {
+            document.getElementById(filterId).addEventListener('change', () => {
+                this.updateOverviewCharts();
+            });
+        });
+
+        // Filtres pour la vue détaillée
+        ['detailStatutFilter', 'detailAvancementFilter', 'detailServiceFilter'].forEach(filterId => {
+            document.getElementById(filterId).addEventListener('change', () => {
+                this.updateDetailCharts();
+            });
+        });
+
+        // Filtre pour le type de projets (mes projets vs tous les projets) - Vue détaillée seulement
+        document.getElementById('projetTypeFilter').addEventListener('change', (e) => {
+            this.currentProjetType = e.target.value;
+            console.log('Changement type projets:', this.currentProjetType);
+            this.updateDetailCharts();
+        });
+    }
+
+    // 🎯 INTERACTIONS DES GRAPHIQUES
+    setupChartInteractions() {
+        document.querySelectorAll('.legend-item').forEach(item => {
+            item.addEventListener('mouseenter', () => {
+                item.style.background = '#f8fafc';
+                item.style.transform = 'translateX(5px)';
+            });
+
+            item.addEventListener('mouseleave', () => {
+                item.style.background = '';
+                item.style.transform = '';
+            });
+        });
+    }
+
+    // 🎨 COULEURS PAR STATUT
+    getColorForStatus(statut) {
+        const colors = {
+            'Débuté': '#964ee3',
+            'En cours': '#f59e0b',
+            'Terminé': '#10b981',
+            'Suspendu': '#ef4444'
+        };
+        return colors[statut] || '#964ee3';
+    }
+
+    // 📅 CORRECTION DU PARSING DES DATES
+    parseDate(dateString) {
+        if (!dateString) return new Date();
+        
+        if (dateString instanceof Date) {
+            return dateString;
+        }
+        
+        if (typeof dateString === 'string') {
+            const date = new Date(dateString);
+            if (!isNaN(date.getTime())) {
+                return date;
+            }
+            
+            const parts = dateString.split('/');
+            if (parts.length === 3) {
+                return new Date(parts[2], parts[1] - 1, parts[0]);
+            }
+            
+            const timestamp = Date.parse(dateString);
+            if (!isNaN(timestamp)) {
+                return new Date(timestamp);
+            }
+        }
+        
+        console.warn('Date invalide:', dateString);
+        return new Date();
+    }
+
+    // 📅 FORMATER LES DATES - CORRIGÉ
+    formatDate(dateString) {
+        try {
+            const date = this.parseDate(dateString);
+            return date.toLocaleDateString('fr-FR', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric'
+            });
+        } catch (error) {
+            console.error('Erreur format date:', error, dateString);
+            return 'N/A';
+        }
+    }
+
+    // 🔄 METTRE À JOUR LES GRAPHIQUES DE LA VUE D'ENSEMBLE
+    updateOverviewCharts() {
+        this.updateVerticalBarChart();
+        this.updatePieChart();
+    }
+
+    // 🔄 METTRE À JOUR LES GRAPHIQUES DE LA VUE DÉTAILLÉE
+    updateDetailCharts() {
+        this.updateHorizontalGanttChart();
+    }
+
+    // ✂️ TRONQUER LE TEXTE POUR LES LABELS
+    truncateText(text, maxLength) {
+        if (text.length <= maxLength) return text;
+        return text.substring(0, maxLength) + '...';
+    }
+}
+
+// 🚀 DÉMARRAGE DU SYSTÈME
+document.addEventListener('DOMContentLoaded', () => {
+    window.createurDashboardCharts = new CreateurDashboardCharts();
+});
+</script>
+{% endblock %}

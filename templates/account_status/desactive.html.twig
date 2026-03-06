@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Compte Désactivé - MIC PTA</title>
+        <link rel="icon" type="image/png" sizes="48x48" href="{{ asset('images/logo.png') }}">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+        
+        <style>
+            /* RESET ET STYLES DE BASE */
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            body {
+                margin: 0;
+                min-height: 100vh;
+                background: linear-gradient(135deg, #964ee3 0%, #75165f 100%);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 20px;
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            }
+
+            /* CARTE DE STATUT */
+            .status-container {
+                width: 100%;
+                max-width: 500px;
+            }
+
+            .status-card {
+                background: #ffff;
+                padding: 50px 40px;
+                border-radius: 20px;
+                box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+                text-align: center;
+                width: 100%;
+            }
+
+            .status-icon {
+                width: 110px;
+                height: 110px;
+                background: #fd6161ff;
+                border-radius: 50%;
+                border: solid 2px #bd2929ff;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin: 0 auto 30px;
+                color: white;
+                font-size: 3.8rem;
+            }
+
+            .status-title {
+                color: #333;
+                font-size: 28px;
+                font-weight: 600;
+                margin-bottom: 20px;
+            }
+
+            .status-message {
+                color: #666;
+                font-size: 16px;
+                line-height: 1.6;
+                margin-bottom: 30px;
+            }
+
+            .contact-info {
+                background: #f8f9fa;
+                padding: 20px;
+                border-radius: 10px;
+                margin-top: 20px;
+                font-size: 14px;
+                color: #666;
+            }
+
+            /* BOUTONS */
+            .status-actions {
+                display: flex;
+                flex-direction: column;
+                gap: 15px;
+                margin-top: 30px;
+            }
+
+            .btn-secondary {
+                padding: 12px 24px;
+                background: linear-gradient(135deg, #964ee3 0%, #75165f 100%);
+                color: white;
+                text-decoration: none;
+                border-radius: 8px;
+                transition: all 0.3s ease;
+                border: none;
+                cursor: pointer;
+                font-size: 14px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 8px;
+            }
+
+            .btn-secondary:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+                text-decoration: none;
+                color: white
+            }
+
+            /* RESPONSIVE */
+            @media (max-width: 768px) {
+                body {
+                    padding: 15px;
+                }
+
+                .status-card {
+                    padding: 40px 30px;
+                }
+
+                .status-icon {
+                    width: 80px;
+                    height: 80px;
+                    font-size: 2.5rem;
+                    margin-bottom: 25px;
+                }
+
+                .status-title {
+                    font-size: 24px;
+                }
+
+                .status-message {
+                    font-size: 15px;
+                }
+            }
+
+            @media (max-width: 480px) {
+                .status-card {
+                    padding: 30px 20px;
+                }
+
+                .status-icon {
+                    width: 70px;
+                    height: 70px;
+                    font-size: 2rem;
+                }
+
+                .status-title {
+                    font-size: 22px;
+                }
+
+                .status-message {
+                    font-size: 14px;
+                }
+
+                .contact-info {
+                    padding: 15px;
+                }
+
+                .status-actions {
+                    gap: 10px;
+                }
+            }
+
+            /* ANIMATIONS */
+            .status-card {
+                animation: fadeInUp 0.6s ease-out;
+            }
+
+            @keyframes fadeInUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(20px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="status-container">
+            <div class="status-card">
+                <div class="status-icon">
+                    <i class="bi bi-person-fill-slash"></i>
+                </div>
+                
+                <h1 class="status-title">Compte Désactivé</h1>
+                
+                <div class="status-message">
+                    <p><strong>Votre compte a été désactivé pour une raison spécifique.</strong></p>
+                    <p>Vous ne pouvez pas vous connecter à l'application pour le moment.</p>
+                    <p>Pour plus d'informations concernant cette désactivation, veuillez contacter votre administrateur le plus proche.</p>
+                </div>
+
+
+                <div class="status-actions">
+                    <a href="{{ path('app_login') }}" class="btn-secondary">
+                        <i class="bi bi-arrow-left"></i> Retour à la page de connexion
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            // EMPÊCHER LE CACHE ET LE RETOUR EN ARRIÈRE
+            history.pushState(null, null, location.href);
+            
+            window.onpopstate = function(event) {
+                history.pushState(null, null, location.href);
+            };
+
+            // Empêcher l'ouverture de la page dans un nouvel onglet/retour
+            if (performance.navigation.type === 2) {
+                // Page chargée via le cache du navigateur (bouton retour)
+                window.location.replace('{{ path('app_login') }}');
+            }
+
+            // Désactiver le cache pour cette page
+            if (window.history && window.history.replaceState) {
+                window.history.replaceState(null, null, window.location.href);
+            }
+
+            // Empêcher le rafraîchissement avec F5 de remettre la page en cache
+            window.addEventListener('beforeunload', function() {
+                sessionStorage.setItem('last_unload', new Date().getTime());
+            });
+
+            // Vérifier si la page a été chargée depuis le cache
+            window.addEventListener('pageshow', function(event) {
+                if (event.persisted) {
+                    // Page chargée depuis le cache du navigateur
+                    window.location.reload();
+                }
+            });
+
+            // Headers no-cache
+            fetch(window.location.href, {
+                headers: {
+                    'Cache-Control': 'no-cache',
+                    'Pragma': 'no-cache'
+                }
+            });
+        </script>
+    </body>
+</html>

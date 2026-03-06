@@ -1,0 +1,3157 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Gestion des Directions{% endblock %}
+
+
+{% block stylesheets %}
+<style>
+
+/* Styles pour Select2 - Version harmonisée */
+.select2-container--bootstrap-5 .select2-selection {
+    min-height: 45px !important;
+    height: 45px !important;
+    padding: 0.575rem !important;
+    border: 1px solid #d1d5db !important;
+    border-radius: 6px !important;
+    font-size: 0.9rem !important;
+    line-height: 1.5 !important;
+    background-color: white !important;
+    transition: all 0.3s ease !important;
+}
+
+.select2-container--bootstrap-5 .select2-selection--single {
+    height: 38px !important;
+}
+
+.select2-container--bootstrap-5 .select2-selection--single .select2-selection__rendered {
+    line-height: 24px !important;
+    padding-left: 0.75rem !important;
+    padding-right: 2.5rem !important;
+    color: #374151 !important;
+}
+
+.select2-container--bootstrap-5 .select2-selection--single .select2-selection__arrow {
+    height: 36px !important;
+    right: 0.5rem !important;
+}
+
+/* Style au survol (hover) */
+.select2-container--bootstrap-5 .select2-selection:hover {
+    border-color: #964ee3 !important;
+    box-shadow: 0 0 0 3px rgba(150, 78, 227, 0.1) !important;
+}
+
+/* Style au focus */
+.select2-container--bootstrap-5.select2-container--focus .select2-selection,
+.select2-container--bootstrap-5.select2-container--open .select2-selection {
+    border-color: #964ee3 !important;
+    box-shadow: 0 0 0 3px rgba(150, 78, 227, 0.1) !important;
+    outline: none !important;
+}
+
+/* Style pour le dropdown */
+.select2-container--bootstrap-5 .select2-dropdown {
+    border: 1px solid #d1d5db !important;
+    border-radius: 6px !important;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1) !important;
+    background-color: white !important;
+}
+
+/* Champ de recherche dans le dropdown */
+.select2-container--bootstrap-5 .select2-search--dropdown .select2-search__field {
+    border: 1px solid #d1d5db !important;
+    border-radius: 4px !important;
+    padding: 0.375rem 0.75rem !important;
+    font-size: 0.9rem !important;
+    height: 38px !important;
+}
+
+.select2-container--bootstrap-5 .select2-search--dropdown .select2-search__field:focus {
+    border-color: #964ee3 !important;
+    box-shadow: 0 0 0 3px rgba(150, 78, 227, 0.1) !important;
+    outline: none !important;
+}
+
+/* Options dans le dropdown */
+.select2-container--bootstrap-5 .select2-results__option {
+    padding: 0.5rem 0.75rem !important;
+    font-size: 0.9rem !important;
+    min-height: 38px !important;
+    display: flex !important;
+    align-items: center !important;
+}
+
+/* Option sélectionnée */
+.select2-container--bootstrap-5 .select2-results__option--selected {
+    background-color: #f3f4f6 !important;
+    color: #374151 !important;
+}
+
+/* Option au survol/surbrillance */
+.select2-container--bootstrap-5 .select2-results__option--highlighted.select2-results__option--selectable {
+    background-color: #3f7ee3 !important;
+    color: white !important;
+}
+
+/* Options désactivées */
+.select2-container--bootstrap-5 .select2-results__option.option-desactive {
+    color: #6b7280 !important;
+    font-style: italic !important;
+    background-color: #f9fafb !important;
+}
+
+.select2-container--bootstrap-5 .select2-results__option.option-desactive.select2-results__option--highlighted {
+    background-color: #f3f4f6 !important;
+    color: #6b7280 !important;
+}
+
+/* Style pour les sélects dans les modaux (z-index corrigé) */
+.modal .select2-container {
+    z-index: 1060 !important;
+}
+
+.modal .select2-dropdown {
+    z-index: 1061 !important;
+}
+
+/* Style pour le placeholder */
+.select2-container--bootstrap-5 .select2-selection--single .select2-selection__placeholder {
+    color: #6b7280 !important;
+    font-size: 0.9rem !important;
+}
+
+/* Style pour les sélects désactivés */
+.select2-container--bootstrap-5 .select2-selection--single[aria-disabled="true"] {
+    background-color: #f1f3f6 !important;
+    border-color: #ced1d6 !important;
+    color: #626771 !important;
+    cursor: default !important;
+}
+
+/* Style pour le clear button */
+.select2-container--bootstrap-5 .select2-selection--single .select2-selection__clear {
+    height: 36px !important;
+    padding: 0 0.5rem !important;
+    color: #6b7280 !important;
+    font-size: 1.2rem !important;
+}
+
+.select2-container--bootstrap-5 .select2-selection--single .select2-selection__clear:hover {
+    color: #ef4444 !important;
+}
+
+
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .select2-container--bootstrap-5 .select2-selection {
+        min-height: 36px !important;
+        height: 36px !important;
+        font-size: 0.85rem !important;
+    }
+    
+    .select2-container--bootstrap-5 .select2-selection--single {
+        height: 36px !important;
+    }
+    
+    .select2-container--bootstrap-5 .select2-selection--single .select2-selection__rendered {
+        padding-left: 0.5rem !important;
+        font-size: 0.85rem !important;
+    }
+    
+    .select2-container--bootstrap-5 .select2-results__option {
+        font-size: 0.85rem !important;
+        min-height: 36px !important;
+    }
+}
+
+/* Style pour correspondre avec vos autres champs */
+.form-control, .form-select, .select2-container--bootstrap-5 .select2-selection {
+    min-height: 38px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    background: white;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
+
+.form-control:focus, .form-select:focus, 
+.select2-container--bootstrap-5.select2-container--focus .select2-selection {
+    outline: none;
+    border-color: #964ee3;
+    box-shadow: 0 0 0 3px rgba(150, 78, 227, 0.1);
+}
+
+
+/* Ajustements pour les modaux */
+.modal .select2-container {
+    z-index: 1060;
+}
+
+.modal .select2-dropdown {
+    z-index: 1061;
+}
+
+/* assets/css/directions.css */
+
+.directions-container {
+    background: #fdfdffff;
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: rgba(0, 0, 0, 0.13) 0px 3px 8px;
+    margin-bottom: 2rem;
+}
+
+.table-directions {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+}
+
+.table-directions th,
+.table-directions td {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.table-directions th {
+    background: #eaeafaff;
+    font-weight: 600;
+    color: #1f2937;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+}
+
+.table-directions td {
+    font-size: 14px;
+}
+
+.table-directions tr:hover {
+    background: #f8fafc;
+}
+
+/* Ligne désactivée */
+.table-directions tr.direction-desactivee {
+    background-color: #f9fafb;
+    color: #6b7280;
+}
+
+.table-directions tr.direction-desactivee:hover {
+    background-color: #f3f4f6;
+}
+
+.table-directions tr.direction-desactivee td {
+    opacity: 0.7;
+}
+
+.status-badge {
+    padding: 0.4rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.status-active {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.status-waiting {
+    background: #fef3c7;
+    color: #d97706;
+}
+
+.status-desactive {
+    background: #e5e7eb;
+    color: #374151;
+}
+
+.role-badge {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+.role-badge-desactive {
+    background: #e5e7eb;
+    color: #6b7280;
+}
+
+
+.actions-container {
+    display: flex;
+    gap: 0.6rem;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: center;
+    min-height: 38px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.btnG {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 16px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-height: 38px;
+    line-height: 1;
+    white-space: nowrap;
+    box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.12) 0px 1px 3px 1px;
+}
+
+.btnG:hover {
+    transform: translateY(-1px);
+    opacity: 0.9;
+}
+
+/* Styles des boutons - Version compacte */
+.btn {
+    padding: 0.1rem 0.3rem;
+    border: none;
+    border-radius: 10px;
+    font-size: 0.7rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.2rem;
+    white-space: nowrap;
+    min-height: 28px;
+    line-height: 1;
+    box-shadow: rgba(60, 64, 67, 0.2) 0px 1px 2px 0px;
+    flex-shrink: 0;
+}
+
+
+/* Styles des boutons */
+.btn-warning {
+    background: linear-gradient(135deg, #f5bf62ff 0%, #df9618ff 100%);
+    color: #ffff;
+    border: 1px solid #df9618ff;
+    min-width: 80px; /* Réduit de 120px à 80px */
+    max-width: 80px;
+}
+
+.btn-success {
+    background: linear-gradient(135deg, #1fbe89ff 0%, #04704cff 100%);
+    color: #ffff;
+    border: 1px solid #087d56ff;
+    min-width: 80px; /* Réduit de 120px à 80px */
+    max-width: 80px;
+}
+
+.btn-dangerG {
+    background: linear-gradient(135deg, #fa6565ff 0%, #e13636ff 100%);
+    color: #ffff;
+    border: 1px solid #e13636ff;
+    min-width: 200px; /* Réduit de 120px à 80px */
+    max-width: 200px;
+}
+
+.btn-warningG {
+    background: linear-gradient(135deg, #f5bf62ff 0%, #df9618ff 100%);
+    color: #ffff;
+    border: 1px solid #df9618ff;
+    min-width: 120px; /* Réduit de 120px à 80px */
+    max-width: 120px;
+}
+
+.btn-successG {
+    background: linear-gradient(135deg, #1fbe89ff 0%, #04704cff 100%);
+    color: #ffff;
+    border: 1px solid #087d56ff;
+    min-width: 190px; /* Réduit de 120px à 80px */
+    max-width: 190px;
+}
+
+.btn-danger {
+    background: linear-gradient(135deg, #fa6565ff 0%, #e13636ff 100%);
+    color: #ffff;
+    border: 1px solid #e13636ff;
+    min-width: 80px; /* Réduit de 120px à 80px */
+    max-width: 80px;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #3f7ee3ff 0%, #2b6ed8ff 100%);
+    color: white;
+    border: 1px solid #3f7ee3ff;
+    min-width: 80px;
+}
+
+.btn-secondary {
+    background: #6b7280;
+    color: white;
+    border: 1px solid #6b7280;
+    min-width: 80px;
+}
+
+
+/* Dropdown plus compact */
+.dropdown .btn {
+    min-width: 80px; /* Réduit de 120px à 80px */
+    max-width: 80px;
+    padding: 0.1rem 0.3rem;
+}
+
+.dropdown-menu {
+    min-width: 180px;
+    border-radius: 6px;
+    padding: 0.3rem;
+}
+
+.dropdown-item {
+    padding: 0.4rem 0.6rem;
+    font-size: 0.7rem;
+    gap: 0.3rem;
+}
+
+/* Icônes plus petites dans les boutons */
+.btn i {
+    font-size: 0.7rem;
+}
+
+/* Hover states */
+.btn:hover:not(:disabled) {
+    transform: translateY(-1px);
+    color: #ffff;
+}
+
+.btn-warning:hover:not(:disabled) {
+    background: linear-gradient(135deg, #d68d0eff 0%, #895b09ff 100%);
+    border-color: #d68d0eff;
+}
+
+.btn-success:hover:not(:disabled) {
+    background: linear-gradient(135deg, #0f9d6eff 0%, #036343ff 100%);
+}
+
+.btn-danger:hover:not(:disabled) {
+    background: linear-gradient(135deg, #e14242ff 0%, #b01818ff 100%);
+}
+
+.btn-primary:hover:not(:disabled) {
+    background: linear-gradient(135deg, #4a6897ff 0%, #1c488fff 100%);
+    border-color: #1c488fff;
+}
+
+.btn-secondary:hover:not(:disabled) {
+    background: #4b5563;
+    border-color: #4b5563;
+}
+
+/* Responsive pour mobile */
+@media (max-width: 768px) {
+    .actions-container {
+        flex-direction: row;
+        gap: 0.2rem;
+        min-height: auto;
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .btn {
+        min-width: 70px;
+        padding: 0.2rem 0.4rem;
+        font-size: 0.65rem;
+    }
+    
+    .table-directions th:nth-child(8),
+    .table-directions td:nth-child(8) {
+        width: 180px;
+        min-width: 180px;
+        max-width: 180px;
+    }
+    
+    .dropdown .btn {
+        min-width: 80px;
+    }
+}
+
+
+
+.btn-secondary {
+    background: #6b7280;
+    color: white;
+    border: 1px solid #6b7280;
+}
+
+/* Hover states */
+.btn:hover {
+    transform: translateY(-1px);
+    color: #ffff;
+}
+
+.btn-warning:hover,
+.btn-warningG:hover {
+    background: #f59e0b linear-gradient(135deg, #d68d0eff 0%, #895b09ff 100%);
+    border-color: #d68d0eff;
+}
+
+.btn-success:hover,
+.btn-successG:hover {
+    background: linear-gradient(135deg, #0f9d6eff 0%, #036343ff 100%);
+
+}
+
+.btn-danger:hover,
+.btn-dangerG:hover {
+    background: linear-gradient(135deg, #e14242ff 0%, #b01818ff 100%);
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #4a6897ff 0%, #1c488fff 100%);
+    border-color: #1c488fff;
+}
+
+.btn-secondary:hover {
+    background: #4b5563;
+    border-color: #4b5563;
+}
+
+/* Boutons désactivés */
+.btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none !important;
+}
+
+.btn-desactive {
+    background: #9ca3af;
+    color: white;
+    border: 1px solid #9ca3af;
+}
+
+/* Hover states */
+.btn:hover:not(:disabled) {
+    transform: translateY(-1px);
+    color: #ffff;
+}
+
+.btn-warning:hover:not(:disabled) {
+    background: #f59e0b linear-gradient(135deg, #d68d0eff 0%, #895b09ff 100%);
+    border-color: #d68d0eff;
+}
+
+.btn-success:hover:not(:disabled) {
+    background: linear-gradient(135deg, #0f9d6eff 0%, #036343ff 100%);
+}
+
+.btn-danger:hover:not(:disabled) {
+    background: linear-gradient(135deg, #e14242ff 0%, #b01818ff 100%);
+}
+
+.btn-primary:hover:not(:disabled) {
+    background: linear-gradient(135deg, #4a6897ff 0%, #1c488fff 100%);
+    border-color: #1c488fff;
+}
+
+.btn-secondary:hover:not(:disabled) {
+    background: #4b5563;
+    border-color: #4b5563;
+}
+
+.btn-info:hover:not(:disabled) {
+    background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+}
+
+.btn-desactive:hover:not(:disabled) {
+    background: #6b7280;
+    border-color: #6b7280;
+}
+
+
+
+/* Style pour le dropdown */
+.dropdown-item:hover {
+    background: #f5ebc0ff;
+}
+
+/* Dropdown responsive */
+.dropdown {
+    display: inline-flex;
+    position: relative;
+}
+
+.dropdown-menu {
+    min-width: 200px;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    background: #fffdf5ff;
+    position: absolute;
+    z-index: 1000;
+}
+
+.dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 0.8rem;
+    font-size: 0.75rem;
+    color: #374151;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.dropdown-item:hover {
+    background: #f5ebc0ff;
+    color: #374151;
+}
+
+/* Responsive pour mobile - Priorité au dropdown */
+@media (max-width: 768px) {
+    .actions-container {
+        flex-direction: row;
+        gap: 0.3rem;
+        min-height: auto;
+        width: 100%;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+    
+    .btn {
+        min-width: 70px;
+        padding: 0.2rem 0.4rem;
+        font-size: 0.65rem;
+    }
+    
+    /* Dropdown spécifique pour mobile */
+    .dropdown {
+        position: static; /* Important pour le responsive */
+    }
+    
+    .dropdown .btn {
+        min-width: 70px;
+        font-size: 0.65rem;
+        padding: 0.2rem 0.4rem;
+    }
+    
+    .dropdown-menu {
+        position: absolute;
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+        min-width: 180px;
+        z-index: 1050;
+    }
+    
+    /* Ajustement spécifique pour la colonne Actions */
+    .table-services th:nth-child(9),
+    .table-services td:nth-child(9) {
+        width: 200px;
+        min-width: 200px;
+        max-width: 200px;
+    }
+    
+    /* Pour les très petits écrans */
+    @media (max-width: 576px) {
+        .actions-container {
+            flex-direction: column;
+            gap: 0.2rem;
+        }
+        
+        .dropdown-menu {
+            position: fixed;
+            top: 50% !important;
+            left: 50% !important;
+            transform: translate(-50%, -50%) !important;
+            width: 90%;
+            max-width: 250px;
+        }
+        
+        .table-services th:nth-child(9),
+        .table-services td:nth-child(9) {
+            width: 180px;
+            min-width: 180px;
+            max-width: 180px;
+        }
+    }
+}
+
+/* Pour les tableaux - Assurer la visibilité du dropdown */
+.table-responsive {
+    position: relative;
+    overflow-x: auto;
+}
+
+/* Empêcher le overflow-x de cacher le dropdown */
+.table-services {
+    position: relative;
+}
+
+/* Z-index pour s'assurer que le dropdown soit au-dessus */
+.dropdown-menu {
+    z-index: 1060;
+}
+
+
+/* Modal styles */
+.modal-content {
+    border-radius: 12px;
+    border: none;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+}
+
+.modal-header {
+    background: linear-gradient(135deg, #964ee3 0%, #75165f 100%);
+    color: white;
+    border-radius: 12px 12px 0 0;
+    border: none;
+    padding: 1.5rem;
+}
+
+.btn-close-custom {
+    background: none;
+    border: none;
+    font-size: 2rem;
+    color: white;
+    opacity: 0.8;
+    transition: all 0.3s ease;
+    padding: 0.5rem;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    margin: -0.5rem -0.5rem -0.5rem auto;
+}
+
+.btn-close-custom:hover {
+    opacity: 1;
+    background: rgba(255, 255, 255, 0.2);
+}
+
+
+.modal-title {
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0;
+}
+
+.modal-body {
+    padding: 1.5rem;
+}
+
+.modal-footer {
+    border-top: 1px solid #e5e7eb;
+    padding: 1rem 1.5rem;
+}
+
+.btn-close-white {
+    filter: invert(1);
+}
+
+.form-group {
+    margin-bottom: 1.25rem;
+}
+
+.form-label {
+    font-weight: 500;
+    color: #374151;
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+.form-control, .form-select {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    background: white;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
+
+.form-control[readonly]{
+    background-color: #f1f3f6ff;
+    border-color: #ced1d6ff;
+    color: #626771ff;
+    cursor: default;
+}
+
+.form-control:focus, .form-select:focus {
+    outline: none;
+    border-color: #964ee3;
+    box-shadow: 0 0 0 3px rgba(150, 78, 227, 0.1);
+}
+
+.form-text {
+    font-size: 0.8rem;
+    color: #6b7280;
+    margin-top: 0.25rem;
+}
+
+.is-invalid {
+    border-color: #dc3545 !important;
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
+}
+
+.invalid-feedback {
+    display: block;
+    width: 100%;
+    margin-top: 0.25rem;
+    font-size: 0.875em;
+    color: #dc3545;
+}
+
+.consigne {
+    background: #f0f9ff;
+    border-left: 4px solid #3b82f6;
+    padding: 1rem;
+    margin: 1rem 0;
+    border-radius: 6px;
+}
+
+.consigne h5 {
+    margin: 0 0 0.5rem 0;
+    color: #1e40af;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.consigne p {
+    margin: 0;
+    font-size: 0.8rem;
+    color: #4b5563;
+    line-height: 1.4;
+}
+
+.consigneD {
+    background: #f0f9ff;
+    border-left: 4px solid #3b82f6;
+    padding: 1rem;
+    margin: 1rem 0;
+    border-radius: 6px;
+}
+
+.consigneD h5 {
+    margin: 0 0 0.5rem 0;
+    color: #1e40af;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.consigneD p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: #4b5563;
+    line-height: 1.4;
+}
+
+.consigne-warning {
+    background: #fffbeb;
+    border-left: 4px solid #f59e0b;
+}
+
+.consigne-warning h5 {
+    color: #d97706;
+}
+
+.consigne-danger {
+    background: #fef2f2;
+    border-left: 4px solid #ef4444;
+}
+
+.consigne-danger h5 {
+    color: #dc2626;
+}
+
+
+.consigne-success {
+    background: #f0fdf4;
+    border-left: 4px solid #22c55e;
+}
+
+.consigne-success h5 {
+    color: #16a34a;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 3rem;
+    color: #6b7280;
+}
+
+.empty-state i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #f1f5f9;
+}
+
+.section-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1f2937;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.loading-spinner {
+    display: inline-block;
+    width: 1rem;
+    height: 1rem;
+    border: 2px solid #f3f3f3;
+    border-top: 2px solid #964ee3;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.user-avatar {
+    width: 32px;
+    height: 32px;
+    background: linear-gradient(135deg, #964ee3 0%, #75165f 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 600;
+    font-size: 0.75rem;
+}
+
+.user-info-cell {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+/* Badge désactivé pour les personnels */
+.badge-desactive {
+    background: #e5e7eb;
+    color: #6b7280;
+    padding: 0.25rem 0.5rem;
+    border-radius: 6px;
+    font-size: 0.7rem;
+    margin-left: 0.5rem;
+}
+
+/* Options désactivées dans les selects */
+.option-desactive {
+    color: #63676dff;
+    font-style: italic;
+}
+
+/* Styles pour la colonne email fixe */
+.table-directions th:nth-child(5),
+.table-directions td:nth-child(5) {
+    width: 200px !important;
+    min-width: 200px !important;
+    max-width: 200px !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Styles pour les colonnes Attribution et Statut */
+.table-directions th:nth-child(6),
+.table-directions td:nth-child(6),
+.table-directions th:nth-child(7),
+.table-directions td:nth-child(7) {
+    width: 120px;
+    min-width: 120px;
+    white-space: normal;
+    word-wrap: break-word;
+}
+
+/* Ajustement pour la colonne Actions */
+.table-directions th:nth-child(8),
+.table-directions td:nth-child(8) {
+    width: 220px;
+    min-width: 220px;
+    max-width: 220px;
+}
+
+/* Style spécifique pour les badges d'attribution et statut */
+.attribution-badge, .status-badge {
+    display: inline-block;
+    text-align: center;
+    padding: 0.4rem 0.6rem;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    line-height: 1.2;
+    white-space: normal;
+    word-break: break-word;
+    max-width: 100%;
+}
+
+/* Badge spécifique pour "Non défini" */
+.attribution-badge {
+    background: #6b7280 !important;
+    color: white !important;
+}
+
+/* Hover effect pour voir l'email complet */
+.table-directions td:nth-child(5):hover {
+    overflow: visible;
+    white-space: normal;
+    background: #f8f9fa;
+    z-index: 1;
+    position: relative;
+}
+
+/* Styles pour les filtres et la recherche */
+.filters-container {
+    background: #f3f3fbff;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    border: 1px solid #e5e7eb;
+    box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.13) 0px 1px 2px;
+}
+
+.filter-row {
+    display: flex;
+    gap: 1rem;
+    align-items: end;
+    flex-wrap: wrap;
+}
+
+.filter-group {
+    flex: 1;
+    min-width: 200px;
+}
+
+.search-group {
+    flex: 2;
+    min-width: 300px;
+}
+
+.filter-group label,
+.search-group label {
+    font-weight: 500;
+    color: #374151;
+    margin-bottom: 0.5rem;
+    display: block;
+    font-size: 0.875rem;
+}
+
+.filter-group .form-control,
+.filter-group .form-select,
+.search-group .form-control {
+    padding: 0.4rem 0.75rem;
+    height: 38px;
+    font-size: 0.85rem;
+    line-height: 1.3;
+}
+
+.filter-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+/* Pagination compacte */
+.pagination-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1rem;
+    padding: 0.75rem 0;
+    border-top: 1px solid #e5e7eb;
+}
+
+.pagination-info {
+    color: #6b7280;
+    font-size: 0.8rem;
+}
+
+.pagination {
+    margin: 0;
+    gap: 0.25rem;
+}
+
+.page-item .page-link {
+    padding: 0.3rem 0.5rem;
+    border: 1px solid #d1d5db;
+    color: #374151;
+    background: white;
+    font-size: 0.8rem;
+    min-width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    border-radius: 6px;
+}
+
+/* Réduire encore plus pour les boutons précédent/suivant */
+.page-item .page-link i {
+    font-size: 0.7rem;
+}
+
+/* États */
+.page-item.active .page-link {
+    background: linear-gradient(135deg, #964ee3 0%, #8b1970ff 100%);    border-color: #964ee3;
+    color: white;
+}
+
+.page-item.disabled .page-link {
+    color: #9ca3af;
+    background: #f9fafb;
+    cursor: not-allowed;
+}
+
+.page-link:hover:not(.disabled) {
+    background: #f3f4f6;
+    color: #1f2937;
+}
+
+/* Ajoutez ceci dans votre section CSS */
+#nouvelleDirectionMutation:disabled {
+    background-color: #f8f9fa;
+    color: #6c757d;
+    cursor: default;
+}
+
+#nouvelleDirectionMutation option:disabled {
+    color: #6c757d;
+    font-style: italic;
+}
+
+/* Style pour le bouton désactivé */
+#submitMutation:disabled {
+    background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+    color: #d1d5db;
+    border-color: #6b7280;
+    cursor: default;
+}
+
+/* Position fixe pour les alertes */
+.fixed-alert-container {
+    position: fixed;
+    top: 100px;
+    right: 20px;
+    z-index: 9999;
+    max-width: 400px;
+    animation: slideInRight 0.3s ease-out;
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+.alert-success-fixed {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 1rem 1.25rem;
+    box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);
+    border-left: 4px solid #047857;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    animation: fadeIn 0.3s ease-out;
+}
+
+.alert-danger-fixed {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 1rem 1.25rem;
+    box-shadow: 0 8px 25px rgba(239, 68, 68, 0.3);
+    border-left: 4px solid #b91c1c;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    animation: fadeIn 0.3s ease-out;
+}
+
+.alert-success-fixed i,
+.alert-danger-fixed i {
+    font-size: 1.2rem;
+}
+
+.alert-close-btn {
+    background: none;
+    border: none;
+    color: white;
+    opacity: 0.8;
+    padding: 0.25rem;
+    margin-left: auto;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+}
+
+.alert-close-btn:hover {
+    opacity: 1;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .table-directions th:nth-child(5),
+    .table-directions td:nth-child(5) {
+        width: 150px !important;
+        min-width: 150px !important;
+        max-width: 150px !important;
+    }
+    
+    .table-directions th:nth-child(6),
+    .table-directions td:nth-child(6),
+    .table-directions th:nth-child(7),
+    .table-directions td:nth-child(7) {
+        width: 100px;
+        min-width: 100px;
+    }
+    
+    .attribution-badge, .status-badge {
+        font-size: 0.65rem;
+        padding: 0.3rem 0.5rem;
+    }
+
+    .filter-row {
+        flex-direction: column;
+    }
+
+    .filter-group,
+    .search-group {
+        min-width: 100%;
+    }
+
+    .filter-actions {
+        width: 100%;
+        justify-content: flex-end;
+    }
+
+    .pagination-container {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+    }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .directions-container {
+        padding: 1rem;
+    }
+    
+    .table-directions {
+        font-size: 0.875rem;
+    }
+    
+    .table-directions th,
+    .table-directions td {
+        padding: 0.75rem 0.5rem;
+    }
+    
+    .actions-container {
+        flex-direction: column;
+        gap: 0.25rem;
+        min-height: auto;
+        width: 100%;
+    }
+    
+    .btn {
+        width: 100%;
+        justify-content: center;
+        min-width: auto;
+    }
+    
+    .table-directions th:nth-child(8),
+    .table-directions td:nth-child(8) {
+        width: 200px;
+        min-width: 200px;
+        max-width: 200px;
+    }
+    
+    .modal-content {
+        margin: 10% auto;
+        width: 95%;
+    }
+    
+    .section-header {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: flex-start;
+    }
+}
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="container-fluid py-4">
+    <div id="fixedAlertContainer" class="fixed-alert-container"></div>
+    <!-- En-tête -->
+    <div class="directions-container">
+        <div class="section-header">
+            <div>
+                <h1 class="section-title">
+                    <i class="bi bi-building"></i>
+                    Liste des Directions
+                </h1>
+                <p class="text-muted mb-0">Gérez les directions et leurs directeurs</p>
+            </div>
+            <button class="btnG btn-primary btn-lg" data-bs-toggle="modal" data-bs-target="#addDirectionModal">
+                <i class="bi bi-plus-circle me-2"></i>
+                Ajouter une direction
+            </button>
+        </div>
+
+        <!-- Filtres et recherche -->
+        <div class="filters-container">
+            <div class="filter-row">
+                <div class="filter-group">
+                    <label for="statutFilter">Filtrer par statut</label>
+                    <select class="form-select" id="statutFilter">
+                        <option value="">Tous les statuts</option>
+                        <option value="ACTIVE">Active</option>
+                        <option value="EN_ATTENTE">En attente</option>
+                        <option value="DESACTIVEE">Désactivée</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label for="attributionFilter">Filtrer par attribution</label>
+                    <select class="form-select" id="attributionFilter">
+                        <option value="">Toutes les attributions</option>
+                        <option value="AVEC_DIRECTEUR">Avec directeur</option>
+                        <option value="SANS_DIRECTEUR">Sans directeur</option>
+                    </select>
+                </div>
+                
+                <div class="search-group">
+                    <label for="searchInput">Recherche</label>
+                    <input type="text" class="form-control" id="searchInput" 
+                           placeholder="Rechercher par nom, email, matricule ou code direction...">
+                </div>
+                
+                <div class="filter-actions">
+                    <button type="button" class="btnG btn-secondary btn-sm" id="resetFilters">
+                        <i class="bi bi-arrow-clockwise"></i>
+                        Réinitialiser
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tableau des directions -->
+       <div class="table-responsive">
+            <table class="table-directions">
+                <thead>
+                    <tr>
+                        <th>CODE</th>
+                        <th>NOM DE LA DIRECTION</th>
+                        <th>DIRECTEUR</th>
+                        <th>IMMATRICULE</th>
+                        <th>EMAIL</th>
+                        <th>ATTRIBUTION</th>
+                        <th>STATUT</th>
+                        <th style="text-align: center;">ACTIONS</th>
+                    </tr>
+                </thead>
+                <tbody id="directionsTableBody">
+                    <!-- Les données seront chargées via JavaScript -->
+                    <tr>
+                        <td colspan="8" class="text-center py-4">
+                            <div class="loading-spinner me-2"></div>
+                            Chargement des directions...
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination-container">
+            <div class="pagination-info" id="paginationInfo">
+                Affichage de 0 à 0 sur 0 directions
+            </div>
+            <nav>
+                <ul class="pagination" id="pagination">
+                    <!-- La pagination sera générée via JavaScript -->
+                </ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Ajouter Direction -->
+<div class="modal fade" id="addDirectionModal" tabindex="-1" aria-labelledby="addDirectionModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-building-add"></i>
+                    Nouvelle Direction
+                </h5>
+                <button type="button" class="btn-close-custom" data-bs-dismiss="modal" aria-label="Close">
+                    <i class="bi bi-x"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="addDirectionForm">
+                    <div class="consigne">
+                        <h5><i class="bi bi-info-circle"></i> Information</h5>
+                        <p>Les champs marqués d'un * sont obligatoires. Vous pourrez assigner un directeur plus tard si nécessaire.</p>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="codeDirection" class="form-label">Code Direction *</label>
+                        <input type="text" class="form-control" id="codeDirection" name="codeDirection" required
+                               placeholder="Ex: DIR001" maxlength="20">
+                        <!-- Message d'erreur pour le code -->
+                        <div class="invalid-feedback" id="codeDirectionError"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="nomDirection" class="form-label">Nom de la Direction *</label>
+                        <input type="text" class="form-control" id="nomDirection" name="nomDirection" required
+                               placeholder="Ex: Direction des Ressources Humaines" maxlength="50">
+                        <!-- Message d'erreur pour le nom -->
+                        <div class="invalid-feedback" id="nomDirectionError"></div>
+                    </div>
+
+                    <div class="form-group">
+    <label for="personnel" class="form-label">Directeur</label>
+    <select class="form-select search-select" id="personnel" name="personnel">
+        <option value="">Sélectionnez un directeur</option>
+    </select>
+    <div class="invalid-feedback" id="personnelError"></div>
+</div>
+                    
+                    <div class="modal-footer">
+                        <button type="button" class="btnG btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                        <button type="submit" class="btnG btn-primary" id="submitAddDirection">
+                            <i class="bi bi-check-circle me-2"></i>
+                            Créer la direction
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Modifier Direction -->
+<div class="modal fade" id="modifierDirectionModal" tabindex="-1" aria-labelledby="modifierDirectionModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-pencil-square"></i>
+                    Modifier la Direction
+                </h5>
+                <button type="button" class="btn-close-custom" data-bs-dismiss="modal" aria-label="Close">
+                    <i class="bi bi-x"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="modifierDirectionForm">
+                    <div class="consigne">
+                        <h5><i class="bi bi-info-circle"></i> Information</h5>
+                        <p>Modifiez le nom de la direction et/ou changez le directeur. Sélectionnez "Aucun directeur" pour désaffecter le directeur.</p>
+                    </div>
+
+                    <input type="hidden" id="modifierDirectionCode" name="codeDirection">
+                    
+                    <div class="form-group">
+                        <label for="modifierCodeDirection" class="form-label">Code Direction</label>
+                        <input type="text" class="form-control" id="modifierCodeDirection" readonly>
+                        {# <div class="form-text">Le code direction ne peut pas être modifié</div> #}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="modifierNomDirection" class="form-label">Nom de la Direction *</label>
+                        <input type="text" class="form-control" id="modifierNomDirection" name="nomDirection" required
+                               placeholder="Ex: Direction des Ressources Humaines" maxlength="50">
+                        <!-- Message d'erreur pour le nom -->
+                        <div class="invalid-feedback" id="modifierNomDirectionError"></div>
+                    </div>
+
+                    <div class="form-group">
+    <label for="modifierDirecteur" class="form-label">Directeur</label>
+    <select class="form-select search-select" id="modifierDirecteur" name="personnel">
+        <option value="">Aucun directeur</option>
+    </select>
+    <div class="invalid-feedback" id="modifierDirecteurError"></div>
+</div>
+                    
+                    <div class="modal-footer">
+                        <button type="button" class="btnG btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                        <button type="submit" class="btnG btn-primary" id="submitModifierDirection">
+                            <i class="bi bi-check-circle me-2"></i>
+                            Enregistrer les modifications
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Mutation -->
+<div class="modal fade" id="mutationModal" tabindex="-1" aria-labelledby="mutationModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-people"></i>
+                    Mutation de Directeur
+                </h5>
+                <button type="button" class="btn-close-custom" data-bs-dismiss="modal" aria-label="Close">
+                    <i class="bi bi-x"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="mutationForm">
+                    <div class="consigne consigne-warning">
+                        <h5><i class="bi bi-exclamation-triangle"></i> Attention</h5>
+                        <p>Cette action va réaffecter le directeur vers la nouvelle direction selectionnée et mettre son ancienne direction en attente de nouveau directeur.</p>
+                    </div>
+                    
+                    <input type="hidden" id="directeurImMutation" name="directeur">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="directeurMutation" class="form-label">Directeur à muter *</label>
+                                <input type="text" class="form-control" id="directeurMutation" readonly>
+                                {# <small class="form-text text-muted">Directeur sélectionné</small> #}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+    <label for="nouvelleDirectionMutation" class="form-label">Nouvelle Direction *</label>
+    <select class="form-select search-select" id="nouvelleDirectionMutation" name="nouvelleDirection" required>
+        <option value="">Chargement des directions...</option>
+    </select>
+</div>
+                        </div>
+                    </div>
+                    
+                    <div class="modal-footer">
+                        <button type="button" class="btnG btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                        <button type="submit" class="btnG btn-primary" id="submitMutation">
+                            <i class="bi bi-check-circle me-2"></i>
+                            Confirmer la réaffectation
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Confirmation Désactivation -->
+<div class="modal fade" id="confirmationDesactivationModal" tabindex="-1" aria-labelledby="confirmationDesactivationModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-exclamation-triangle"></i>
+                    Confirmation de désactivation
+                </h5>
+                <button type="button" class="btn-close-custom" data-bs-dismiss="modal" aria-label="Close">
+                    <i class="bi bi-x"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="consigneD consigne-danger">
+                    <h5><i class="bi bi-x-circle"></i> Désactivation</h5>
+                    <p id="confirmationDesactivationMessage">
+                        Êtes-vous sûr de vouloir désactiver cette direction ? Cette action désactivera également tous les services et personnels associés.
+                    </p>
+                </div>
+                <div class="mt-3">
+                    <small class="text-muted">Direction concernée :</small>
+                    <span id="directionNomDesactivation" class="fw-bold mb-1"></span>
+                </div>
+                <div>
+                    <small class="text-muted">Code :</small>
+                    <span id="directionCodeDesactivation" class="fw-bold mb-1"></span>
+                </div>
+                {# <div id="desactivationDetails" class="mt-3">
+                    <small class="text-muted">
+                        <i class="bi bi-info-circle"></i>
+                        Cette action est réversible. La direction pourra être réactivée ultérieurement.
+                    </small>
+                </div> #}
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btnG btn-secondary" data-bs-dismiss="modal">
+                    Annuler
+                </button>
+                <button type="button" class="btnG btn-dangerG" id="confirmDesactiverDirection">
+                    <i class="bi bi-x-circle me-2"></i>
+                    Confirmer la désactivation
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Activation -->
+<div class="modal fade" id="activationModal" tabindex="-1" aria-labelledby="activationModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-check-circle"></i>
+                    Activation de Direction
+                </h5>
+                <button type="button" class="btn-close-custom" data-bs-dismiss="modal" aria-label="Close">
+                    <i class="bi bi-x"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="activationForm">
+                    <div class="consigne consigne-success">
+                        <h5><i class="bi bi-check-circle"></i> Activation</h5>
+                        <p>Vous allez réactiver cette direction. Choisissez comment gérer le directeur.</p>
+                    </div>
+
+                    <input type="hidden" id="activationDirectionCode" name="codeDirection">
+                    
+                    <div class="form-group">
+                        <label class="form-label">Direction</label>
+                        <input type="text" class="form-control" id="activationDirectionNom" readonly>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Ancien directeur</label>
+                        <input type="text" class="form-control" id="activationAncienDirecteur" readonly>
+                        <div class="form-text" id="activationDirecteurInfo"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Options d'activation</label>
+                        <div class="mt-2">
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="radio" name="activationOption" id="garderDirecteur" value="garder" checked>
+                                <label class="form-check-label" for="garderDirecteur">
+                                    Garder l'ancien directeur
+                                </label>
+                                <div class="form-text">Réactiver l'ancien directeur et le réassigner à cette direction</div>
+                            </div>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="radio" name="activationOption" id="choisirDirecteur" value="choisir">
+                                <label class="form-check-label" for="choisirDirecteur">
+                                    Choisir un nouveau directeur
+                                </label>
+                                <div class="form-text">Sélectionner un nouveau directeur parmi les personnels disponibles</div>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="activationOption" id="aucunDirecteur" value="aucun">
+                                <label class="form-check-label" for="aucunDirecteur">
+                                    Aucun directeur pour le moment
+                                </label>
+                                <div class="form-text">Activer la direction sans directeur (en attente)</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group" id="nouveauDirecteurGroup" style="display: none;">
+    <label for="activationNouveauDirecteur" class="form-label">Nouveau Directeur</label>
+    <select class="form-select search-select" id="activationNouveauDirecteur" name="nouveauDirecteur">
+        <option value="">Sélectionnez un directeur</option>
+    </select>
+</div>
+                    
+                    <div class="modal-footer">
+                        <button type="button" class="btnG btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                        <button type="submit" class="btnG btn-successG" id="submitActivation">
+                            <i class="bi bi-check-circle me-2"></i>
+                            Activer la direction
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+class DirectionManager {
+    constructor() {
+        this.currentPage = 1;
+        this.itemsPerPage = 5;
+        this.totalItems = 0;
+        this.allDirections = [];
+        this.filteredDirections = [];
+        this.currentFilters = {
+            statut: '',
+            attribution: '',
+            search: ''
+        };
+        this.init();
+        this.currentDirectionCode = null;
+        this.currentDirecteurInfo = null;
+    }
+
+// Dans la classe DirectionManager, remplacez les méthodes initSelect2 et loadPersonnelsActifs
+
+initSelect2() {
+    // Fonction d'initialisation générique pour Select2
+    const initSelect = (selector, options = {}) => {
+        const defaultOptions = {
+            theme: 'bootstrap-5',
+            width: '100%',
+            placeholder: 'Rechercher...',
+            allowClear: true,
+            dropdownParent: $(selector).closest('.modal').length ? $(selector).closest('.modal') : $(document.body),
+            language: {
+                noResults: () => "Aucun résultat trouvé",
+                searching: () => "Recherche en cours..."
+            }
+        };
+        
+        return $(selector).select2({ ...defaultOptions, ...options });
+    };
+
+    // Initialiser tous les selects
+    this.selects = {
+        personnel: initSelect('#personnel'),
+        modifierDirecteur: initSelect('#modifierDirecteur', { placeholder: 'Rechercher un directeur...' }),
+        activationNouveauDirecteur: initSelect('#activationNouveauDirecteur', { placeholder: 'Rechercher un nouveau directeur...' }),
+        nouvelleDirectionMutation: initSelect('#nouvelleDirectionMutation', { placeholder: 'Rechercher une direction...' })
+    };
+
+    // Gérer la fermeture des modaux
+    $('.modal').on('hidden.bs.modal', () => {
+        Object.values(this.selects).forEach(select => {
+            if (select && $.fn.select2) {
+                select.select2('close');
+            }
+        });
+    });
+
+    // Réinitialiser quand le modal s'ouvre
+    $('.modal').on('show.bs.modal', () => {
+        setTimeout(() => {
+            Object.values(this.selects).forEach(select => {
+                if (select && $.fn.select2) {
+                    select.trigger('change.select2');
+                }
+            });
+        }, 100);
+    });
+
+    console.log('✅ Select2 initialisé sur tous les selects');
+}
+
+async loadPersonnelsActifs() {
+    try {
+        const response = await fetch('/admin/directions/api/personnels-selections');
+        const data = await response.json();
+        
+        if (data.success) {
+            const select = this.selects.personnel;
+            if (!select) return;
+            
+            // Vider et réinitialiser
+            select.empty();
+            select.append('<option value=""></option>');
+            
+            // Ajouter l'option "Aucun directeur"
+            select.append('<option value="AUCUN">Aucun directeur</option>');
+            
+            data.personnels.forEach(personnel => {
+                const desactive = personnel.StatutPer === 'DESACTIVE';
+                let suffix = '';
+                
+                if (desactive) {
+                    if (personnel.FonctionPer === 'Directeur') {
+                        suffix = ' (Directeur désactivé)';
+                    } else if (personnel.FonctionPer === 'Chef_service') {
+                        suffix = ' (Chef désactivé)';
+                    } else {
+                        suffix = ' (Agent désactivé)';
+                    }
+                }
+                
+                const optionText = `${personnel.NomPer} ${personnel.PrenomPer} - ${personnel.ImPer}${suffix}`;
+                const option = new Option(optionText, personnel.ImPer, false, false);
+                
+                if (desactive) {
+                    $(option).addClass('option-desactive');
+                }
+                
+                select.append(option);
+            });
+            
+            // Mettre à jour Select2
+            select.trigger('change.select2');
+        }
+    } catch (error) {
+        console.error('Erreur chargement personnels actifs:', error);
+    }
+}
+
+// async loadPersonnelsPourModification() {
+//     try {
+//         const response = await fetch('/admin/directions/api/personnels-selections');
+//         const data = await response.json();
+        
+//         if (data.success) {
+//             const select = this.selects.modifierDirecteur;
+//             if (!select) return;
+            
+//             select.empty();
+//             select.append('<option value=""></option>');
+            
+//             data.personnels.forEach(personnel => {
+//                 const desactive = personnel.StatutPer === 'DESACTIVE';
+//                 let suffix = '';
+                
+//                 if (desactive) {
+//                     if (personnel.FonctionPer === 'Directeur') {
+//                         suffix = ' (Directeur désactivé)';
+//                     } else if (personnel.FonctionPer === 'Chef_service') {
+//                         suffix = ' (Chef désactivé)';
+//                     } else {
+//                         suffix = ' (Agent désactivé)';
+//                     }
+//                 }
+                
+//                 const optionText = `${personnel.NomPer} ${personnel.PrenomPer} - ${personnel.ImPer}${suffix}`;
+//                 const option = new Option(optionText, personnel.ImPer, false, false);
+                
+//                 if (desactive) {
+//                     $(option).addClass('option-desactive');
+//                 }
+                
+//                 select.append(option);
+//             });
+            
+//             // Mettre à jour Select2
+//             select.trigger('change.select2');
+            
+//             // Sélectionner le directeur actuel si existe
+//             if (this.currentDirecteurInfo && this.currentDirecteurInfo.im) {
+//                 select.val(this.currentDirecteurInfo.im).trigger('change');
+//             }
+//         }
+//     } catch (error) {
+//         console.error('Erreur chargement personnels:', error);
+//     }
+// }
+
+
+
+async loadDirectionsEnAttente() {
+    try {
+        const response = await fetch('/admin/directions/api/directions-en-attente');
+        const data = await response.json();
+
+        if (data.success) {
+            const select = this.selects.nouvelleDirectionMutation;
+            if (!select) return;
+            
+            select.empty();
+            
+            if (data.directions && data.directions.length > 0) {
+                select.append('<option value=""></option>');
+                
+                data.directions.forEach(direction => {
+                    const optionText = `${direction.nomDirection} (${direction.CodeDirection})`;
+                    const option = new Option(optionText, direction.CodeDirection, false, false);
+                    select.append(option);
+                });
+                
+                select.prop('disabled', false);
+            } else {
+                select.append('<option value="">Aucune direction disponible</option>');
+                select.prop('disabled', true);
+            }
+            
+            select.trigger('change.select2');
+        }
+    } catch (error) {
+        console.error('Erreur chargement directions en attente:', error);
+        
+        const select = this.selects.nouvelleDirectionMutation;
+        if (select) {
+            select.empty();
+            select.append('<option value="">Aucune direction disponible</option>');
+            select.prop('disabled', true);
+            select.trigger('change.select2');
+        }
+    }
+}
+
+// Modifiez la méthode init() pour inclure initSelect2
+init() {
+    this.loadDirections();
+    this.setupEventListeners();
+    this.setupModalResetListeners();
+    this.initSelect2(); // Initialiser Select2 avant de charger les données
+    this.loadPersonnelsActifs();
+}
+
+    async loadDirections() {
+        try {
+            const response = await fetch('/admin/directions/api/list');
+            const data = await response.json();
+            
+            if (data.success) {
+                this.allDirections = data.directions;
+                this.applyFilters();
+            } else {
+                this.showError(data.message);
+            }
+        } catch (error) {
+            console.error('Erreur chargement directions:', error);
+            this.showError('Erreur lors du chargement des directions');
+        }
+    }
+
+    applyFilters() {
+        let filtered = [...this.allDirections];
+
+        // Filtre par statut
+        if (this.currentFilters.statut) {
+            filtered = filtered.filter(direction => 
+                direction.statutDirection === this.currentFilters.statut
+            );
+        }
+
+        // Filtre par attribution
+        if (this.currentFilters.attribution) {
+            if (this.currentFilters.attribution === 'AVEC_DIRECTEUR') {
+                filtered = filtered.filter(direction => direction.personnel !== null);
+            } else if (this.currentFilters.attribution === 'SANS_DIRECTEUR') {
+                filtered = filtered.filter(direction => direction.personnel === null);
+            }
+        }
+
+        // Filtre par recherche
+        if (this.currentFilters.search) {
+            const searchTerm = this.currentFilters.search.toLowerCase();
+            filtered = filtered.filter(direction => {
+                const directeur = direction.personnel;
+                return (
+                    direction.CodeDirection.toLowerCase().includes(searchTerm) ||
+                    direction.nomDirection.toLowerCase().includes(searchTerm) ||
+                    (directeur && (
+                        directeur.NomPer.toLowerCase().includes(searchTerm) ||
+                        directeur.PrenomPer.toLowerCase().includes(searchTerm) ||
+                        (directeur.EmailPer && directeur.EmailPer.toLowerCase().includes(searchTerm)) ||
+                        (directeur.ImPer && directeur.ImPer.toLowerCase().includes(searchTerm))
+                    ))
+                );
+            });
+        }
+
+        this.filteredDirections = filtered;
+        this.totalItems = filtered.length;
+        this.currentPage = 1;
+        this.renderDirections();
+        this.renderPagination();
+    }
+
+    getPaginatedDirections() {
+        const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+        const endIndex = startIndex + this.itemsPerPage;
+        return this.filteredDirections.slice(startIndex, endIndex);
+    }
+
+    renderDirections() {
+        const directions = this.getPaginatedDirections();
+        const tbody = document.getElementById('directionsTableBody');
+        
+        if (!directions || directions.length === 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="8" class="text-center py-4 text-muted">
+                        <i class="bi bi-building-x" style="font-size: 2rem;"></i>
+                        <p class="mt-2">Aucune direction trouvée</p>
+                        ${this.hasActiveFilters() ? 
+                            '<p class="text-sm">Essayez de modifier vos critères de recherche</p>' : 
+                            ''
+                        }
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+
+        
+
+        tbody.innerHTML = directions.map(direction => {
+            const directeur = direction.personnel;
+            const nomDirecteur = directeur ? 
+                `${this.escapeHtml(directeur.NomPer)} ${this.escapeHtml(directeur.PrenomPer)}` : 
+                'Aucun directeur';
+
+            const fonctionDirecteur = directeur ? directeur.FonctionPer : null;
+            const estDesactivee = direction.statutDirection === 'DESACTIVEE';
+            const directeurDesactive = directeur && directeur.StatutPer === 'DESACTIVE';
+            const rowClass = estDesactivee ? 'direction-desactivee' : '';
+            
+            
+            const statutBadge = estDesactivee ? 
+                '<span class="status-badge status-desactive">Désactivée</span>' :
+                (direction.statutDirection === 'ACTIVE' ? 
+                    '<span class="status-badge status-active">Active</span>' : 
+                    '<span class="status-badge status-waiting">En attente</span>'
+                );
+            
+            const fonctionBadge = directeur ? 
+                `<span class="status-badge ${directeurDesactive ? 'role-badge-desactive' : 'role-badge'}">
+                    ${this.capitalizeFirstLetter(fonctionDirecteur)}${directeurDesactive ? '' : ''}
+                </span>` : 
+                '<span class="status-badge" style="background: #6b7280; color: white;">Non défini</span>';
+
+            return `
+                <tr class="direction-item ${rowClass}" id="direction-${direction.CodeDirection}">
+                    <td style="width: 50px;"><strong>${direction.CodeDirection}</strong></td>
+                    <td style="width: 150px;">${this.escapeHtml(direction.nomDirection)}</td>
+                    <td>
+                        ${directeur ? 
+                            `<div class="user-info-cell">
+                                <div>${nomDirecteur}</div>
+                            </div>` : 
+                            '<span class="text-muted">Aucun directeur</span>'
+                        }
+                    </td>
+                    <td>${directeur ? (directeur.ImPer || 'Aucun') : 'Aucun'}</td>
+                    <td style="width: 50px !important;">${directeur ? (directeur.EmailPer || 'Aucun') : 'Aucun'}</td>
+                    <td style="width: 120px;">
+                        ${fonctionBadge}
+                    </td>
+                    <td style="width: 120px;">
+                        ${statutBadge}
+                    </td>
+                    <td>
+                        <div>
+                            ${!estDesactivee ? 
+                                (directeur ? 
+                                    `<div class="dropdown">
+                                        <button class="btn btn-warning dropdown-toggle" type="button" 
+                                            data-bs-toggle="dropdown" aria-expanded="false">
+                                            <i class="bi bi-pencil"></i>
+                                            Modifier
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li>
+                                                <a class="dropdown-item" href="#" 
+                                                   onclick="directionManager.openModifierDirectionModal(
+                                                       '${direction.CodeDirection}', 
+                                                       '${this.escapeHtml(direction.nomDirection)}', 
+                                                       '${directeur.ImPer}', 
+                                                       '${this.escapeHtml(nomDirecteur)}'
+                                                   )">
+                                                    <i class="bi bi-pencil-square me-2"></i>
+                                                    Modifier la direction
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="dropdown-item" href="#" 
+                                                   onclick="directionManager.openMutationModal(
+                                                       '${direction.CodeDirection}', 
+                                                       '${this.escapeHtml(direction.nomDirection)}', 
+                                                       '${directeur.ImPer}', 
+                                                       '${this.escapeHtml(nomDirecteur)}'
+                                                   )">
+                                                    <i class="bi bi-people me-2"></i>
+                                                    Réaffecter le directeur
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </div>` :
+                                    `<button type="button" class="btn btn-warning"
+                                        onclick="directionManager.openModifierDirectionModal(
+                                            '${direction.CodeDirection}', 
+                                            '${this.escapeHtml(direction.nomDirection)}', 
+                                            null, 
+                                            'Aucun directeur'
+                                        )">
+                                        <i class="bi bi-pencil"></i>
+                                        Modifier
+                                    </button>`
+                                ) :
+                                `<button type="button" class="btn btn-warning" disabled>
+                                    <i class="bi bi-pencil"></i>
+                                    Modifier
+                                </button>`
+                            }
+                            
+                            ${estDesactivee ? 
+                                `<button type="button" class="btn btn-success"
+                                    onclick="directionManager.openActivationModal(
+                                        '${direction.CodeDirection}', 
+                                        '${this.escapeHtml(direction.nomDirection)}',
+                                        '${directeur ? this.escapeHtml(nomDirecteur) : 'Aucun directeur'}',
+                                        '${directeur ? directeur.ImPer : ''}'
+                                    )">
+                                    <i class="bi bi-check-circle"></i>
+                                    Activer
+                                </button>` :
+                                `<button type="button" class="btn btn-danger" 
+                                    onclick="directionManager.openConfirmationDesactivationModal(
+                                        '${direction.CodeDirection}', 
+                                        '${this.escapeHtml(direction.nomDirection)}'
+                                    )">
+                                    <i class="bi bi-x-circle"></i>
+                                    Désactiver
+                                </button>`
+                                
+                            }
+                        </div>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+    }
+
+    renderPagination() {
+        const totalPages = Math.ceil(this.totalItems / this.itemsPerPage);
+        const paginationElement = document.getElementById('pagination');
+        const paginationInfoElement = document.getElementById('paginationInfo');
+
+        const startItem = (this.currentPage - 1) * this.itemsPerPage + 1;
+        const endItem = Math.min(this.currentPage * this.itemsPerPage, this.totalItems);
+        
+        paginationInfoElement.textContent = 
+            `Affichage de ${startItem} à ${endItem} sur ${this.totalItems} direction${this.totalItems !== 1 ? 's' : ''}`;
+
+        let paginationHTML = '';
+
+        paginationHTML += `
+            <li class="page-item ${this.currentPage === 1 ? 'disabled' : ''}">
+                <a class="page-link" href="#" onclick="directionManager.changePage(${this.currentPage - 1})">
+                    <i class="bi bi-chevron-left"></i>
+                </a>
+            </li>
+        `;
+
+        for (let i = 1; i <= totalPages; i++) {
+            if (i === 1 || i === totalPages || (i >= this.currentPage - 1 && i <= this.currentPage + 1)) {
+                paginationHTML += `
+                    <li class="page-item ${i === this.currentPage ? 'active' : ''}">
+                        <a class="page-link" href="#" onclick="directionManager.changePage(${i})">${i}</a>
+                    </li>
+                `;
+            } else if (i === this.currentPage - 2 || i === this.currentPage + 2) {
+                paginationHTML += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
+            }
+        }
+
+        paginationHTML += `
+            <li class="page-item ${this.currentPage === totalPages ? 'disabled' : ''}">
+                <a class="page-link" href="#" onclick="directionManager.changePage(${this.currentPage + 1})">
+                    <i class="bi bi-chevron-right"></i>
+                </a>
+            </li>
+        `;
+
+        paginationElement.innerHTML = paginationHTML;
+    }
+
+    changePage(page) {
+        if (page < 1 || page > Math.ceil(this.totalItems / this.itemsPerPage)) {
+            return;
+        }
+        this.currentPage = page;
+        this.renderDirections();
+        this.renderPagination();
+        
+        document.querySelector('.table-responsive').scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'start' 
+        });
+    }
+
+    hasActiveFilters() {
+        return this.currentFilters.statut || this.currentFilters.attribution || this.currentFilters.search;
+    }
+
+    escapeHtml(unsafe) {
+        if (!unsafe) return '';
+        return unsafe
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
+
+    setupEventListeners() {
+        // Formulaire ajout direction
+        document.getElementById('addDirectionForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            this.ajouterDirection();
+        });
+
+        // Filtres
+        document.getElementById('statutFilter').addEventListener('change', (e) => {
+            this.currentFilters.statut = e.target.value;
+            this.applyFilters();
+        });
+
+        document.getElementById('attributionFilter').addEventListener('change', (e) => {
+            this.currentFilters.attribution = e.target.value;
+            this.applyFilters();
+        });
+
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            this.currentFilters.search = e.target.value;
+            clearTimeout(this.searchTimeout);
+            this.searchTimeout = setTimeout(() => {
+                this.applyFilters();
+            }, 300);
+        });
+
+        document.getElementById('resetFilters').addEventListener('click', () => {
+            this.resetFilters();
+        });
+
+        // Formulaire modifier direction
+        document.getElementById('modifierDirectionForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            this.modifierDirection();
+        });
+
+        // Formulaire activation
+        document.getElementById('activationForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            this.activerDirection();
+        });
+
+        // Formulaire mutation
+        document.getElementById('mutationForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            this.effectuerMutation();
+        });
+
+        // Confirmation désactivation
+        document.getElementById('confirmDesactiverDirection').addEventListener('click', () => {
+            this.confirmDesactiverDirection();
+        });
+
+        // Gestion des options d'activation
+        document.querySelectorAll('input[name="activationOption"]').forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                this.toggleNouveauDirecteurGroup(e.target.value);
+            });
+        });
+
+        // Charger les personnels quand les modaux s'ouvrent
+        document.getElementById('addDirectionModal').addEventListener('show.bs.modal', () => {
+            this.clearModalErrors('add');
+            this.loadPersonnelsActifs();
+        });
+        
+        document.getElementById('modifierDirectionModal').addEventListener('show.bs.modal', () => {
+            this.clearModalErrors('modify');
+            this.loadPersonnelsPourModification().then(() => {
+                if (this.currentDirecteurInfo && this.currentDirecteurInfo.im) {
+                    const select = document.getElementById('modifierDirecteur');
+                    
+                    // Vérifier si l'option existe déjà
+                    const optionExists = Array.from(select.options).some(option => 
+                        option.value === this.currentDirecteurInfo.im
+                    );
+                    
+                    if (!optionExists) {
+                        // Ajouter l'option sans le suffixe "(Directeur actuel)"
+                        select.innerHTML += `<option value="${this.currentDirecteurInfo.im}" selected>${this.currentDirecteurInfo.nom}</option>`;
+                    } else {
+                        select.value = this.currentDirecteurInfo.im;
+                    }
+                }
+                this.currentDirecteurInfo = null;
+            });
+        });
+
+        document.getElementById('activationModal').addEventListener('show.bs.modal', () => {
+            this.loadPersonnelsPourActivation();
+        });
+
+        // Effacer les erreurs quand l'utilisateur tape dans les champs
+        document.getElementById('codeDirection')?.addEventListener('input', () => {
+            this.clearFieldError('codeDirection');
+        });
+        
+        document.getElementById('nomDirection')?.addEventListener('input', () => {
+            this.clearFieldError('nomDirection');
+        });
+
+        document.getElementById('personnel')?.addEventListener('change', () => {
+            this.clearFieldError('personnel');
+        });
+
+        document.getElementById('modifierNomDirection')?.addEventListener('input', () => {
+            this.clearFieldError('modifierNomDirection');
+        });
+
+        document.getElementById('modifierDirecteur')?.addEventListener('change', () => {
+            this.clearFieldError('modifierDirecteur');
+        });
+    }
+
+    setupModalResetListeners() {
+    // Modal d'ajout
+    document.getElementById('addDirectionModal').addEventListener('hidden.bs.modal', () => {
+        const form = document.getElementById('addDirectionForm');
+        form.reset();
+        this.clearModalErrors('add');
+        
+        // Réinitialiser l'état du bouton
+        const submitBtn = document.getElementById('submitAddDirection');
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="bi bi-check-circle me-2"></i> Créer la direction';
+    });
+    
+    // Modal de modification
+    document.getElementById('modifierDirectionModal').addEventListener('hidden.bs.modal', () => {
+        const form = document.getElementById('modifierDirectionForm');
+        form.reset();
+        this.clearModalErrors('modify');
+        
+        // Réinitialiser le select
+        const select = document.getElementById('modifierDirecteur');
+        select.innerHTML = '<option value="">Aucun directeur</option>';
+        
+        // Réinitialiser l'état du bouton
+        const submitBtn = document.getElementById('submitModifierDirection');
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="bi bi-check-circle me-2"></i> Enregistrer les modifications';
+        
+        this.currentDirecteurInfo = null;
+    });
+    
+    // Modal de mutation
+    document.getElementById('mutationModal').addEventListener('hidden.bs.modal', () => {
+        const form = document.getElementById('mutationForm');
+        form.reset();
+        
+        // Réinitialiser le select
+        const directionsSelect = document.getElementById('nouvelleDirectionMutation');
+        directionsSelect.innerHTML = '<option value="">Chargement des directions...</option>';
+        directionsSelect.disabled = false;
+        
+        // Réactiver le bouton
+        const submitBtn = document.getElementById('submitMutation');
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="bi bi-check-circle me-2"></i> Confirmer la réaffectation';
+    });
+    
+    // Modal de confirmation de désactivation
+    document.getElementById('confirmationDesactivationModal').addEventListener('hidden.bs.modal', () => {
+        // Réinitialiser le bouton
+        const confirmBtn = document.getElementById('confirmDesactiverDirection');
+        confirmBtn.innerHTML = '<i class="bi bi-x-circle me-2"></i> Confirmer la désactivation';
+        confirmBtn.disabled = false;
+        
+        this.currentDirectionCode = null;
+    });
+    
+    // Modal d'activation
+    document.getElementById('activationModal').addEventListener('hidden.bs.modal', () => {
+        const form = document.getElementById('activationForm');
+        form.reset();
+        
+        // Réinitialiser les options
+        document.getElementById('garderDirecteur').checked = true;
+        document.getElementById('garderDirecteur').disabled = false;
+        document.querySelector('label[for="garderDirecteur"]').innerHTML = 'Garder l\'ancien directeur';
+        
+        document.getElementById('choisirDirecteur').disabled = false;
+        document.querySelector('label[for="choisirDirecteur"]').innerHTML = 'Choisir un nouveau directeur';
+        
+        this.toggleNouveauDirecteurGroup('garder');
+        
+        // Réinitialiser le select
+        const select = document.getElementById('activationNouveauDirecteur');
+        select.innerHTML = '<option value="">Sélectionnez un directeur</option>';
+        select.disabled = false;
+        
+        // Réinitialiser l'état du bouton
+        const submitBtn = document.getElementById('submitActivation');
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="bi bi-check-circle me-2"></i> Activer la direction';
+    });
+}
+
+    resetFilters() {
+        document.getElementById('statutFilter').value = '';
+        document.getElementById('attributionFilter').value = '';
+        document.getElementById('searchInput').value = '';
+
+        const resetBtn = document.getElementById('resetFilters');
+        const originalText = resetBtn.innerHTML;
+        resetBtn.innerHTML = '<i class="bi bi-check"></i> Réinitialisé !';
+        resetBtn.style.background = '#10b981';
+        
+        setTimeout(() => {
+            resetBtn.innerHTML = originalText;
+            resetBtn.style.background = '';
+        }, 1500);
+        
+        this.currentFilters = {
+            statut: '',
+            attribution: '',
+            search: ''
+        };
+        
+        this.applyFilters();
+    }
+
+    capitalizeFirstLetter(string) {
+        if (!string) return '';
+        return string.charAt(0).toUpperCase() + string.slice(1);
+    }
+
+    showMultipleErrors(errors) {
+        Object.keys(errors).forEach(fieldKey => {
+            const errorMessage = errors[fieldKey];
+            
+            const fieldMapping = {
+                'codeDirection': 'codeDirection',
+                'nomDirection': 'nomDirection',
+                'personnel': 'personnel'
+            };
+            
+            const modifierFieldMapping = {
+                'nomDirection': 'modifierNomDirection',
+                'personnel': 'modifierDirecteur'
+            };
+            
+            const addModal = document.getElementById('addDirectionModal');
+            const modifyModal = document.getElementById('modifierDirectionModal');
+            
+            if (addModal && addModal.classList.contains('show')) {
+                if (fieldMapping[fieldKey]) {
+                    this.showFieldError(fieldMapping[fieldKey], errorMessage);
+                }
+            } else if (modifyModal && modifyModal.classList.contains('show')) {
+                if (modifierFieldMapping[fieldKey]) {
+                    this.showFieldError(modifierFieldMapping[fieldKey], errorMessage);
+                }
+            }
+        });
+    }
+
+    showFieldError(fieldId, errorMessage) {
+        const field = document.getElementById(fieldId);
+        const errorElement = document.getElementById(fieldId + 'Error');
+        
+        if (field && errorElement) {
+            field.classList.add('is-invalid');
+            errorElement.textContent = errorMessage;
+            errorElement.style.display = 'block';
+        }
+    }
+
+    clearFieldError(fieldId) {
+        const field = document.getElementById(fieldId);
+        const errorElement = document.getElementById(fieldId + 'Error');
+        
+        if (field) {
+            field.classList.remove('is-invalid');
+        }
+        if (errorElement) {
+            errorElement.textContent = '';
+            errorElement.style.display = 'none';
+        }
+    }
+
+    clearModalErrors(modalType) {
+        if (modalType === 'add') {
+            this.clearFieldError('codeDirection');
+            this.clearFieldError('nomDirection');
+            this.clearFieldError('personnel');
+        } else if (modalType === 'modify') {
+            this.clearFieldError('modifierNomDirection');
+            this.clearFieldError('modifierDirecteur');
+        }
+    }
+
+    // async loadPersonnelsActifs() {
+    //     try {
+    //         const response = await fetch('/admin/directions/api/personnels-selections');
+    //         const data = await response.json();
+            
+    //         if (data.success) {
+    //             const select = document.getElementById('personnel');
+    //             select.innerHTML = '<option value="">Sélectionnez un directeur</option>';
+                
+    //             data.personnels.forEach(personnel => {
+    //                 const desactive = personnel.StatutPer === 'DESACTIVE';
+    //                 let suffix = '';
+                    
+    //                 if (desactive) {
+    //                     if (personnel.FonctionPer === 'Directeur') {
+    //                         suffix = ' (Directeur désactivé)';
+    //                     } else if (personnel.FonctionPer === 'Chef_service') {
+    //                         suffix = ' (Chef désactivé)';
+    //                     } else {
+    //                         suffix = ' (Agent désactivé)';
+    //                     }
+    //                 }
+                    
+    //                 const optionClass = desactive ? 'class="option-desactive"' : '';
+    //                 select.innerHTML += `<option value="${personnel.ImPer}" ${optionClass}>${personnel.NomPer} ${personnel.PrenomPer} - ${personnel.ImPer}${suffix}</option>`;
+    //             });
+    //         }
+    //     } catch (error) {
+    //         console.error('Erreur chargement personnels actifs:', error);
+    //     }
+    // }
+
+    async loadPersonnelsPourModification() {
+    try {
+        const response = await fetch('/admin/directions/api/personnels-selections');
+        const data = await response.json();
+        
+        if (data.success) {
+            const select = this.selects.modifierDirecteur;
+            if (!select) return;
+            
+            select.empty();
+            select.append('<option value=""></option>');
+            
+            // Ajouter l'option "Aucun directeur"
+            select.append('<option value="AUCUN">Aucun directeur</option>');
+            
+            data.personnels.forEach(personnel => {
+                const desactive = personnel.StatutPer === 'DESACTIVE';
+                let suffix = '';
+                
+                if (desactive) {
+                    if (personnel.FonctionPer === 'Directeur') {
+                        suffix = ' (Directeur désactivé)';
+                    } else if (personnel.FonctionPer === 'Chef_service') {
+                        suffix = ' (Chef désactivé)';
+                    } else {
+                        suffix = ' (Agent désactivé)';
+                    }
+                }
+                
+                const optionText = `${personnel.NomPer} ${personnel.PrenomPer} - ${personnel.ImPer}${suffix}`;
+                const option = new Option(optionText, personnel.ImPer, false, false);
+                
+                if (desactive) {
+                    $(option).addClass('option-desactive');
+                }
+                
+                select.append(option);
+            });
+            
+            // Mettre à jour Select2
+            select.trigger('change.select2');
+            
+            // Sélectionner le directeur actuel si existe
+            if (this.currentDirecteurInfo && this.currentDirecteurInfo.im) {
+                select.val(this.currentDirecteurInfo.im).trigger('change');
+            } else if (this.currentDirecteurInfo && this.currentDirecteurInfo.nom === 'Aucun directeur') {
+                // Si aucun directeur, sélectionner l'option "Aucun directeur"
+                select.val('AUCUN').trigger('change');
+            }
+        }
+    } catch (error) {
+        console.error('Erreur chargement personnels:', error);
+    }
+}
+
+async loadPersonnelsPourActivation() {
+    try {
+        const directionCode = document.getElementById('activationDirectionCode').value;
+        const response = await fetch(`/admin/directions/api/personnels-pour-activation?directionCode=${directionCode}`);
+        const data = await response.json();
+        
+        if (data.success) {
+            const select = this.selects.activationNouveauDirecteur;
+            if (!select) return;
+            
+            const ancienDirecteurIm = data.ancienDirecteurIm;
+            
+            select.empty();
+            select.append('<option value=""></option>');
+            
+            
+            if (data.personnels && data.personnels.length > 0) {
+                data.personnels.forEach(personnel => {
+                    // Exclure l'ancien directeur de la liste des nouveaux
+                    if (personnel.ImPer === ancienDirecteurIm) return;
+                    
+                    const desactive = personnel.StatutPer === 'DESACTIVE';
+                    let suffix = '';
+                    
+                    if (desactive) {
+                        if (personnel.FonctionPer === 'Directeur') {
+                            suffix = ' (Directeur désactivé)';
+                        } else if (personnel.FonctionPer === 'Chef_service') {
+                            suffix = ' (Chef désactivé)';
+                        } else {
+                            suffix = ' (Agent désactivé)';
+                        }
+                    }
+                    
+                    const optionText = `${personnel.NomPer} ${personnel.PrenomPer} - ${personnel.ImPer}${suffix}`;
+                    const option = new Option(optionText, personnel.ImPer, false, false);
+                    
+                    if (desactive) {
+                        $(option).addClass('option-desactive');
+                    }
+                    
+                    select.append(option);
+                });
+                
+                // Activer/désactiver selon le nombre d'options
+                if (select.find('option').length <= 2) { // +1 pour l'option "Aucun directeur"
+                    select.prop('disabled', true);
+                    document.getElementById('choisirDirecteur').disabled = true;
+                    
+                    if (document.getElementById('garderDirecteur').disabled) {
+                        document.getElementById('aucunDirecteur').checked = true;
+                        this.toggleNouveauDirecteurGroup('aucun');
+                    }
+                } else {
+                    select.prop('disabled', false);
+                    document.getElementById('choisirDirecteur').disabled = false;
+                }
+            } else {
+                select.append('<option value="">Aucun directeur disponible</option>');
+                select.prop('disabled', true);
+                document.getElementById('choisirDirecteur').disabled = true;
+                document.getElementById('aucunDirecteur').checked = true;
+                this.toggleNouveauDirecteurGroup('aucun');
+            }
+            
+            select.trigger('change.select2');
+        }
+    } catch (error) {
+        console.error('Erreur chargement personnels pour activation:', error);
+    }
+}
+    
+    async ajouterDirection() {
+        const form = document.getElementById('addDirectionForm');
+        const submitBtn = document.getElementById('submitAddDirection');
+        const originalText = submitBtn.innerHTML;
+
+        try {
+            this.clearModalErrors('add');
+            
+            submitBtn.innerHTML = '<div class="loading-spinner me-2"></div> Création...';
+            submitBtn.disabled = true;
+
+            const formData = new FormData(form);
+            const data = {
+                codeDirection: formData.get('codeDirection'),
+                nomDirection: formData.get('nomDirection'),
+                personnel: formData.get('personnel') || null
+            };
+
+            const response = await fetch('/admin/directions/api/create', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                this.showSuccess(result.message);
+                bootstrap.Modal.getInstance(document.getElementById('addDirectionModal')).hide();
+                form.reset();
+                this.loadDirections();
+            } else {
+                if (result.errors) {
+                    this.showMultipleErrors(result.errors);
+                } else {
+                    this.showError(result.message);
+                }
+            }
+        } catch (error) {
+            console.error('Erreur création direction:', error);
+            this.showError('Erreur lors de la création de la direction');
+        } finally {
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
+        }
+    }
+
+    async modifierDirection() {
+        const form = document.getElementById('modifierDirectionForm');
+        const submitBtn = document.getElementById('submitModifierDirection');
+        const originalText = submitBtn.innerHTML;
+
+        try {
+            this.clearModalErrors('modify');
+            
+            submitBtn.innerHTML = '<div class="loading-spinner me-2"></div> Modification...';
+            submitBtn.disabled = true;
+
+            const formData = new FormData(form);
+            const data = {
+                nomDirection: formData.get('nomDirection'),
+                personnel: formData.get('personnel') || null
+            };
+
+            const directionCode = formData.get('codeDirection');
+            const response = await fetch(`/admin/directions/api/${directionCode}/modifier`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                this.showSuccess(result.message);
+                bootstrap.Modal.getInstance(document.getElementById('modifierDirectionModal')).hide();
+                this.loadDirections();
+            } else {
+                if (result.errors) {
+                    this.showMultipleErrors(result.errors);
+                } else {
+                    this.showError(result.message);
+                }
+            }
+        } catch (error) {
+            console.error('Erreur modification direction:', error);
+            this.showError('Erreur lors de la modification de la direction');
+        } finally {
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
+        }
+    }
+
+    openModifierDirectionModal(codeDirection, nomDirection, directeurIm, directeurNom) {
+        document.getElementById('modifierDirectionCode').value = codeDirection;
+        document.getElementById('modifierCodeDirection').value = codeDirection;
+        document.getElementById('modifierNomDirection').value = nomDirection;
+        
+        const modalElement = document.getElementById('modifierDirectionModal');
+        const modal = new bootstrap.Modal(modalElement);
+        
+        // Stocker les infos du directeur actuel
+        this.currentDirecteurInfo = {
+            im: directeurIm,
+            nom: directeurNom
+        };
+        
+        modal.show();
+    }
+
+    async loadDirectionsEnAttente() {
+    try {
+        const response = await fetch('/admin/directions/api/directions-en-attente');
+        const data = await response.json();
+
+        if (data.success) {
+            const directionsSelect = document.getElementById('nouvelleDirectionMutation');
+            
+            // Réinitialiser le select
+            directionsSelect.innerHTML = '';
+            
+            if (data.directions && data.directions.length > 0) {
+                // Ajouter une option par défaut
+                directionsSelect.innerHTML += '<option value="">Sélectionnez une direction</option>';
+                
+                // Ajouter les directions disponibles
+                data.directions.forEach(direction => {
+                    directionsSelect.innerHTML += `<option value="${direction.CodeDirection}">${direction.nomDirection}</option>`;
+                });
+            } else {
+                // Si aucune direction n'est disponible, afficher l'option "Aucune direction disponible"
+                directionsSelect.innerHTML = '<option value="">Aucune direction disponible</option>';
+                directionsSelect.disabled = true;
+            }
+        }
+    } catch (error) {
+        console.error('Erreur chargement directions en attente:', error);
+        
+        // En cas d'erreur, afficher aussi l'option
+        const directionsSelect = document.getElementById('nouvelleDirectionMutation');
+        directionsSelect.innerHTML = '<option value="">Aucune direction disponible</option>';
+        directionsSelect.disabled = true;
+        
+        this.showError('Erreur lors du chargement des directions');
+    }
+}
+
+    openMutationModal(directionCode, directionNom, directeurIm, directeurNom) {
+    try {
+        document.getElementById('directeurImMutation').value = directeurIm;
+        document.getElementById('directeurMutation').value = directeurNom;
+        
+        this.loadDirectionsEnAttente().then(() => {
+            const directionsSelect = document.getElementById('nouvelleDirectionMutation');
+            
+            // Si le select est désactivé (pas de directions disponibles), désactiver aussi le bouton de soumission
+            if (directionsSelect.disabled) {
+                const submitBtn = document.getElementById('submitMutation');
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="bi bi-exclamation-circle me-2"></i> Aucune direction disponible';
+            }
+            
+            const modal = new bootstrap.Modal(document.getElementById('mutationModal'));
+            modal.show();
+        });
+        
+    } catch (error) {
+        console.error('Erreur ouverture modal mutation:', error);
+        this.showError('Erreur lors de l\'ouverture du modal');
+    }
+}
+
+    openConfirmationDesactivationModal(codeDirection, nomDirection) {
+    this.currentDirectionCode = codeDirection;
+    
+    document.getElementById('directionNomDesactivation').textContent = nomDirection;
+    document.getElementById('directionCodeDesactivation').textContent = codeDirection;
+    
+    // Réinitialiser le bouton de confirmation
+    const confirmBtn = document.getElementById('confirmDesactiverDirection');
+    confirmBtn.innerHTML = '<i class="bi bi-x-circle me-2"></i> Confirmer la désactivation';
+    confirmBtn.disabled = false;
+    
+    const modal = new bootstrap.Modal(document.getElementById('confirmationDesactivationModal'));
+    modal.show();
+}
+
+    async confirmDesactiverDirection() {
+    if (!this.currentDirectionCode) return;
+
+    try {
+        const modal = bootstrap.Modal.getInstance(document.getElementById('confirmationDesactivationModal'));
+        
+        // Mettre le spinner sur le bouton de confirmation du modal
+        const confirmBtn = document.getElementById('confirmDesactiverDirection');
+        const originalBtnText = confirmBtn.innerHTML;
+        confirmBtn.innerHTML = '<div class="loading-spinner me-2"></div> Désactivation...';
+        confirmBtn.disabled = true;
+
+        const response = await fetch(`/admin/directions/api/${this.currentDirectionCode}/desactiver`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            modal.hide();
+            this.showSuccess(result.message);
+            this.loadDirections();
+        } else {
+            this.showError(result.message);
+            // Réinitialiser le bouton en cas d'erreur
+            confirmBtn.innerHTML = originalBtnText;
+            confirmBtn.disabled = false;
+        }
+    } catch (error) {
+        console.error('Erreur désactivation:', error);
+        this.showError('Erreur lors de la désactivation');
+        // Réinitialiser le bouton en cas d'erreur
+        const confirmBtn = document.getElementById('confirmDesactiverDirection');
+        confirmBtn.innerHTML = '<i class="bi bi-x-circle me-2"></i> Confirmer la désactivation';
+        confirmBtn.disabled = false;
+    } finally {
+        this.currentDirectionCode = null;
+    }
+}
+
+    openActivationModal(codeDirection, nomDirection, ancienDirecteurNom, ancienDirecteurIm) {
+    this.currentDirectionCode = codeDirection;
+    
+    document.getElementById('activationDirectionCode').value = codeDirection;
+    document.getElementById('activationDirectionNom').value = nomDirection;
+    document.getElementById('activationAncienDirecteur').value = ancienDirecteurNom;
+    
+    const directeurInfo = document.getElementById('activationDirecteurInfo');
+    const garderDirecteurRadio = document.getElementById('garderDirecteur');
+    const garderDirecteurLabel = document.querySelector('label[for="garderDirecteur"]');
+    const choisirDirecteurRadio = document.getElementById('choisirDirecteur');
+
+    if (ancienDirecteurIm && ancienDirecteurIm !== '') {
+        directeurInfo.textContent = 'Cet ancien directeur sera réactivé si vous choisissez de le garder.';
+        directeurInfo.className = 'form-text text-primary';
+        garderDirecteurRadio.disabled = false;
+        garderDirecteurLabel.innerHTML = 'Garder l\'ancien directeur';
+        garderDirecteurRadio.checked = true; // Option par défaut quand disponible
+    } else {
+        directeurInfo.textContent = 'Aucun ancien directeur trouvé pour cette direction.';
+        directeurInfo.className = 'form-text text-primary';
+        garderDirecteurLabel.innerHTML = 'Garder l\'ancien directeur <span class="text-muted">(non disponible)</span>';
+        garderDirecteurRadio.disabled = true;
+        garderDirecteurRadio.checked = false;
+        
+        // Passer à l'option suivante disponible
+        if (!choisirDirecteurRadio.disabled) {
+            choisirDirecteurRadio.checked = true;
+        } else {
+            document.getElementById('aucunDirecteur').checked = true;
+        }
+    }
+
+    // Charger les personnels après avoir configuré les options
+    this.loadPersonnelsPourActivation().then(() => {
+        this.toggleNouveauDirecteurGroup(document.querySelector('input[name="activationOption"]:checked').value);
+    });
+    
+    const modal = new bootstrap.Modal(document.getElementById('activationModal'));
+    modal.show();
+}
+
+    toggleNouveauDirecteurGroup(option) {
+        const nouveauDirecteurGroup = document.getElementById('nouveauDirecteurGroup');
+        if (option === 'choisir') {
+            nouveauDirecteurGroup.style.display = 'block';
+        } else {
+            nouveauDirecteurGroup.style.display = 'none';
+        }
+    }
+
+    async activerDirection() {
+        const form = document.getElementById('activationForm');
+        const submitBtn = document.getElementById('submitActivation');
+        const originalText = submitBtn.innerHTML;
+
+        try {
+            submitBtn.innerHTML = '<div class="loading-spinner me-2"></div> Activation...';
+            submitBtn.disabled = true;
+
+            const activationOption = document.querySelector('input[name="activationOption"]:checked').value;
+            const data = {
+                garderDirecteur: activationOption === 'garder',
+                nouveauDirecteur: activationOption === 'choisir' ? document.getElementById('activationNouveauDirecteur').value : null
+            };
+
+            const directionCode = document.getElementById('activationDirectionCode').value;
+            const response = await fetch(`/admin/directions/api/${directionCode}/activer`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                this.showSuccess(result.message);
+                bootstrap.Modal.getInstance(document.getElementById('activationModal')).hide();
+                this.loadDirections();
+            } else {
+                this.showError(result.message);
+            }
+        } catch (error) {
+            console.error('Erreur activation:', error);
+            this.showError('Erreur lors de l\'activation de la direction');
+        } finally {
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
+        }
+    }
+
+    async effectuerMutation() {
+    const form = document.getElementById('mutationForm');
+    const submitBtn = document.getElementById('submitMutation');
+    const originalText = submitBtn.innerHTML;
+    
+    const nouvelleDirectionSelect = document.getElementById('nouvelleDirectionMutation');
+    
+    // Vérifier si le select est désactivé ou vide
+    if (nouvelleDirectionSelect.disabled || !nouvelleDirectionSelect.value) {
+        this.showError('Aucune direction disponible pour la mutation');
+        return;
+    }
+
+    try {
+        submitBtn.innerHTML = '<div class="loading-spinner me-2"></div> Mutation...';
+        submitBtn.disabled = true;
+
+        const formData = new FormData(form);
+        const data = {
+            directeur: document.getElementById('directeurImMutation').value,
+            nouvelleDirection: formData.get('nouvelleDirection')
+        };
+
+        const response = await fetch('/admin/directions/api/mutation', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data)
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            this.showSuccess(result.message);
+            bootstrap.Modal.getInstance(document.getElementById('mutationModal')).hide();
+            this.loadDirections();
+        } else {
+            this.showError(result.message);
+        }
+    } catch (error) {
+        console.error('Erreur mutation:', error);
+        this.showError('Erreur lors de la mutation');
+    } finally {
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+    }
+}
+
+    // showLoadingState(directionCode, isLoading, action = '') {
+    //     const row = document.getElementById(`direction-${directionCode}`);
+    //     if (!row) return;
+
+    //     const buttons = row.querySelectorAll('button');
+    //     buttons.forEach(button => {
+    //         if (isLoading) {
+    //             button.disabled = true;
+    //             if (action === 'desactivation' && button.innerHTML.includes('Désactiver')) {
+    //                 button.innerHTML = '<div class="loading-spinner me-2"></div> Désactivation...';
+    //             }
+    //         } else {
+    //             button.disabled = false;
+    //             if (button.innerHTML.includes('Désactivation')) {
+    //                 button.innerHTML = '<i class="bi bi-power"></i> Désactiver';
+    //             }
+    //         }
+    //     });
+    // }
+
+    showSuccess(message) {
+    const alertContainer = document.getElementById('fixedAlertContainer');
+    const alert = document.createElement('div');
+    alert.className = 'alert-success-fixed mb-3';
+    alert.innerHTML = `
+        <i class="bi bi-check-circle-fill"></i>
+        <span>${message}</span>
+        <button type="button" class="alert-close-btn" onclick="this.parentElement.remove()">
+            <i class="bi bi-x"></i>
+        </button>
+    `;
+    
+    // Supprimer les anciennes alertes
+    while (alertContainer.firstChild) {
+        alertContainer.removeChild(alertContainer.firstChild);
+    }
+    
+    // Ajouter la nouvelle alerte
+    alertContainer.appendChild(alert);
+    
+    // Auto-suppression après 5 secondes
+    setTimeout(() => {
+        if (alert.parentElement) {
+            alert.style.animation = 'fadeOut 0.3s ease-out';
+            setTimeout(() => {
+                if (alert.parentElement) {
+                    alert.remove();
+                }
+            }, 300);
+        }
+    }, 5000);
+}
+
+showError(message) {
+    const alertContainer = document.getElementById('fixedAlertContainer');
+    const alert = document.createElement('div');
+    alert.className = 'alert-danger-fixed mb-3';
+    alert.innerHTML = `
+        <i class="bi bi-exclamation-triangle-fill"></i>
+        <span>${message}</span>
+        <button type="button" class="alert-close-btn" onclick="this.parentElement.remove()">
+            <i class="bi bi-x"></i>
+        </button>
+    `;
+    
+    // Supprimer les anciennes alertes
+    while (alertContainer.firstChild) {
+        alertContainer.removeChild(alertContainer.firstChild);
+    }
+    
+    // Ajouter la nouvelle alerte
+    alertContainer.appendChild(alert);
+    
+    // Auto-suppression après 5 secondes
+    setTimeout(() => {
+        if (alert.parentElement) {
+            alert.style.animation = 'fadeOut 0.3s ease-out';
+            setTimeout(() => {
+                if (alert.parentElement) {
+                    alert.remove();
+                }
+            }, 300);
+        }
+    }, 5000);
+}
+}
+
+// Initialisation
+document.addEventListener('DOMContentLoaded', function() {
+    window.directionManager = new DirectionManager();
+});
+</script>
+{% endblock %}
