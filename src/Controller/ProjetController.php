@@ -37,7 +37,7 @@ class ProjetController extends AbstractController
     {
         try {
             $projets = $projetRepository->findAllWithDetails();
-            
+
             return $this->json([
                 'success' => true,
                 'projets' => $projets
@@ -71,9 +71,9 @@ class ProjetController extends AbstractController
             }
 
             $data = json_decode($request->getContent(), true);
-            
+
             $errors = [];
-            
+
             // Validation des données
             if (empty($data['numProjet'])) {
                 $errors['numProjet'] = 'Le numéro du projet est obligatoire';
@@ -99,7 +99,6 @@ class ProjetController extends AbstractController
                 $errors['personnels'] = 'Au moins un responsable doit être sélectionné';
             }
 
-            // Vérifier si le numéro existe déjà
             if (!empty($data['numProjet'])) {
                 $existingProjet = $this->entityManager->getRepository(Projet::class)->find($data['numProjet']);
                 if ($existingProjet) {
@@ -111,13 +110,12 @@ class ProjetController extends AbstractController
             if (!empty($data['dateDebutPro']) && !empty($data['dateFinPro'])) {
                 $dateDebut = new \DateTime($data['dateDebutPro']);
                 $dateFin = new \DateTime($data['dateFinPro']);
-                
+
                 if ($dateFin <= $dateDebut) {
                     $errors['dateFinPro'] = 'La date de fin doit être postérieure à la date de début';
                 }
             }
 
-            // Si il y a des erreurs, les retourner toutes
             if (!empty($errors)) {
                 return $this->json([
                     'success' => false,
@@ -133,7 +131,7 @@ class ProjetController extends AbstractController
             $projet->setCommentairePro($data['commentairePro'] ?? null);
             $projet->setBudgetPro($data['budgetPro']);
             $projet->setDateDebutPro(new \DateTime($data['dateDebutPro']));
-            
+
             if (!empty($data['dateFinPro'])) {
                 $projet->setDateFinPro(new \DateTime($data['dateFinPro']));
             }
@@ -175,7 +173,7 @@ class ProjetController extends AbstractController
                 foreach ($validationErrors as $error) {
                     $errors[$error->getPropertyPath()] = $error->getMessage();
                 }
-                
+
                 return $this->json([
                     'success' => false,
                     'message' => 'Des erreurs de validation ont été trouvées',
@@ -200,152 +198,146 @@ class ProjetController extends AbstractController
     }
 
     #[Route('/api/{numProjet}/modifier', name: 'api_projet_modifier', methods: ['PUT'])]
-public function apiModifierProjet(Request $request, string $numProjet, ServiceRepository $serviceRepository, PersonnelRepository $personnelRepository, ValidatorInterface $validator): JsonResponse
-{
-    try {
-        $user = $this->getUser();
-        if (!$user instanceof Personnel) {
-            return $this->json([
-                'success' => false,
-                'message' => 'Utilisateur non authentifié'
-            ], 401);
-        }
-        
-        $projet = $this->entityManager->getRepository(Projet::class)->find($numProjet);
-        
-        if (!$projet) {
-            return $this->json([
-                'success' => false,
-                'message' => 'Projet non trouvé'
-            ], 404);
-        }
-
-        $data = json_decode($request->getContent(), true);
-        
-        $errors = [];
-
-        // Validation des données
-        if (empty($data['titrePro'])) {
-            $errors['titrePro'] = 'Le titre du projet est obligatoire';
-        }
-
-        if (empty($data['budgetPro'])) {
-            $errors['budgetPro'] = 'Le budget est obligatoire';
-        }
-
-        if (empty($data['dateDebutPro'])) {
-            $errors['dateDebutPro'] = 'La date de début est obligatoire';
-        }
-
-        if (empty($data['service'])) {
-            $errors['service'] = 'Le service est obligatoire';
-        }
-
-
-        if (empty($data['personnels']) || !is_array($data['personnels']) || count($data['personnels']) === 0) {
-            $errors['personnels'] = 'Au moins un responsable doit être sélectionné';
-        }
-
-        // Vérification de la cohérence des dates
-        if (!empty($data['dateDebutPro']) && !empty($data['dateFinPro'])) {
-            $dateDebut = new \DateTime($data['dateDebutPro']);
-            $dateFin = new \DateTime($data['dateFinPro']);
-            
-            if ($dateFin <= $dateDebut) {
-                $errors['dateFinPro'] = 'La date de fin doit être postérieure à la date de début';
+    public function apiModifierProjet(Request $request, string $numProjet, ServiceRepository $serviceRepository, PersonnelRepository $personnelRepository, ValidatorInterface $validator): JsonResponse
+    {
+        try {
+            $user = $this->getUser();
+            if (!$user instanceof Personnel) {
+                return $this->json([
+                    'success' => false,
+                    'message' => 'Utilisateur non authentifié'
+                ], 401);
             }
-        }
 
-        // Si il y a des erreurs, les retourner toutes
-        if (!empty($errors)) {
-            return $this->json([
-                'success' => false,
-                'message' => 'Des erreurs ont été trouvées',
-                'errors' => $errors
-            ], 400);
-        }
+            $projet = $this->entityManager->getRepository(Projet::class)->find($numProjet);
 
-        // Vérification des permissions
-        if ($user->hasRole('ROLE_UTILISATEUR')) {
-            return $this->json([
-                'success' => false,
-                'message' => 'Vous n\'avez pas les permissions nécessaires pour modifier un projet'
-            ], 403);
-        }
+            if (!$projet) {
+                return $this->json([
+                    'success' => false,
+                    'message' => 'Projet non trouvé'
+                ], 404);
+            }
 
-        if ($user->hasRole('ROLE_CREATEUR_DE_PROJET') && $projet->getCreateur() !== $user) {
-            return $this->json([
-                'success' => false,
-                'message' => 'Vous ne pouvez modifier que les projets que vous avez créés'
-            ], 403);
-        }
+            $data = json_decode($request->getContent(), true);
 
-        // Mettre à jour les propriétés
-        $projet->setTitrePro($data['titrePro']);
-        $projet->setDescriptionPro($data['descriptionPro'] ?? null);
-        $projet->setCommentairePro($data['commentairePro'] ?? null);
-        $projet->setBudgetPro($data['budgetPro']);
-        $projet->setDateDebutPro(new \DateTime($data['dateDebutPro']));
-        
-        if (!empty($data['dateFinPro'])) {
-            $projet->setDateFinPro(new \DateTime($data['dateFinPro']));
-        } else {
-            $projet->setDateFinPro(null);
-        }
+            $errors = [];
 
-        // Mettre à jour le service
-        $service = $serviceRepository->find($data['service']);
-        if ($service) {
-            $projet->setService($service);
-        }
+            // Validation des données
+            if (empty($data['titrePro'])) {
+                $errors['titrePro'] = 'Le titre du projet est obligatoire';
+            }
 
-        // CORRECTION IMPORTANTE : Mettre à jour les responsables (personnels)
-        // 1. Vider complètement la collection actuelle
-        foreach ($projet->getPersonnels() as $personnel) {
-            $projet->removePersonnel($personnel);
-        }
-        
-        // 2. Flush pour s'assurer que les suppressions sont appliquées
-        $this->entityManager->flush();
-        
-        // 3. Ajouter les nouveaux personnels
-        if (!empty($data['personnels']) && is_array($data['personnels'])) {
-            foreach ($data['personnels'] as $personnelIm) {
-                $personnel = $personnelRepository->find($personnelIm);
-                if ($personnel) {
-                    $projet->addPersonnel($personnel);
+            if (empty($data['budgetPro'])) {
+                $errors['budgetPro'] = 'Le budget est obligatoire';
+            }
+
+            if (empty($data['dateDebutPro'])) {
+                $errors['dateDebutPro'] = 'La date de début est obligatoire';
+            }
+
+            if (empty($data['service'])) {
+                $errors['service'] = 'Le service est obligatoire';
+            }
+
+
+            if (empty($data['personnels']) || !is_array($data['personnels']) || count($data['personnels']) === 0) {
+                $errors['personnels'] = 'Au moins un responsable doit être sélectionné';
+            }
+
+            // Vérification de la cohérence des dates
+            if (!empty($data['dateDebutPro']) && !empty($data['dateFinPro'])) {
+                $dateDebut = new \DateTime($data['dateDebutPro']);
+                $dateFin = new \DateTime($data['dateFinPro']);
+
+                if ($dateFin <= $dateDebut) {
+                    $errors['dateFinPro'] = 'La date de fin doit être postérieure à la date de début';
                 }
             }
-        }
 
-        // Validation Symfony
-        $validationErrors = $validator->validate($projet);
-        if (count($validationErrors) > 0) {
-            foreach ($validationErrors as $error) {
-                $errors[$error->getPropertyPath()] = $error->getMessage();
+            if (!empty($errors)) {
+                return $this->json([
+                    'success' => false,
+                    'message' => 'Des erreurs ont été trouvées',
+                    'errors' => $errors
+                ], 400);
             }
-            
+
+            // Vérification des permissions
+            if ($user->hasRole('ROLE_UTILISATEUR')) {
+                return $this->json([
+                    'success' => false,
+                    'message' => 'Vous n\'avez pas les permissions nécessaires pour modifier un projet'
+                ], 403);
+            }
+
+            if ($user->hasRole('ROLE_CREATEUR_DE_PROJET') && $projet->getCreateur() !== $user) {
+                return $this->json([
+                    'success' => false,
+                    'message' => 'Vous ne pouvez modifier que les projets que vous avez créés'
+                ], 403);
+            }
+
+            // Mettre à jour les propriétés
+            $projet->setTitrePro($data['titrePro']);
+            $projet->setDescriptionPro($data['descriptionPro'] ?? null);
+            $projet->setCommentairePro($data['commentairePro'] ?? null);
+            $projet->setBudgetPro($data['budgetPro']);
+            $projet->setDateDebutPro(new \DateTime($data['dateDebutPro']));
+
+            if (!empty($data['dateFinPro'])) {
+                $projet->setDateFinPro(new \DateTime($data['dateFinPro']));
+            } else {
+                $projet->setDateFinPro(null);
+            }
+
+            // Mettre à jour le service
+            $service = $serviceRepository->find($data['service']);
+            if ($service) {
+                $projet->setService($service);
+            }
+
+            foreach ($projet->getPersonnels() as $personnel) {
+                $projet->removePersonnel($personnel);
+            }
+
+            $this->entityManager->flush();
+
+            // 3. Ajouter les nouveaux personnels
+            if (!empty($data['personnels']) && is_array($data['personnels'])) {
+                foreach ($data['personnels'] as $personnelIm) {
+                    $personnel = $personnelRepository->find($personnelIm);
+                    if ($personnel) {
+                        $projet->addPersonnel($personnel);
+                    }
+                }
+            }
+
+            $validationErrors = $validator->validate($projet);
+            if (count($validationErrors) > 0) {
+                foreach ($validationErrors as $error) {
+                    $errors[$error->getPropertyPath()] = $error->getMessage();
+                }
+
+                return $this->json([
+                    'success' => false,
+                    'message' => 'Des erreurs de validation ont été trouvées',
+                    'errors' => $errors
+                ], 400);
+            }
+
+            $this->entityManager->flush();
+
+            return $this->json([
+                'success' => true,
+                'message' => 'Projet modifié avec succès'
+            ], 200);
+        } catch (\Exception $e) {
             return $this->json([
                 'success' => false,
-                'message' => 'Des erreurs de validation ont été trouvées',
-                'errors' => $errors
-            ], 400);
+                'message' => 'Erreur lors de la modification: ' . $e->getMessage()
+            ], 500);
         }
-
-        $this->entityManager->flush();
-
-        return $this->json([
-            'success' => true,
-            'message' => 'Projet modifié avec succès'
-        ], 200);
-
-    } catch (\Exception $e) {
-        return $this->json([
-            'success' => false,
-            'message' => 'Erreur lors de la modification: ' . $e->getMessage()
-        ], 500);
     }
-}
 
     #[Route('/api/{numProjet}/suspendre', name: 'api_projet_suspendre', methods: ['POST'])]
     public function apiSuspendreProjet(string $numProjet): JsonResponse
@@ -377,7 +369,7 @@ public function apiModifierProjet(Request $request, string $numProjet, ServiceRe
             }
 
             $projet = $this->entityManager->getRepository(Projet::class)->find($numProjet);
-            
+
             if (!$projet) {
                 return $this->json([
                     'success' => false,
@@ -394,7 +386,7 @@ public function apiModifierProjet(Request $request, string $numProjet, ServiceRe
 
             // Suspendre le projet
             $projet->setStatutPro('Suspendu');
-            
+
             // Suspendre toutes les tâches associées
             foreach ($projet->getTaches() as $tache) {
                 $tache->setStatutTache('Suspendu');
@@ -406,7 +398,6 @@ public function apiModifierProjet(Request $request, string $numProjet, ServiceRe
                 'success' => true,
                 'message' => 'Projet et toutes ses tâches ont été suspendus avec succès'
             ], 200);
-
         } catch (\Exception $e) {
             return $this->json([
                 'success' => false,
@@ -428,7 +419,7 @@ public function apiModifierProjet(Request $request, string $numProjet, ServiceRe
             }
 
             $projet = $this->entityManager->getRepository(Projet::class)->find($numProjet);
-            
+
             if (!$projet) {
                 return $this->json([
                     'success' => false,
@@ -453,7 +444,7 @@ public function apiModifierProjet(Request $request, string $numProjet, ServiceRe
             // VÉRIFICATION DU SERVICE - AVEC GESTION DES OPTIONS
             $service = $projet->getService();
             $data = json_decode($request->getContent(), true);
-            
+
             $garderService = $data['garderService'] ?? false;
             $nouveauServiceCode = $data['nouveauService'] ?? null;
 
@@ -468,14 +459,14 @@ public function apiModifierProjet(Request $request, string $numProjet, ServiceRe
                             'message' => 'Service non trouvé'
                         ], 404);
                     }
-                    
+
                     if (!$nouveauService->estActif()) {
                         return $this->json([
                             'success' => false,
                             'message' => 'Le service sélectionné n\'est pas actif'
                         ], 400);
                     }
-                    
+
                     $projet->setService($nouveauService);
                 } else {
                     return $this->json([
@@ -496,13 +487,13 @@ public function apiModifierProjet(Request $request, string $numProjet, ServiceRe
 
             // Reprendre le projet
             $projet->setStatutPro('Débuté');
-            
+
             // Reprendre toutes les tâches associées qui étaient suspendues
             foreach ($projet->getTaches() as $tache) {
                 if ($tache->getStatutTache() === 'Suspendu') {
                     // Recalculer le statut basé sur l'avancement actuel
                     $avancement = $tache->getavancementTache();
-                    
+
                     if ($avancement === 100) {
                         $tache->setStatutTache('Terminé');
                     } elseif ($avancement > 0 && $avancement < 100) {
@@ -522,7 +513,6 @@ public function apiModifierProjet(Request $request, string $numProjet, ServiceRe
                 'success' => true,
                 'message' => 'Projet et toutes ses tâches ont été repris avec succès'
             ], 200);
-
         } catch (\Exception $e) {
             return $this->json([
                 'success' => false,
@@ -536,7 +526,7 @@ public function apiModifierProjet(Request $request, string $numProjet, ServiceRe
     {
         try {
             $directions = $directionRepository->findAll();
-            
+
             return $this->json([
                 'success' => true,
                 'directions' => $directions
@@ -554,7 +544,7 @@ public function apiModifierProjet(Request $request, string $numProjet, ServiceRe
     {
         try {
             $directions = $directionRepository->findBy(['statutDirection' => 'ACTIVE']);
-            
+
             return $this->json([
                 'success' => true,
                 'directions' => $directions
@@ -572,7 +562,7 @@ public function apiModifierProjet(Request $request, string $numProjet, ServiceRe
     {
         try {
             $services = $serviceRepository->findAll();
-            
+
             return $this->json([
                 'success' => true,
                 'services' => $services
@@ -590,7 +580,7 @@ public function apiModifierProjet(Request $request, string $numProjet, ServiceRe
     {
         try {
             $services = $serviceRepository->findBy(['statutService' => 'ACTIF']);
-            
+
             return $this->json([
                 'success' => true,
                 'services' => $services
@@ -609,7 +599,7 @@ public function apiModifierProjet(Request $request, string $numProjet, ServiceRe
         try {
             // Utilisez la nouvelle méthode qui charge les relations
             $personnels = $personnelRepository->findPersonnelsActifsEtDesactives();
-            
+
             return $this->json([
                 'success' => true,
                 'personnels' => $personnels
@@ -628,7 +618,7 @@ public function apiModifierProjet(Request $request, string $numProjet, ServiceRe
         try {
             // Utilisez la nouvelle méthode qui charge les relations
             $personnels = $personnelRepository->findPersonnelsActifs();
-            
+
             return $this->json([
                 'success' => true,
                 'personnels' => $personnels
@@ -646,7 +636,7 @@ public function apiModifierProjet(Request $request, string $numProjet, ServiceRe
     {
         try {
             $projet = $this->entityManager->getRepository(Projet::class)->find($numProjet);
-            
+
             if (!$projet) {
                 return $this->json([
                     'success' => false,
@@ -665,7 +655,7 @@ public function apiModifierProjet(Request $request, string $numProjet, ServiceRe
             ], 500);
         }
     }
-    
+
     // Dans votre RapportController
     private function serializeDirectionForRapport(Direction $direction): array
     {
@@ -674,18 +664,18 @@ public function apiModifierProjet(Request $request, string $numProjet, ServiceRe
             'nomDirection' => $direction->getNomDirection(),
             'services' => []
         ];
-        
+
         foreach ($direction->getServices() as $service) {
             if ($service->getStatutService() !== 'ACTIF') {
                 continue;
             }
-            
+
             $serviceData = [
                 'CodeService' => $service->getCodeService(),
                 'nomService' => $service->getNomService(),
                 'projets' => []
             ];
-            
+
             foreach ($service->getProjets() as $projet) {
                 $projetData = [
                     'numProjet' => $projet->getNumProjet(),
@@ -699,7 +689,7 @@ public function apiModifierProjet(Request $request, string $numProjet, ServiceRe
                     'StatutPro' => $projet->getStatutPro(),
                     'taches' => []
                 ];
-                
+
                 // Tâches du projet
                 foreach ($projet->getTaches() as $tache) {
                     $projetData['taches'][] = [
@@ -713,13 +703,13 @@ public function apiModifierProjet(Request $request, string $numProjet, ServiceRe
                         'statutTache' => $tache->getStatutTache()
                     ];
                 }
-                
+
                 $serviceData['projets'][] = $projetData;
             }
-            
+
             $data['services'][] = $serviceData;
         }
-        
+
         return $data;
     }
 }

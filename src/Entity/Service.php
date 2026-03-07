@@ -52,7 +52,7 @@ class Service
 
     #[ORM\ManyToOne(inversedBy: 'services')]
     #[ORM\JoinColumn(name: 'code_direction', referencedColumnName: 'code_direction', nullable: true)]
-    #[Groups(['service:read', 'service:write', 'projet:read'])] 
+    #[Groups(['service:read', 'service:write', 'projet:read'])]
     private ?Direction $direction = null;
 
     #[ORM\OneToOne(targetEntity: Personnel::class)]
@@ -129,50 +129,48 @@ class Service
     }
 
     public function setChefService(?Personnel $chefService): static
-{
-    // Sauvegarder l'ancien chef
-    $ancienChef = $this->chefService;
-    
-    // CAS 1: On enlève le chef actuel
-    if ($ancienChef !== null && $chefService === null) {
-        // Réinitialiser la fonction de l'ancien chef
-        $ancienChef->setFonctionPer($ancienChef->determinerFonction());
-        // L'ancien chef reste dans le service mais n'est plus chef
-    }
-    
-    // CAS 2: On assigne un nouveau chef
-    if ($chefService !== null) {
-        // CAS 2A: On remplace l'ancien chef par un nouveau
-        if ($ancienChef !== null && $ancienChef !== $chefService) {
+    {
+        // Sauvegarder l'ancien chef
+        $ancienChef = $this->chefService;
+
+        // CAS 1: On enlève le chef actuel
+        if ($ancienChef !== null && $chefService === null) {
             // Réinitialiser la fonction de l'ancien chef
             $ancienChef->setFonctionPer($ancienChef->determinerFonction());
+            // L'ancien chef reste dans le service mais n'est plus chef
         }
-        
-        // CAS 2B: Le nouveau chef rejoint le service
-        // Ajouter le chef au service (relation bidirectionnelle)
-        if (!$this->personnels->contains($chefService)) {
-            $this->addPersonnel($chefService);
+
+        // CAS 2: On assigne un nouveau chef
+        if ($chefService !== null) {
+            // CAS 2A: On remplace l'ancien chef par un nouveau
+            if ($ancienChef !== null && $ancienChef !== $chefService) {
+                // Réinitialiser la fonction de l'ancien chef
+                $ancienChef->setFonctionPer($ancienChef->determinerFonction());
+            }
+
+            // CAS 2B: Le nouveau chef rejoint le service
+            // Ajouter le chef au service (relation bidirectionnelle)
+            if (!$this->personnels->contains($chefService)) {
+                $this->addPersonnel($chefService);
+            }
+
+            // Mettre à jour la fonction du nouveau chef
+            $chefService->setFonctionPer('Chef_service');
         }
-        
-        // Mettre à jour la fonction du nouveau chef
-        $chefService->setFonctionPer('Chef_service');
+
+        $this->chefService = $chefService;
+        return $this;
     }
 
-    $this->chefService = $chefService;
-    return $this;
-}
-     
     public function mettreAJourDirectionChef(): static
-{
-    if ($this->chefService !== null && $this->direction !== null) {
-        // Le chef hérite de la direction de son service
-        $this->chefService->setDirectionD($this->direction);
-        
-        // Mettre à jour la fonction automatiquement
-        $this->chefService->setFonctionPer($this->chefService->determinerFonction());
+    {
+        if ($this->chefService !== null && $this->direction !== null) {
+            // Le chef hérite de la direction de son service
+            $this->chefService->setDirectionD($this->direction);
+            $this->chefService->setFonctionPer($this->chefService->determinerFonction());
+        }
+        return $this;
     }
-    return $this;
-}
 
     /**
      * @return Collection<int, Personnel>
@@ -195,7 +193,6 @@ class Service
     public function removePersonnel(Personnel $personnel): static
     {
         if ($this->personnels->removeElement($personnel)) {
-            // set the owning side to null (unless already changed)
             if ($personnel->getService() === $this) {
                 $personnel->setService(null);
             }
@@ -235,7 +232,6 @@ class Service
         return $this;
     }
 
-    // Méthodes utilitaires
     public function estActif(): bool
     {
         return $this->statutService === 'ACTIF';
@@ -247,58 +243,36 @@ class Service
     }
 
 
-    // Dans App\Entity\Service
 
-public function desactiverAvecCascade(): static
-{
-    $this->statutService = 'DESACTIVE';
-    
-    // Désactiver tous les personnels du service
-    foreach ($this->personnels as $personnel) {
-        $personnel->desactiver();
-        // Mettre à jour la fonction du personnel
-        $personnel->setFonctionPer($personnel->determinerFonction());
-    }
-    
-    // Désactiver le chef de service s'il existe
-    if ($this->chefService) {
-        $this->chefService->desactiver();
-        $this->chefService->setFonctionPer($this->chefService->determinerFonction());
-    }
-    
-    // Désactiver tous les projets du service et leurs tâches
-    foreach ($this->projets as $projet) {
-        // Ne pas désactiver les projets déjà terminés
-        if ($projet->getStatutPro() !== 'Terminé') {
-            $projet->desactiverAvecCascade();
+    public function desactiverAvecCascade(): static
+    {
+        $this->statutService = 'DESACTIVE';
+
+        // Désactiver tous les personnels du service
+        foreach ($this->personnels as $personnel) {
+            $personnel->desactiver();
+
+            $personnel->setFonctionPer($personnel->determinerFonction());
         }
-    }
-    
-    return $this;
-}
 
-// /**
-//  * Active le service et tous ses personnels associés
-//  */
-// public function activerAvecCascade(): static
-// {
-//     $this->statutService = 'ACTIF';
+
+        if ($this->chefService) {
+            $this->chefService->desactiver();
+            $this->chefService->setFonctionPer($this->chefService->determinerFonction());
+        }
+
+        // Désactiver tous les projets du service et leurs tâches
+        foreach ($this->projets as $projet) {
+           
+            if ($projet->getStatutPro() !== 'Terminé') {
+                $projet->desactiverAvecCascade();
+            }
+        }
+
+        return $this;
+    }
+
     
-//     // Réactiver tous les personnels du service
-//     foreach ($this->personnels as $personnel) {
-//         $personnel->activer();
-//         // Mettre à jour la fonction du personnel
-//         $personnel->setFonctionPer($personnel->determinerFonction());
-//     }
-    
-//     // Réactiver le chef de service s'il existe
-//     if ($this->chefService) {
-//         $this->chefService->activer();
-//         $this->chefService->setFonctionPer($this->chefService->determinerFonction());
-//     }
-    
-//     return $this;
-// }
 
     public function estEnAttente(): bool
     {

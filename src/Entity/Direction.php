@@ -95,12 +95,10 @@ class Direction
 
     public function setPersonnel(?Personnel $personnel): static
     {
-        // unset the owning side of the relation if necessary
         if ($personnel === null && $this->personnel !== null) {
             $this->personnel->setDirectionD(null);
         }
 
-        // set the owning side of the relation if necessary
         if ($personnel !== null && $personnel->getDirectionD() !== $this) {
             $personnel->setDirectionD($this);
         }
@@ -142,7 +140,6 @@ class Direction
     public function removeService(Service $service): static
     {
         if ($this->services->removeElement($service)) {
-            // set the owning side to null (unless already changed)
             if ($service->getDirection() === $this) {
                 $service->setDirection(null);
             }
@@ -151,7 +148,6 @@ class Direction
         return $this;
     }
 
-    // Méthodes utilitaires
     public function estEnAttente(): bool
     {
         return $this->statutDirection === 'EN_ATTENTE';
@@ -179,54 +175,24 @@ class Direction
         return $this;
     }
 
-    // Dans App\Entity\Direction
+    public function desactiverAvecCascade(): static
+    {
+        $this->statutDirection = 'DESACTIVEE';
 
-/**
- * Désactive la direction et tous ses services, projets et tâches associés
- */
-public function desactiverAvecCascade(): static
-{
-    $this->statutDirection = 'DESACTIVEE';
-    
-    // Désactiver tous les services de cette direction
-    foreach ($this->services as $service) {
-        $service->desactiverAvecCascade();
-    }
-    
-    // Désactiver le directeur s'il existe
-    if ($this->personnel) {
-        $this->personnel->desactiver();
-        $this->personnel->setFonctionPer($this->personnel->determinerFonction());
-    }
-    
-    return $this;
-}
+        // Désactiver tous les services de cette direction
+        foreach ($this->services as $service) {
+            $service->desactiverAvecCascade();
+        }
 
-// /**
-//  * Active la direction et tous ses services et personnels associés
-//  */
-// public function activerAvecCascade(?Personnel $nouveauDirecteur = null): static
-// {
-//     $this->statutDirection = 'ACTIVE';
-    
-//     // Réactiver tous les services de cette direction
-//     foreach ($this->services as $service) {
-//         $service->activerAvecCascade();
-//     }
-    
-//     // Gérer le directeur
-//     if ($nouveauDirecteur) {
-//         $this->setPersonnel($nouveauDirecteur);
-//         $nouveauDirecteur->activer();
-//         $nouveauDirecteur->setFonctionPer($nouveauDirecteur->determinerFonction());
-//     } elseif ($this->personnel) {
-//         // Réactiver l'ancien directeur
-//         $this->personnel->activer();
-//         $this->personnel->setFonctionPer($this->personnel->determinerFonction());
-//     }
-    
-//     return $this;
-// }
+        // Désactiver le directeur s'il existe
+        if ($this->personnel) {
+            $this->personnel->desactiver();
+            $this->personnel->setFonctionPer($this->personnel->determinerFonction());
+        }
+
+        return $this;
+    }
+
 
     public function __toString(): string
     {

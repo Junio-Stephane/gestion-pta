@@ -133,7 +133,6 @@ class RegistrationController extends AbstractController
             $errors['mdp_per'] = 'Le mot de passe est obligatoire';
         }
 
-        // Si erreurs de base, rediriger
         if (!empty($errors)) {
             $request->getSession()->set('registration_errors', $errors);
             return $this->redirectToRoute('app_register');
@@ -149,7 +148,7 @@ class RegistrationController extends AbstractController
             $errors['email_per'] = 'L\'adresse email n\'est pas valide';
         }
 
-        // Validation de la longueur du mot de passe
+
         if (strlen($data['mdp_per']) < 6) {
             $errors['mdp_per'] = 'Le mot de passe doit contenir au moins 6 caractères';
         }
@@ -165,12 +164,10 @@ class RegistrationController extends AbstractController
             $errors['mdp_per'] = 'Le mot de passe doit contenir au moins un caractère spécial (@$!%*?&)';
         }
 
-        // Vérification de la correspondance des mots de passe
         if ($data['mdp_per'] !== $data['confirm_mdp_per']) {
             $errors['password_mismatch'] = 'Les mots de passe ne correspondent pas';
         }
 
-        // Vérifier si l'utilisateur existe déjà par email
         $existingUser = $em->getRepository(Personnel::class)->findOneBy(['EmailPer' => $data['email_per']]);
         if ($existingUser) {
             $errors['email_per'] = 'Cet email est déjà utilisé';
@@ -212,7 +209,6 @@ class RegistrationController extends AbstractController
         //     }
         // }
         
-        // Hasher le mot de passe
         $hashedPassword = $passwordHasher->hashPassword($user, $data['mdp_per']);
         $user->setMdpPer($hashedPassword);
         
@@ -226,10 +222,8 @@ class RegistrationController extends AbstractController
             $em->persist($user);
             $em->flush();
 
-            // CRÉER LA NOTIFICATION POUR L'ADMIN
             $notificationService->notifyNewRegistration($user);
 
-            // STOCKER L'EMAIL POUR LA PAGE DE CONFIRMATION
             $request->getSession()->set('registered_email', $user->getEmailPer());
 
             // NETTOYER LES DONNÉES DE SESSION
@@ -256,11 +250,10 @@ class RegistrationController extends AbstractController
         $registeredEmail = $request->getSession()->get('registered_email');
         
         if (!$registeredEmail) {
-            // Rediriger vers l'inscription si pas d'email en session
+
             return $this->redirectToRoute('app_register');
         }
 
-        // Nettoyer la session après affichage
         $request->getSession()->remove('registered_email');
 
         return $this->render('registration/confirmation.html.twig', [

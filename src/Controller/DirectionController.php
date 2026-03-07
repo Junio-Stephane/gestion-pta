@@ -3,11 +3,8 @@
 namespace App\Controller;
 
 use App\Entity\Direction;
-use App\Entity\Personnel;
-use App\Entity\Service;
 use App\Repository\DirectionRepository;
 use App\Repository\PersonnelRepository;
-use App\Repository\ServiceRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -28,14 +25,12 @@ class DirectionController extends AbstractController
         return $this->render('direction/index.html.twig');
     }
 
-    // API ENDPOINTS
-
     #[Route('/api/list', name: 'api_directions_list', methods: ['GET'])]
     public function apiList(DirectionRepository $directionRepository): JsonResponse
     {
         try {
             $directions = $directionRepository->findAllWithDirector();
-            
+
             return $this->json([
                 'success' => true,
                 'directions' => $directions
@@ -53,9 +48,9 @@ class DirectionController extends AbstractController
     {
         try {
             $data = json_decode($request->getContent(), true);
-            
+
             $errors = [];
-            
+
             // Validation des données
             if (empty($data['codeDirection'])) {
                 $errors['codeDirection'] = 'Le code de la direction est obligatoire';
@@ -98,52 +93,51 @@ class DirectionController extends AbstractController
             $direction = new Direction();
             $direction->setCodeDirection($data['codeDirection']);
             $direction->setNomDirection($data['nomDirection']);
-            
-            // Déterminer le statut en fonction de la présence d'un directeur
-            // Gestion du directeur
-if (!empty($data['personnel'])) {
-    // Si "AUCUN" est sélectionné, ne pas assigner de directeur
-    if ($data['personnel'] === 'AUCUN') {
-        $direction->setPersonnel(null);
-        $direction->setStatutDirection('EN_ATTENTE');
-    } else {
-        $personnel = $personnelRepository->find($data['personnel']);
-        if ($personnel) {
-            if ($personnel->getDirectionD() && $personnel->getDirectionD()->estActive()) {
-                $errors['personnel'] = 'Ce personnel est déjà directeur d\'une direction active';
-            }
-            
-            if (empty($errors)) {
-                if ($personnel->estChefService() && $personnel->getService()) {
-                    $service = $personnel->getService();
-                    $service->setChefService(null);
-                    $personnel->setService(null);
-                    $personnel->setStatutPer('ACTIF');
-                    $personnel->setFonctionPer($personnel->determinerFonction());
-                } 
-                  
-                $direction->setPersonnel($personnel);
-                $direction->setStatutDirection('ACTIVE');
-                $personnel->setFonctionPer($personnel->determinerFonction());
-                
-                // Si le personnel était désactivé, le réactiver
-                if ($personnel->estDesactive()) {
-                    $personnel->activer();
+
+
+            if (!empty($data['personnel'])) {
+                // Si "AUCUN" est sélectionné, ne pas assigner de directeur
+                if ($data['personnel'] === 'AUCUN') {
+                    $direction->setPersonnel(null);
+                    $direction->setStatutDirection('EN_ATTENTE');
+                } else {
+                    $personnel = $personnelRepository->find($data['personnel']);
+                    if ($personnel) {
+                        if ($personnel->getDirectionD() && $personnel->getDirectionD()->estActive()) {
+                            $errors['personnel'] = 'Ce personnel est déjà directeur d\'une direction active';
+                        }
+
+                        if (empty($errors)) {
+                            if ($personnel->estChefService() && $personnel->getService()) {
+                                $service = $personnel->getService();
+                                $service->setChefService(null);
+                                $personnel->setService(null);
+                                $personnel->setStatutPer('ACTIF');
+                                $personnel->setFonctionPer($personnel->determinerFonction());
+                            }
+
+                            $direction->setPersonnel($personnel);
+                            $direction->setStatutDirection('ACTIVE');
+                            $personnel->setFonctionPer($personnel->determinerFonction());
+
+                            // Si le personnel était désactivé, le réactiver
+                            if ($personnel->estDesactive()) {
+                                $personnel->activer();
+                            }
+                        }
+                    } else {
+                        $direction->setStatutDirection('EN_ATTENTE');
+                    }
                 }
+            } else {
+                $direction->setStatutDirection('EN_ATTENTE');
             }
-        } else {
-            $direction->setStatutDirection('EN_ATTENTE');
-        }
-    }
-} else {
-    $direction->setStatutDirection('EN_ATTENTE');
-}
 
             $this->entityManager->persist($direction);
             $this->entityManager->flush();
 
-            $message = $direction->getStatutDirection() === 'ACTIVE' 
-                ? 'Direction créée avec succès avec directeur' 
+            $message = $direction->getStatutDirection() === 'ACTIVE'
+                ? 'Direction créée avec succès avec directeur'
                 : 'Direction créée avec succès - En attente de directeur';
 
             return $this->json([
@@ -164,7 +158,7 @@ if (!empty($data['personnel'])) {
     {
         try {
             $direction = $this->entityManager->getRepository(Direction::class)->find($codeDirection);
-            
+
             if (!$direction) {
                 return $this->json([
                     'success' => false,
@@ -173,7 +167,7 @@ if (!empty($data['personnel'])) {
             }
 
             $data = json_decode($request->getContent(), true);
-            
+
             $errors = [];
 
             if (empty($data['nomDirection'])) {
@@ -184,7 +178,7 @@ if (!empty($data['personnel'])) {
             if (!empty($data['nomDirection'])) {
                 $currentNomDirection = $direction->getNomDirection();
                 $newNomDirection = $data['nomDirection'];
-                
+
                 // Seulement vérifier l'unicité si le nom a changé
                 if ($newNomDirection !== $currentNomDirection) {
                     if (!$directionRepository->isNomDirectionUnique($newNomDirection, $codeDirection)) {
@@ -218,88 +212,83 @@ if (!empty($data['personnel'])) {
             $ancienDirecteur = $direction->getPersonnel();
 
             if ($nouveauDirecteurIm) {
-    // CAS "AUCUN DIRECTEUR"
-    if ($nouveauDirecteurIm === 'AUCUN') {
-        if ($ancienDirecteur) {
-            $ancienDirecteur->setDirectionD(null);
-            $ancienDirecteur->setFonctionPer($ancienDirecteur->determinerFonction());
-        }
-        $direction->setPersonnel(null);
-        $direction->setStatutDirection('EN_ATTENTE');
-    } else {
-        // Assigner un nouveau directeur
-        $nouveauDirecteur = $personnelRepository->find($nouveauDirecteurIm);
-        
-        if (!$nouveauDirecteur) {
-            return $this->json([
-                'success' => false,
-                'message' => 'Personnel non trouvé'
-            ], 404);
-        }
+                // CAS "AUCUN DIRECTEUR"
+                if ($nouveauDirecteurIm === 'AUCUN') {
+                    if ($ancienDirecteur) {
+                        $ancienDirecteur->setDirectionD(null);
+                        $ancienDirecteur->setFonctionPer($ancienDirecteur->determinerFonction());
+                    }
+                    $direction->setPersonnel(null);
+                    $direction->setStatutDirection('EN_ATTENTE');
+                } else {
+                    // Assigner un nouveau directeur
+                    $nouveauDirecteur = $personnelRepository->find($nouveauDirecteurIm);
 
-                // CORRECTION : Libérer d'abord l'ancien directeur AVANT d'assigner le nouveau
-                if ($ancienDirecteur && $ancienDirecteur !== $nouveauDirecteur) {
-                    // Réinitialiser complètement la relation
+                    if (!$nouveauDirecteur) {
+                        return $this->json([
+                            'success' => false,
+                            'message' => 'Personnel non trouvé'
+                        ], 404);
+                    }
+
+                    // CORRECTION : Libérer d'abord l'ancien directeur AVANT d'assigner le nouveau
+                    if ($ancienDirecteur && $ancienDirecteur !== $nouveauDirecteur) {
+                        // Réinitialiser complètement la relation
+                        $ancienDirecteur->setDirectionD(null);
+                        $this->entityManager->persist($ancienDirecteur);
+                        $this->entityManager->flush(); // Flush intermédiaire pour libérer la contrainte
+
+                        // Mettre à jour la fonction de l'ancien directeur
+                        $ancienDirecteur->setFonctionPer($ancienDirecteur->determinerFonction());
+                    }
+
+                    // CORRECTION : Vérifier si le nouveau directeur a déjà une direction
+                    if ($nouveauDirecteur->getDirectionD() && $nouveauDirecteur->getDirectionD() !== $direction) {
+                        $ancienneDirectionDuNouveau = $nouveauDirecteur->getDirectionD();
+                        $ancienneDirectionDuNouveau->setPersonnel(null);
+                        $this->entityManager->persist($ancienneDirectionDuNouveau);
+                    }
+
+                    if ($nouveauDirecteur->estChefService() && $nouveauDirecteur->getService()) {
+                        $service = $nouveauDirecteur->getService();
+                        $service->setChefService(null);
+                        // $service->setStatutService('DESACTIVE');
+                    }
+
+                    if ($nouveauDirecteur->getService()) {
+                        $ancienService = $nouveauDirecteur->getService();
+
+                        // Si le nouveau directeur était chef de service, libérer ce poste
+                        if ($ancienService->getChefService() === $nouveauDirecteur) {
+                            $ancienService->setChefService(null);
+
+                        }
+
+                        // Retirer le personnel du service
+                        $nouveauDirecteur->setService(null);
+                        $this->entityManager->persist($ancienService);
+                    }
+
+                    // Assigner le nouveau directeur
+                    $direction->setPersonnel($nouveauDirecteur);
+                    $direction->setStatutDirection('ACTIVE');
+
+                    // Mettre à jour la fonction du nouveau directeur
+                    $nouveauDirecteur->setFonctionPer($nouveauDirecteur->determinerFonction());
+
+                    // Si le nouveau directeur était désactivé, le réactiver
+                    if ($nouveauDirecteur->estDesactive()) {
+                        $nouveauDirecteur->activer();
+                    }
+                }
+            } else {
+                if ($ancienDirecteur) {
                     $ancienDirecteur->setDirectionD(null);
-                    $this->entityManager->persist($ancienDirecteur);
-                    $this->entityManager->flush(); // Flush intermédiaire pour libérer la contrainte
-                    
-                    // Mettre à jour la fonction de l'ancien directeur
                     $ancienDirecteur->setFonctionPer($ancienDirecteur->determinerFonction());
                 }
-
-                // CORRECTION : Vérifier si le nouveau directeur a déjà une direction
-                if ($nouveauDirecteur->getDirectionD() && $nouveauDirecteur->getDirectionD() !== $direction) {
-                    // Libérer l'ancienne direction du nouveau directeur
-                    $ancienneDirectionDuNouveau = $nouveauDirecteur->getDirectionD();
-                    $ancienneDirectionDuNouveau->setPersonnel(null);
-                    $this->entityManager->persist($ancienneDirectionDuNouveau);
-                }
-
-                if ($nouveauDirecteur->estChefService() && $nouveauDirecteur->getService()) {
-                    $service = $nouveauDirecteur->getService();
-                    $service->setChefService(null);
-                    // $service->setStatutService('DESACTIVE');
-                }
-
-                if ($nouveauDirecteur->getService()) {
-                    $ancienService = $nouveauDirecteur->getService();
-                    
-                    // Si le nouveau directeur était chef de service, libérer ce poste
-                    if ($ancienService->getChefService() === $nouveauDirecteur) {
-                        $ancienService->setChefService(null);
-                        
-                        // Optionnel : désactiver le service s'il n'a plus de chef
-                        // $ancienService->setStatutService('EN_ATTENTE');
-                    }
-                    
-                    // Retirer le personnel du service
-                    $nouveauDirecteur->setService(null);
-                    $this->entityManager->persist($ancienService);
-                }
-
-                // Assigner le nouveau directeur
-                $direction->setPersonnel($nouveauDirecteur);
-                $direction->setStatutDirection('ACTIVE');
-
-                // Mettre à jour la fonction du nouveau directeur
-                $nouveauDirecteur->setFonctionPer($nouveauDirecteur->determinerFonction());
-                
-                // Si le nouveau directeur était désactivé, le réactiver
-                if ($nouveauDirecteur->estDesactive()) {
-                    $nouveauDirecteur->activer();
-                }
-
+                $direction->setPersonnel(null);
+                $direction->setStatutDirection('EN_ATTENTE');
             }
-} else {
-    // Cas où personnel est vide (déjà géré)
-    if ($ancienDirecteur) {
-        $ancienDirecteur->setDirectionD(null);
-        $ancienDirecteur->setFonctionPer($ancienDirecteur->determinerFonction());
-    }
-    $direction->setPersonnel(null);
-    $direction->setStatutDirection('EN_ATTENTE');
-}
 
             $this->entityManager->flush();
 
@@ -307,7 +296,6 @@ if (!empty($data['personnel'])) {
                 'success' => true,
                 'message' => 'Direction modifiée avec succès'
             ], 200);
-
         } catch (\Exception $e) {
             return $this->json([
                 'success' => false,
@@ -321,7 +309,7 @@ if (!empty($data['personnel'])) {
     {
         try {
             $direction = $this->entityManager->getRepository(Direction::class)->find($codeDirection);
-            
+
             if (!$direction) {
                 return $this->json([
                     'success' => false,
@@ -374,7 +362,6 @@ if (!empty($data['personnel'])) {
                     'personnelsDesactives' => $personnelsDesactives
                 ]
             ], 200);
-
         } catch (\Exception $e) {
             return $this->json([
                 'success' => false,
@@ -383,122 +370,121 @@ if (!empty($data['personnel'])) {
         }
     }
 
-#[Route('/api/{codeDirection}/activer', name: 'api_direction_activer', methods: ['POST'])]
-public function apiActiverDirection(Request $request, string $codeDirection, PersonnelRepository $personnelRepository): JsonResponse
-{
-    try {
-        $direction = $this->entityManager->getRepository(Direction::class)->find($codeDirection);
-        
-        if (!$direction) {
-            return $this->json([
-                'success' => false,
-                'message' => 'Direction non trouvée'
-            ], 404);
-        }
+    #[Route('/api/{codeDirection}/activer', name: 'api_direction_activer', methods: ['POST'])]
+    public function apiActiverDirection(Request $request, string $codeDirection, PersonnelRepository $personnelRepository): JsonResponse
+    {
+        try {
+            $direction = $this->entityManager->getRepository(Direction::class)->find($codeDirection);
 
-        if (!$direction->estDesactivee()) {
-            return $this->json([
-                'success' => false,
-                'message' => 'Cette direction n\'est pas désactivée'
-            ], 400);
-        }
+            if (!$direction) {
+                return $this->json([
+                    'success' => false,
+                    'message' => 'Direction non trouvée'
+                ], 404);
+            }
 
-        $data = json_decode($request->getContent(), true);
-        $garderDirecteur = $data['garderDirecteur'] ?? false;
-        $nouveauDirecteurIm = $data['nouveauDirecteur'] ?? null;
+            if (!$direction->estDesactivee()) {
+                return $this->json([
+                    'success' => false,
+                    'message' => 'Cette direction n\'est pas désactivée'
+                ], 400);
+            }
 
-        // Activer la direction
-        $direction->activer();
+            $data = json_decode($request->getContent(), true);
+            $garderDirecteur = $data['garderDirecteur'] ?? false;
+            $nouveauDirecteurIm = $data['nouveauDirecteur'] ?? null;
 
-        // Gérer le directeur
-        $ancienDirecteur = $direction->getPersonnel();
-        $ancienDirecteurDisponible = $ancienDirecteur && $ancienDirecteur->estDesactive();
+            // Activer la direction
+            $direction->activer();
 
-        if ($garderDirecteur && $ancienDirecteurDisponible) {
-            // Réactiver l'ancien directeur
-            $ancienDirecteur->activer();
-            $ancienDirecteur->setFonctionPer($ancienDirecteur->determinerFonction());
-        } elseif ($nouveauDirecteurIm !== null && $nouveauDirecteurIm !== '') {
-            // CAS "AUCUN DIRECTEUR"
-            if ($nouveauDirecteurIm === 'AUCUN') {
+            // Gérer le directeur
+            $ancienDirecteur = $direction->getPersonnel();
+            $ancienDirecteurDisponible = $ancienDirecteur && $ancienDirecteur->estDesactive();
+
+            if ($garderDirecteur && $ancienDirecteurDisponible) {
+                // Réactiver l'ancien directeur
+                $ancienDirecteur->activer();
+                $ancienDirecteur->setFonctionPer($ancienDirecteur->determinerFonction());
+            } elseif ($nouveauDirecteurIm !== null && $nouveauDirecteurIm !== '') {
+                // CAS "AUCUN DIRECTEUR"
+                if ($nouveauDirecteurIm === 'AUCUN') {
+                    if ($ancienDirecteur) {
+                        $ancienDirecteur->setDirectionD(null);
+                        $ancienDirecteur->setFonctionPer($ancienDirecteur->determinerFonction());
+                    }
+                    $direction->setPersonnel(null);
+                    $direction->setStatutDirection('EN_ATTENTE');
+                } else {
+                    // Assigner un nouveau directeur
+                    $nouveauDirecteur = $personnelRepository->find($nouveauDirecteurIm);
+
+                    if (!$nouveauDirecteur) {
+                        return $this->json([
+                            'success' => false,
+                            'message' => 'Personnel non trouvé'
+                        ], 404);
+                    }
+
+                    // Vérifier si le nouveau directeur n'est pas déjà directeur d'une direction active
+                    if ($nouveauDirecteur->getDirectionD() && $nouveauDirecteur->getDirectionD()->estActive()) {
+                        return $this->json([
+                            'success' => false,
+                            'message' => 'Ce personnel est déjà directeur d\'une autre direction active'
+                        ], 400);
+                    }
+
+                    if ($nouveauDirecteur->estDesactive()) {
+                        $nouveauDirecteur->activer();
+                    }
+
+                    // Libérer l'ancien directeur
+                    if ($ancienDirecteur && $ancienDirecteur !== $nouveauDirecteur) {
+                        $ancienDirecteur->setDirectionD(null);
+                        $ancienDirecteur->setFonctionPer($ancienDirecteur->determinerFonction());
+                    }
+
+                    // Gérer le cas où le nouveau directeur était chef de service
+                    if ($nouveauDirecteur->estChefService() && $nouveauDirecteur->getService()) {
+                        $service = $nouveauDirecteur->getService();
+                        $service->setChefService(null);
+                        $nouveauDirecteur->setService(null);
+                        $nouveauDirecteur->setStatutPer('ACTIF');
+                        $this->entityManager->persist($service);
+                    }
+
+                    $direction->setPersonnel($nouveauDirecteur);
+                    $nouveauDirecteur->setFonctionPer($nouveauDirecteur->determinerFonction());
+                }
+            } else {
+                // Pas de directeur sélectionné (bouton radio "Aucun directeur")
                 if ($ancienDirecteur) {
                     $ancienDirecteur->setDirectionD(null);
                     $ancienDirecteur->setFonctionPer($ancienDirecteur->determinerFonction());
                 }
                 $direction->setPersonnel(null);
                 $direction->setStatutDirection('EN_ATTENTE');
-            } else {
-                // Assigner un nouveau directeur
-                $nouveauDirecteur = $personnelRepository->find($nouveauDirecteurIm);
-                
-                if (!$nouveauDirecteur) {
-                    return $this->json([
-                        'success' => false,
-                        'message' => 'Personnel non trouvé'
-                    ], 404);
-                }
-
-                // Vérifier si le nouveau directeur n'est pas déjà directeur d'une direction active
-                if ($nouveauDirecteur->getDirectionD() && $nouveauDirecteur->getDirectionD()->estActive()) {
-                    return $this->json([
-                        'success' => false,
-                        'message' => 'Ce personnel est déjà directeur d\'une autre direction active'
-                    ], 400);
-                }
-
-                if ($nouveauDirecteur->estDesactive()) {
-                    $nouveauDirecteur->activer();
-                }
-
-                // Libérer l'ancien directeur
-                if ($ancienDirecteur && $ancienDirecteur !== $nouveauDirecteur) {
-                    $ancienDirecteur->setDirectionD(null);
-                    $ancienDirecteur->setFonctionPer($ancienDirecteur->determinerFonction());
-                }
-
-                // Gérer le cas où le nouveau directeur était chef de service
-                if ($nouveauDirecteur->estChefService() && $nouveauDirecteur->getService()) {
-                    $service = $nouveauDirecteur->getService();
-                    $service->setChefService(null);
-                    $nouveauDirecteur->setService(null);
-                    $nouveauDirecteur->setStatutPer('ACTIF');
-                    $this->entityManager->persist($service);
-                }
-
-                $direction->setPersonnel($nouveauDirecteur);
-                $nouveauDirecteur->setFonctionPer($nouveauDirecteur->determinerFonction());
             }
-        } else {
-            // Pas de directeur sélectionné (bouton radio "Aucun directeur")
-            if ($ancienDirecteur) {
-                $ancienDirecteur->setDirectionD(null);
-                $ancienDirecteur->setFonctionPer($ancienDirecteur->determinerFonction());
-            }
-            $direction->setPersonnel(null);
-            $direction->setStatutDirection('EN_ATTENTE');
+
+            $this->entityManager->flush();
+
+            return $this->json([
+                'success' => true,
+                'message' => 'Direction activée avec succès'
+            ], 200);
+        } catch (\Exception $e) {
+            return $this->json([
+                'success' => false,
+                'message' => 'Erreur lors de l\'activation: ' . $e->getMessage()
+            ], 500);
         }
-
-        $this->entityManager->flush();
-
-        return $this->json([
-            'success' => true,
-            'message' => 'Direction activée avec succès'
-        ], 200);
-
-    } catch (\Exception $e) {
-        return $this->json([
-            'success' => false,
-            'message' => 'Erreur lors de l\'activation: ' . $e->getMessage()
-        ], 500);
     }
-}
 
     #[Route('/api/mutation', name: 'api_direction_mutation', methods: ['POST'])]
     public function apiMutation(Request $request, DirectionRepository $directionRepository, PersonnelRepository $personnelRepository): JsonResponse
     {
         try {
             $data = json_decode($request->getContent(), true);
-            
+
             if (empty($data['directeur']) || empty($data['nouvelleDirection'])) {
                 return $this->json([
                     'success' => false,
@@ -568,7 +554,7 @@ public function apiActiverDirection(Request $request, string $codeDirection, Per
     {
         try {
             $directions = $directionRepository->findDirectionsEnAttente();
-            
+
             return $this->json([
                 'success' => true,
                 'directions' => $directions
@@ -582,54 +568,54 @@ public function apiActiverDirection(Request $request, string $codeDirection, Per
     }
 
     #[Route('/api/personnels-pour-activation', name: 'api_personnels_pour_activation', methods: ['GET'])]
-public function apiPersonnelsPourActivation(Request $request, PersonnelRepository $personnelRepository): JsonResponse
-{
-    try {
-        // Récupérer le code de direction depuis les paramètres de requête si disponible
-        $codeDirection = $request->query->get('directionCode');
-        $ancienDirecteurIm = null;
-        
-        // Si on a un code direction, récupérer l'ancien directeur
-        if ($codeDirection) {
-            $direction = $this->entityManager->getRepository(Direction::class)->find($codeDirection);
-            if ($direction && $direction->getPersonnel()) {
-                $ancienDirecteurIm = $direction->getPersonnel()->getImPer();
+    public function apiPersonnelsPourActivation(Request $request, PersonnelRepository $personnelRepository): JsonResponse
+    {
+        try {
+            // Récupérer le code de direction depuis les paramètres de requête si disponible
+            $codeDirection = $request->query->get('directionCode');
+            $ancienDirecteurIm = null;
+
+            // Si on a un code direction, récupérer l'ancien directeur
+            if ($codeDirection) {
+                $direction = $this->entityManager->getRepository(Direction::class)->find($codeDirection);
+                if ($direction && $direction->getPersonnel()) {
+                    $ancienDirecteurIm = $direction->getPersonnel()->getImPer();
+                }
             }
+
+            // Récupérer les personnels sans direction OU l'ancien directeur s'il existe
+            $qb = $personnelRepository->createQueryBuilder('p')
+                ->leftJoin('p.directionD', 'd')
+                ->where('((p.FonctionPer != :directeur AND p.FonctionPer != :chef_service) OR p.StatutPer = :desactive)')
+                ->andWhere('p.StatutPer != :en_attente')
+                ->setParameter('directeur', 'directeur')
+                ->setParameter('chef_service', 'chef_service')
+                ->setParameter('desactive', 'DESACTIVE')
+                ->setParameter('en_attente', 'EN_ATTENTE')
+                ->orderBy('p.StatutPer', 'DESC') // ACTIF d'abord
+                ->addOrderBy('p.NomPer', 'ASC')
+                ->addOrderBy('p.PrenomPer', 'ASC');
+
+            // Si on a un ancien directeur, l'inclure dans les résultats
+            if ($ancienDirecteurIm) {
+                $qb->orWhere('p.ImPer = :ancienDirecteur')
+                    ->setParameter('ancienDirecteur', $ancienDirecteurIm);
+            }
+
+            $personnels = $qb->getQuery()->getResult();
+
+            return $this->json([
+                'success' => true,
+                'personnels' => $personnels,
+                'ancienDirecteurIm' => $ancienDirecteurIm
+            ], 200, [], ['groups' => ['personnel:read']]);
+        } catch (\Exception $e) {
+            return $this->json([
+                'success' => false,
+                'message' => 'Erreur lors du chargement des personnels'
+            ], 500);
         }
-
-        // Récupérer les personnels sans direction OU l'ancien directeur s'il existe
-        $qb = $personnelRepository->createQueryBuilder('p')
-            ->leftJoin('p.directionD', 'd')
-            ->where('((p.FonctionPer != :directeur AND p.FonctionPer != :chef_service) OR p.StatutPer = :desactive)')
-            ->andWhere('p.StatutPer != :en_attente')
-            ->setParameter('directeur', 'directeur')
-            ->setParameter('chef_service', 'chef_service')
-            ->setParameter('desactive', 'DESACTIVE')
-            ->setParameter('en_attente', 'EN_ATTENTE')
-            ->orderBy('p.StatutPer', 'DESC') // ACTIF d'abord
-            ->addOrderBy('p.NomPer', 'ASC')
-            ->addOrderBy('p.PrenomPer', 'ASC');
-
-        // Si on a un ancien directeur, l'inclure dans les résultats
-        if ($ancienDirecteurIm) {
-            $qb->orWhere('p.ImPer = :ancienDirecteur')
-               ->setParameter('ancienDirecteur', $ancienDirecteurIm);
-        }
-
-        $personnels = $qb->getQuery()->getResult();
-        
-        return $this->json([
-            'success' => true,
-            'personnels' => $personnels,
-            'ancienDirecteurIm' => $ancienDirecteurIm
-        ], 200, [], ['groups' => ['personnel:read']]);
-    } catch (\Exception $e) {
-        return $this->json([
-            'success' => false,
-            'message' => 'Erreur lors du chargement des personnels'
-        ], 500);
     }
-}
 }
 
 // #[Route('/api/personnels-pour-modification', name: 'api_personnels_pour_modification', methods: ['GET'])]

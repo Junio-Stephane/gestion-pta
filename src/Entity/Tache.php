@@ -32,7 +32,7 @@ class Tache
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(name: "num_tache", type: 'integer')]
-    #[Groups(['tache:read'])] // Retirer 'tache:write' car l'ID est généré automatiquement
+    #[Groups(['tache:read'])]
     private ?int $numTache = null;
 
     #[ORM\Column(length: 40)]
@@ -82,14 +82,12 @@ class Tache
         return $this->numTache;
     }
 
-    // Supprimer setNumTache ou la rendre privée
     private function setNumTache(int $numTache): static
     {
         $this->numTache = $numTache;
         return $this;
     }
 
-    // Le reste des getters et setters reste inchangé...
     public function getTitreTache(): ?string
     {
         return $this->titreTache;
@@ -153,7 +151,7 @@ class Tache
     public function setavancementTache(?int $avancementTache): static
     {
         $this->avancementTache = $avancementTache === null ? null : max(0, min(100, $avancementTache));
-        
+
         if ($this->statutTache !== 'Suspendu') {
             if ($this->avancementTache === null || $this->avancementTache === 0) {
                 $this->statutTache = 'Débuté';
@@ -163,7 +161,7 @@ class Tache
                 $this->statutTache = 'Terminé';
             }
         }
-        
+
         return $this;
     }
 

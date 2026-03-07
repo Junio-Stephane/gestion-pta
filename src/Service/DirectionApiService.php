@@ -102,7 +102,7 @@ class DirectionApiService
                 throw new \Exception('Direction non trouvée');
             }
 
-            // Désérialiser les données dans l'entité existante
+
             $this->serializer->deserialize(
                 json_encode($data),
                 'App\Entity\Direction',
@@ -152,7 +152,7 @@ class DirectionApiService
             
             $decodedData = json_decode($data, true);
             
-            // Transformer les clés camelCase en snake_case pour Twig
+
             return array_map(function($item) {
                 return $this->transformPersonnelKeys($item);
             }, $decodedData);
@@ -174,8 +174,7 @@ class DirectionApiService
             );
             
             $decodedData = json_decode($data, true);
-            
-            // Transformer les clés camelCase en snake_case pour Twig
+
             return array_map(function($item) {
                 return $this->transformPersonnelKeys($item);
             }, $decodedData);

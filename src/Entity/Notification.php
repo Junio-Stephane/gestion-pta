@@ -60,19 +60,53 @@ class Notification
     }
 
     // Getters et Setters
-    public function getId(): ?int { return $this->id; }
-    
-    public function getMessage(): ?string { return $this->message; }
-    public function setMessage(string $message): static { $this->message = $message; return $this; }
-    
-    public function getType(): ?string { return $this->type; }
-    public function setType(string $type): static { $this->type = $type; return $this; }
-    
-    public function isIsRead(): ?bool { return $this->isRead; }
-    public function setIsRead(bool $isRead): static { $this->isRead = $isRead; return $this; }
-    
-    public function getCreatedAt(): ?\DateTimeImmutable { return $this->createdAt; }
-    
-    public function getRelatedUser(): ?Personnel { return $this->relatedUser; }
-    public function setRelatedUser(?Personnel $relatedUser): static { $this->relatedUser = $relatedUser; return $this; }
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
+    public function getMessage(): ?string
+    {
+        return $this->message;
+    }
+    public function setMessage(string $message): static
+    {
+        $this->message = $message;
+        return $this;
+    }
+
+    public function getType(): ?string
+    {
+        return $this->type;
+    }
+    public function setType(string $type): static
+    {
+        $this->type = $type;
+        return $this;
+    }
+
+    public function isIsRead(): ?bool
+    {
+        return $this->isRead;
+    }
+    public function setIsRead(bool $isRead): static
+    {
+        $this->isRead = $isRead;
+        return $this;
+    }
+
+    public function getCreatedAt(): ?\DateTimeImmutable
+    {
+        return $this->createdAt;
+    }
+
+    public function getRelatedUser(): ?Personnel
+    {
+        return $this->relatedUser;
+    }
+    public function setRelatedUser(?Personnel $relatedUser): static
+    {
+        $this->relatedUser = $relatedUser;
+        return $this;
+    }
 }

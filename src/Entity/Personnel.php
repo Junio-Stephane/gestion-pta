@@ -100,13 +100,14 @@ class Personnel implements UserInterface, PasswordAuthenticatedUserInterface
     private ?Service $service = null;
 
     #[ORM\ManyToMany(targetEntity: Projet::class, inversedBy: 'personnels')]
-    #[ORM\JoinTable(name: 'personnel_projet',
+    #[ORM\JoinTable(
+        name: 'personnel_projet',
         joinColumns: [new ORM\JoinColumn(name: 'im_per', referencedColumnName: 'im_per')],
         inverseJoinColumns: [new ORM\JoinColumn(name: 'num_projet', referencedColumnName: 'num_projet')]
     )]
     private Collection $projetsG;
 
-    
+
     /**
      * @var Collection<int, Projet>
      */
@@ -121,25 +122,65 @@ class Personnel implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
 
+    public function getImPer(): ?string
+    {
+        return $this->ImPer;
+    }
+    public function setImPer(string $ImPer): static
+    {
+        $this->ImPer = $ImPer;
+        return $this;
+    }
 
-    // GETTERS/SETTERS
-    public function getImPer(): ?string { return $this->ImPer; }
-    public function setImPer(string $ImPer): static { $this->ImPer = $ImPer; return $this; }
+    public function getNomPer(): ?string
+    {
+        return $this->NomPer;
+    }
+    public function setNomPer(string $NomPer): static
+    {
+        $this->NomPer = $NomPer;
+        return $this;
+    }
 
-    public function getNomPer(): ?string { return $this->NomPer; }
-    public function setNomPer(string $NomPer): static { $this->NomPer = $NomPer; return $this; }
+    public function getPrenomPer(): ?string
+    {
+        return $this->PrenomPer;
+    }
+    public function setPrenomPer(?string $PrenomPer): static
+    {
+        $this->PrenomPer = $PrenomPer;
+        return $this;
+    }
 
-    public function getPrenomPer(): ?string { return $this->PrenomPer; }
-    public function setPrenomPer(?string $PrenomPer): static { $this->PrenomPer = $PrenomPer; return $this; }
+    public function getEmailPer(): ?string
+    {
+        return $this->EmailPer;
+    }
+    public function setEmailPer(string $EmailPer): static
+    {
+        $this->EmailPer = $EmailPer;
+        return $this;
+    }
 
-    public function getEmailPer(): ?string { return $this->EmailPer; }
-    public function setEmailPer(string $EmailPer): static { $this->EmailPer = $EmailPer; return $this; }
+    public function getTelPer(): ?string
+    {
+        return $this->TelPer;
+    }
+    public function setTelPer(?string $TelPer): static
+    {
+        $this->TelPer = $TelPer;
+        return $this;
+    }
 
-    public function getTelPer(): ?string { return $this->TelPer; }
-    public function setTelPer(?string $TelPer): static { $this->TelPer = $TelPer; return $this; }
-
-    public function getMdpPer(): ?string { return $this->MdpPer; }
-    public function setMdpPer(string $MdpPer): static { $this->MdpPer = $MdpPer; return $this; }
+    public function getMdpPer(): ?string
+    {
+        return $this->MdpPer;
+    }
+    public function setMdpPer(string $MdpPer): static
+    {
+        $this->MdpPer = $MdpPer;
+        return $this;
+    }
 
     public function getResetToken(): ?string
     {
@@ -171,13 +212,27 @@ class Personnel implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->resetTokenExpiresAt < new \DateTimeImmutable();
     }
 
-    public function getRolePer(): ?string { return $this->RolePer; }
-    public function setRolePer(string $RolePer): static { $this->RolePer = $RolePer; return $this; }
+    public function getRolePer(): ?string
+    {
+        return $this->RolePer;
+    }
+    public function setRolePer(string $RolePer): static
+    {
+        $this->RolePer = $RolePer;
+        return $this;
+    }
 
-    public function getStatutPer(): ?string { return $this->StatutPer; }
-    public function setStatutPer(string $StatutPer): static { $this->StatutPer = $StatutPer; return $this; }
+    public function getStatutPer(): ?string
+    {
+        return $this->StatutPer;
+    }
+    public function setStatutPer(string $StatutPer): static
+    {
+        $this->StatutPer = $StatutPer;
+        return $this;
+    }
 
-     public function getTimeAgo(): ?string
+    public function getTimeAgo(): ?string
     {
         return $this->timeAgo;
     }
@@ -191,11 +246,10 @@ class Personnel implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function getFonctionPer(): ?string
     {
-        // Si la fonction n'est pas définie en base, on la détermine automatiquement
         if ($this->FonctionPer === null) {
             return $this->determinerFonction();
         }
-        
+
         return $this->FonctionPer;
     }
 
@@ -205,12 +259,21 @@ class Personnel implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function isValidated(): bool { return $this->isValidated; }
-    public function setIsValidated(bool $isValidated): static { $this->isValidated = $isValidated; return $this; }
+    public function isValidated(): bool
+    {
+        return $this->isValidated;
+    }
+    public function setIsValidated(bool $isValidated): static
+    {
+        $this->isValidated = $isValidated;
+        return $this;
+    }
 
-    public function getDateCreationPer(): ?\DateTimeImmutable { return $this->Date_creationPer; }
+    public function getDateCreationPer(): ?\DateTimeImmutable
+    {
+        return $this->Date_creationPer;
+    }
 
-    // MÉTHODES UTILITAIRES
     public function estDesactive(): bool
     {
         return $this->StatutPer === 'DESACTIVE';
@@ -236,7 +299,7 @@ class Personnel implements UserInterface, PasswordAuthenticatedUserInterface
     public function approve(): static
     {
         $this->StatutPer = 'ACTIF';
-        $this->isValidated = true;        
+        $this->isValidated = true;
         return $this;
     }
 
@@ -247,131 +310,165 @@ class Personnel implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    /**
- * Détermine automatiquement la fonction du personnel basée sur ses relations
- */
-public function determinerFonction(): string
-{
-    // Priorité 1: Si c'est directeur d'une direction
-    if ($this->directionD !== null) {
-        // Vérifier si c'est bien le directeur de cette direction
-        if ($this->directionD->getPersonnel() === $this) {
-            return 'Directeur';
+    public function determinerFonction(): string
+    {
+        // Priorité 1: Si c'est directeur d'une direction
+        if ($this->directionD !== null) {
+            // Vérifier si c'est bien le directeur de cette direction
+            if ($this->directionD->getPersonnel() === $this) {
+                return 'Directeur';
+            }
         }
-    }
-    
-    // Priorité 2: Si c'est le chef de son service actuel
-    if ($this->service && $this->service->getChefService() === $this) {
-        return 'Chef_service';
-    }
-    
-    // Priorité 3: Si c'est dans un service mais pas chef
-    if ($this->service !== null) {
-        return 'Agent';
-    }
-    
-    return 'Agent'; // Par défaut
-}
 
-    /**
-     * Vérifie si le personnel est directeur
-     */
+        // Priorité 2: Si c'est le chef de son service actuel
+        if ($this->service && $this->service->getChefService() === $this) {
+            return 'Chef_service';
+        }
+
+        // Priorité 3: Si c'est dans un service mais pas chef
+        if ($this->service !== null) {
+            return 'Agent';
+        }
+
+        return 'Agent'; // Par défaut
+    }
+
+
     public function estDirecteur(): bool
     {
         return $this->getFonctionPer() === 'Directeur';
     }
 
-    /**
-     * Vérifie si le personnel est chef de service
-     */
+
     public function estChefService(): bool
     {
         return $this->getFonctionPer() === 'Chef_service';
     }
 
-    /**
-     * Vérifie si le personnel est agent
-     */
+
     public function estAgent(): bool
     {
         return $this->getFonctionPer() === 'Agent';
     }
 
-    // RELATIONS
-    public function getDirectionD(): ?Direction { return $this->directionD; }
-    public function setDirectionD(?Direction $directionD): static { $this->directionD = $directionD; return $this; }
+  
+    public function getDirectionD(): ?Direction
+    {
+        return $this->directionD;
+    }
+    public function setDirectionD(?Direction $directionD): static
+    {
+        $this->directionD = $directionD;
+        return $this;
+    }
 
-    public function getService(): ?Service { return $this->service; }
-    public function setService(?Service $service): static { $this->service = $service; return $this; }
+    public function getService(): ?Service
+    {
+        return $this->service;
+    }
+    public function setService(?Service $service): static
+    {
+        $this->service = $service;
+        return $this;
+    }
 
-    public function getProjetsG(): Collection { return $this->projetsG; }
-    public function addProjetsG(Projet $projetsG): static {
+    public function getProjetsG(): Collection
+    {
+        return $this->projetsG;
+    }
+    public function addProjetsG(Projet $projetsG): static
+    {
         if (!$this->projetsG->contains($projetsG)) {
             $this->projetsG->add($projetsG);
         }
         return $this;
     }
-    public function removeProjetsG(Projet $projetsG): static {
+    public function removeProjetsG(Projet $projetsG): static
+    {
         $this->projetsG->removeElement($projetsG);
         return $this;
     }
 
-    // UserInterface
-    public function getRoles(): array {
-    $roles = [$this->RolePer];
-    
-    // Garantir que ROLE_USER est toujours présent pour tous les utilisateurs authentifiés
-    if (!in_array('ROLE_USER', $roles)) {
-        $roles[] = 'ROLE_USER';
+
+    public function getRoles(): array
+    {
+        $roles = [$this->RolePer];
+
+        if (!in_array('ROLE_USER', $roles)) {
+            $roles[] = 'ROLE_USER';
+        }
+
+        return array_unique($roles);
     }
-    
-    return array_unique($roles);
-}
 
-    public function getPassword(): string { return $this->MdpPer; }
-    public function getSalt(): ?string { return null; }
-    public function eraseCredentials(): void { }
-    public function getUserIdentifier(): string { return $this->EmailPer; }
-    public function getUsername(): string { return $this->getUserIdentifier(); }
+    public function getPassword(): string
+    {
+        return $this->MdpPer;
+    }
+    public function getSalt(): ?string
+    {
+        return null;
+    }
+    public function eraseCredentials(): void {}
+    public function getUserIdentifier(): string
+    {
+        return $this->EmailPer;
+    }
+    public function getUsername(): string
+    {
+        return $this->getUserIdentifier();
+    }
 
-    // VÉRIFICATIONS
-    public function hasRole(string $role): bool { return in_array($role, $this->getRoles(), true); }
-    public function isAdmin(): bool { return $this->hasRole('ROLE_ADMIN'); }
-    public function isApproved(): bool { return $this->StatutPer === 'ACTIF' && $this->isValidated; }
-    public function isPending(): bool { return $this->StatutPer === 'EN_ATTENTE'; }
+    public function hasRole(string $role): bool
+    {
+        return in_array($role, $this->getRoles(), true);
+    }
+    public function isAdmin(): bool
+    {
+        return $this->hasRole('ROLE_ADMIN');
+    }
+    public function isApproved(): bool
+    {
+        return $this->StatutPer === 'ACTIF' && $this->isValidated;
+    }
+    public function isPending(): bool
+    {
+        return $this->StatutPer === 'EN_ATTENTE';
+    }
 
-    public function __toString(): string {
+    public function __toString(): string
+    {
         $fonction = $this->getFonctionPer();
-        return sprintf('%s %s (%s) - %s', 
-            $this->PrenomPer, 
-            $this->NomPer, 
+        return sprintf(
+            '%s %s (%s) - %s',
+            $this->PrenomPer,
+            $this->NomPer,
             $this->EmailPer,
             ucfirst($fonction)
         );
     }
 
-    // AJOUT: Getters et setters pour projetsCrees
-public function getProjetsCrees(): Collection
-{
-    return $this->projetsCrees;
-}
-
-public function addProjetsCree(Projet $projetsCree): static
-{
-    if (!$this->projetsCrees->contains($projetsCree)) {
-        $this->projetsCrees->add($projetsCree);
-        $projetsCree->setCreateur($this);
+    public function getProjetsCrees(): Collection
+    {
+        return $this->projetsCrees;
     }
-    return $this;
-}
 
-public function removeProjetsCree(Projet $projetsCree): static
-{
-    if ($this->projetsCrees->removeElement($projetsCree)) {
-        if ($projetsCree->getCreateur() === $this) {
-            $projetsCree->setCreateur(null);
+    public function addProjetsCree(Projet $projetsCree): static
+    {
+        if (!$this->projetsCrees->contains($projetsCree)) {
+            $this->projetsCrees->add($projetsCree);
+            $projetsCree->setCreateur($this);
         }
+        return $this;
     }
-    return $this;
-}
+
+    public function removeProjetsCree(Projet $projetsCree): static
+    {
+        if ($this->projetsCrees->removeElement($projetsCree)) {
+            if ($projetsCree->getCreateur() === $this) {
+                $projetsCree->setCreateur(null);
+            }
+        }
+        return $this;
+    }
 }

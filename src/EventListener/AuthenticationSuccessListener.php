@@ -1,5 +1,4 @@
 <?php
-// src/EventListener/AuthenticationSuccessListener.php
 
 namespace App\EventListener;
 

@@ -27,7 +27,7 @@ class ProjetRepository extends ServiceEntityRepository
     public function findAllWithDetails(): array
     {
         $user = $this->security->getUser();
-        
+
         $qb = $this->createQueryBuilder('p')
             ->leftJoin('p.service', 's')
             ->leftJoin('s.direction', 'd')
@@ -39,16 +39,15 @@ class ProjetRepository extends ServiceEntityRepository
 
         if ($user instanceof Personnel) {
             if ($user->hasRole('ROLE_UTILISATEUR')) {
-                
+
                 $subQb = $this->createQueryBuilder('p2')
                     ->select('p2.numProjet')
                     ->leftJoin('p2.personnels', 'pers2')
                     ->where('pers2.ImPer = :userId');
-                
+
                 $qb->andWhere($qb->expr()->in('p.numProjet', $subQb->getDQL()))
-                   ->setParameter('userId', $user->getImPer());
+                    ->setParameter('userId', $user->getImPer());
             }
-            
         }
 
         return $qb->getQuery()->getResult();
@@ -60,7 +59,7 @@ class ProjetRepository extends ServiceEntityRepository
     public function findWithPermissionCheck(string $numProjet): ?Projet
     {
         $user = $this->security->getUser();
-        
+
         $qb = $this->createQueryBuilder('p')
             ->leftJoin('p.service', 's')
             ->leftJoin('s.direction', 'd')
@@ -71,18 +70,17 @@ class ProjetRepository extends ServiceEntityRepository
             ->where('p.numProjet = :numProjet')
             ->setParameter('numProjet', $numProjet);
 
-        // Logique de permission par rôle
+
         if ($user instanceof Personnel && $user->hasRole('ROLE_UTILISATEUR')) {
-            // ROLE_UTILISATEUR: doit être assigné au projet
-            // On utilise une sous-requête pour vérifier l'accès sans filtrer les personnels
+
             $subQb = $this->createQueryBuilder('p2')
                 ->select('p2.numProjet')
                 ->leftJoin('p2.personnels', 'pers2')
                 ->where('pers2.ImPer = :userId')
                 ->andWhere('p2.numProjet = :numProjet');
-            
+
             $qb->andWhere($qb->expr()->exists($subQb->getDQL()))
-               ->setParameter('userId', $user->getImPer());
+                ->setParameter('userId', $user->getImPer());
         }
 
         return $qb->getQuery()->getOneOrNullResult();
@@ -93,7 +91,6 @@ class ProjetRepository extends ServiceEntityRepository
      */
     public function findForSimpleUser(Personnel $user): array
     {
-        // D'abord, trouver les numéros de projets où l'utilisateur est responsable
         $projetNumbers = $this->createQueryBuilder('p')
             ->select('p.numProjet')
             ->leftJoin('p.personnels', 'pers')
@@ -108,7 +105,6 @@ class ProjetRepository extends ServiceEntityRepository
             return [];
         }
 
-        // Ensuite, charger les projets complets avec tous les responsables
         return $this->createQueryBuilder('p')
             ->leftJoin('p.service', 's')
             ->leftJoin('s.direction', 'd')
@@ -128,7 +124,6 @@ class ProjetRepository extends ServiceEntityRepository
      */
     public function userHasAccessToProjet(string $numProjet, Personnel $user): bool
     {
-        // Si l'utilisateur n'est pas ROLE_UTILISATEUR, il a accès
         if (!$user->hasRole('ROLE_UTILISATEUR')) {
             return true;
         }
@@ -148,7 +143,7 @@ class ProjetRepository extends ServiceEntityRepository
     public function findByService(string $serviceCode): array
     {
         $user = $this->security->getUser();
-        
+
         $qb = $this->createQueryBuilder('p')
             ->leftJoin('p.service', 's')
             ->leftJoin('s.direction', 'd')
@@ -160,15 +155,14 @@ class ProjetRepository extends ServiceEntityRepository
             ->setParameter('serviceCode', $serviceCode)
             ->orderBy('p.dateDebutPro', 'DESC');
 
-        // Filtre pour ROLE_UTILISATEUR avec sous-requête
         if ($user instanceof Personnel && $user->hasRole('ROLE_UTILISATEUR')) {
             $subQb = $this->createQueryBuilder('p2')
                 ->select('p2.numProjet')
                 ->leftJoin('p2.personnels', 'pers2')
                 ->where('pers2.ImPer = :userId');
-            
+
             $qb->andWhere($qb->expr()->in('p.numProjet', $subQb->getDQL()))
-               ->setParameter('userId', $user->getImPer());
+                ->setParameter('userId', $user->getImPer());
         }
 
         return $qb->getQuery()->getResult();
@@ -177,7 +171,7 @@ class ProjetRepository extends ServiceEntityRepository
     public function findProjetsEnCours(): array
     {
         $user = $this->security->getUser();
-        
+
         $qb = $this->createQueryBuilder('p')
             ->leftJoin('p.service', 's')
             ->leftJoin('s.direction', 'd')
@@ -189,15 +183,14 @@ class ProjetRepository extends ServiceEntityRepository
             ->setParameter('statut', 'En cours')
             ->orderBy('p.dateDebutPro', 'DESC');
 
-        // Filtre pour ROLE_UTILISATEUR avec sous-requête
         if ($user instanceof Personnel && $user->hasRole('ROLE_UTILISATEUR')) {
             $subQb = $this->createQueryBuilder('p2')
                 ->select('p2.numProjet')
                 ->leftJoin('p2.personnels', 'pers2')
                 ->where('pers2.ImPer = :userId');
-            
+
             $qb->andWhere($qb->expr()->in('p.numProjet', $subQb->getDQL()))
-               ->setParameter('userId', $user->getImPer());
+                ->setParameter('userId', $user->getImPer());
         }
 
         return $qb->getQuery()->getResult();
@@ -208,7 +201,6 @@ class ProjetRepository extends ServiceEntityRepository
      */
     public function findByPersonnel(Personnel $personnel): array
     {
-        // D'abord, trouver les numéros de projets où l'utilisateur est responsable
         $projetNumbers = $this->createQueryBuilder('p')
             ->select('p.numProjet')
             ->leftJoin('p.personnels', 'pers')
@@ -223,7 +215,6 @@ class ProjetRepository extends ServiceEntityRepository
             return [];
         }
 
-        // Ensuite, charger les projets complets avec tous les responsables
         return $this->createQueryBuilder('p')
             ->leftJoin('p.service', 's')
             ->leftJoin('s.direction', 'd')

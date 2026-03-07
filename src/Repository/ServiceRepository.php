@@ -44,7 +44,7 @@ class ServiceRepository extends ServiceEntityRepository
 
         if ($codeService !== null) {
             $qb->andWhere('s.CodeService != :codeService')
-               ->setParameter('codeService', $codeService);
+                ->setParameter('codeService', $codeService);
         }
 
         $result = $qb->getQuery()->getResult();
@@ -77,8 +77,8 @@ class ServiceRepository extends ServiceEntityRepository
             ->leftJoin('p.directionD', 'd', Join::WITH, 'd.statutDirection = :active')
             ->leftJoin('p.service', 'serv', Join::WITH, 'serv.chefService = p AND serv.statutService = :active')
             ->where('p.StatutPer = :actif')
-            ->andWhere('d.id IS NULL') // Pas directeur d'une direction active
-            ->andWhere('serv.id IS NULL') // Pas déjà chef de service d'un service actif
+            ->andWhere('d.id IS NULL')
+            ->andWhere('serv.id IS NULL')
             ->setParameter('actif', 'ACTIF')
             ->setParameter('active', 'ACTIVE')
             ->orderBy('p.NomPer', 'ASC')
@@ -101,7 +101,7 @@ class ServiceRepository extends ServiceEntityRepository
             ->getResult();
     }
 
-     public function findChefsServiceDisponibles(?string $excludeServiceCode = null): array
+    public function findChefsServiceDisponibles(?string $excludeServiceCode = null): array
     {
         $qb = $this->createQueryBuilder('s')
             ->leftJoin('s.chefService', 'c')
@@ -112,24 +112,21 @@ class ServiceRepository extends ServiceEntityRepository
 
         if ($excludeServiceCode) {
             $qb->andWhere('s.CodeService != :excludeService')
-               ->setParameter('excludeService', $excludeServiceCode);
+                ->setParameter('excludeService', $excludeServiceCode);
         }
 
         return $qb->getQuery()->getResult();
     }
-    
-   public function findServicesEnAttenteTable(): array
-{
-    return $this->createQueryBuilder('s')
-        ->leftJoin('s.chefService', 'c')
-        ->where('s.chefService IS NULL')
-        ->andWhere('s.statutService = :statut')
-        ->setParameter('statut', 'EN_ATTENTE')
-        ->orderBy('s.nomService', 'ASC')
-        ->getQuery()
-        ->getResult();
-}
 
-
-    
+    public function findServicesEnAttenteTable(): array
+    {
+        return $this->createQueryBuilder('s')
+            ->leftJoin('s.chefService', 'c')
+            ->where('s.chefService IS NULL')
+            ->andWhere('s.statutService = :statut')
+            ->setParameter('statut', 'EN_ATTENTE')
+            ->orderBy('s.nomService', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
 }

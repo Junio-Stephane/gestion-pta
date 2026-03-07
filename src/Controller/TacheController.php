@@ -35,63 +35,54 @@ class TacheController extends AbstractController
         ]);
     }
 
-    
 
-    /**
-     * Vérifie si l'utilisateur a accès au projet (lecture)
-     * TOUS les utilisateurs connectés ont accès en lecture
-     */
     private function checkProjetAccess(Projet $projet): bool
     {
         $user = $this->getUser();
-        
-        // Tout utilisateur connecté a accès en lecture
+
         return $user instanceof Personnel;
     }
 
-    /**
-     * Vérifie si l'utilisateur peut MODIFIER le projet
-     */
 
-private function canManageProjet(Projet $projet): bool
-{
-    $user = $this->getUser();
-    
-    if (!$user instanceof Personnel) {
+
+    private function canManageProjet(Projet $projet): bool
+    {
+        $user = $this->getUser();
+
+        if (!$user instanceof Personnel) {
+            return false;
+        }
+
+        if ($user->hasRole('ROLE_ADMIN')) {
+            return true;
+        }
+
+        // Créateur peut gérer SES PROPRES projets
+        if ($user->hasRole('ROLE_CREATEUR_DE_PROJET')) {
+            // Vérifier si l'utilisateur est le créateur du projet
+            if ($projet->getCreateur() === $user) {
+                return true; 
+            }
+            // Pour les projets des autres : doit être désigné comme responsable
+            return $projet->getPersonnels()->contains($user);
+        }
+
+        // Les utilisateurs normaux (ROLE_UTILISATEUR) peuvent gérer les projets où ils sont assignés
+        if ($user->hasRole('ROLE_UTILISATEUR') && $projet->getPersonnels()->contains($user)) {
+            return true;
+        }
+
         return false;
     }
 
-    // Admin peut tout gérer
-    if ($user->hasRole('ROLE_ADMIN')) {
-        return true;
-    }
 
-    // Créateur peut gérer SES PROPRES projets
-    if ($user->hasRole('ROLE_CREATEUR_DE_PROJET')) {
-        // Vérifier si l'utilisateur est le créateur du projet
-        if ($projet->getCreateur() === $user) {
-            return true; // ✅ Peut gérer SON projet même s'il n'est pas responsable
-        }
-        // Pour les projets des autres : doit être désigné comme responsable
-        return $projet->getPersonnels()->contains($user);
-    }
-
-    // Les utilisateurs normaux (ROLE_UTILISATEUR) peuvent gérer les projets où ils sont assignés
-    if ($user->hasRole('ROLE_UTILISATEUR') && $projet->getPersonnels()->contains($user)) {
-        return true;
-    }
-
-    return false;
-}
-
-    // API ENDPOINTS
 
     #[Route('/api/projet/{numProjet}/list', name: 'api_taches_list', methods: ['GET'])]
     public function apiList(string $numProjet): JsonResponse
     {
         try {
             $projet = $this->entityManager->getRepository(Projet::class)->find($numProjet);
-            
+
             if (!$projet) {
                 return $this->json([
                     'success' => false,
@@ -128,7 +119,7 @@ private function canManageProjet(Projet $projet): bool
     {
         try {
             $tache = $this->entityManager->getRepository(Tache::class)->find($numTache);
-            
+
             if (!$tache) {
                 return $this->json([
                     'success' => false,
@@ -137,7 +128,7 @@ private function canManageProjet(Projet $projet): bool
             }
 
             $projet = $tache->getProjet();
-            
+
             // Vérifier l'accès en lecture
             if (!$this->checkProjetAccess($projet)) {
                 return $this->json([
@@ -168,7 +159,7 @@ private function canManageProjet(Projet $projet): bool
     {
         try {
             $projet = $this->entityManager->getRepository(Projet::class)->find($numProjet);
-            
+
             if (!$projet) {
                 return $this->json([
                     'success' => false,
@@ -189,7 +180,6 @@ private function canManageProjet(Projet $projet): bool
                 'dateDebut' => $projet->getDateDebutPro()?->format('Y-m-d'),
                 'dateFin' => $projet->getDateFinPro()?->format('Y-m-d')
             ], 200);
-
         } catch (\Exception $e) {
             return $this->json([
                 'success' => false,
@@ -198,13 +188,10 @@ private function canManageProjet(Projet $projet): bool
         }
     }
 
-    /**
-     * Validation des dates des tâches par rapport au projet
-     */
     private function validateTacheDates(Tache $tache, array &$errors): bool
     {
         $projet = $tache->getProjet();
-        
+
         if (!$projet) {
             return true; // Pas de projet, pas de validation
         }
@@ -231,7 +218,7 @@ private function canManageProjet(Projet $projet): bool
     {
         try {
             $data = json_decode($request->getContent(), true);
-            
+
             $errors = [];
 
             // Vérifier si le projet existe
@@ -275,7 +262,7 @@ private function canManageProjet(Projet $projet): bool
             if (!empty($data['dateDebutTache']) && !empty($data['dateFinTache'])) {
                 $dateDebut = new \DateTime($data['dateDebutTache']);
                 $dateFin = new \DateTime($data['dateFinTache']);
-                
+
                 if ($dateFin < $dateDebut) {
                     $errors['dateFinTache'] = 'La date de fin doit être postérieure à la date de début';
                 }
@@ -290,12 +277,11 @@ private function canManageProjet(Projet $projet): bool
             }
 
             $tache = new Tache();
-            // Plus besoin de setNumTache - il sera généré automatiquement
             $tache->setTitreTache($data['titreTache']);
             $tache->setDescriptionTache($data['descriptionTache'] ?? null);
             $tache->setCommentaireTache($data['commentaireTache'] ?? null);
             $tache->setDateDebutTache(new \DateTime($data['dateDebutTache']));
-            
+
             if (!empty($data['dateFinTache'])) {
                 $tache->setDateFinTache(new \DateTime($data['dateFinTache']));
             }
@@ -318,14 +304,12 @@ private function canManageProjet(Projet $projet): bool
                     'errors' => $errors
                 ], 400);
             }
-
-            // Validation Symfony
             $validationErrors = $validator->validate($tache);
             if (count($validationErrors) > 0) {
                 foreach ($validationErrors as $error) {
                     $errors[$error->getPropertyPath()] = $error->getMessage();
                 }
-                
+
                 return $this->json([
                     'success' => false,
                     'message' => 'Des erreurs de validation ont été trouvées',
@@ -359,7 +343,7 @@ private function canManageProjet(Projet $projet): bool
     {
         try {
             $tache = $this->entityManager->getRepository(Tache::class)->find($numTache);
-            
+
             if (!$tache) {
                 return $this->json([
                     'success' => false,
@@ -385,7 +369,7 @@ private function canManageProjet(Projet $projet): bool
             }
 
             $data = json_decode($request->getContent(), true);
-            
+
             $errors = [];
 
             // Validation des données
@@ -401,7 +385,7 @@ private function canManageProjet(Projet $projet): bool
             if (!empty($data['dateDebutTache']) && !empty($data['dateFinTache'])) {
                 $dateDebut = new \DateTime($data['dateDebutTache']);
                 $dateFin = new \DateTime($data['dateFinTache']);
-                
+
                 if ($dateFin < $dateDebut) {
                     $errors['dateFinTache'] = 'La date de fin doit être postérieure à la date de début';
                 }
@@ -420,7 +404,7 @@ private function canManageProjet(Projet $projet): bool
             $tache->setDescriptionTache($data['descriptionTache'] ?? null);
             $tache->setCommentaireTache($data['commentaireTache'] ?? null);
             $tache->setDateDebutTache(new \DateTime($data['dateDebutTache']));
-            
+
             if (!empty($data['dateFinTache'])) {
                 $tache->setDateFinTache(new \DateTime($data['dateFinTache']));
             } else {
@@ -430,7 +414,7 @@ private function canManageProjet(Projet $projet): bool
             // Gestion de l'avancement (mode manuel uniquement)
             if (isset($data['avancementTache'])) {
                 $tache->setavancementTache($data['avancementTache']);
-                
+
                 // Mettre à jour le statut en fonction de l'avancement
                 if ($data['avancementTache'] == 0) {
                     $tache->setStatutTache('Débuté');
@@ -450,13 +434,12 @@ private function canManageProjet(Projet $projet): bool
                 ], 400);
             }
 
-            // Validation Symfony
             $validationErrors = $validator->validate($tache);
             if (count($validationErrors) > 0) {
                 foreach ($validationErrors as $error) {
                     $errors[$error->getPropertyPath()] = $error->getMessage();
                 }
-                
+
                 return $this->json([
                     'success' => false,
                     'message' => 'Des erreurs de validation ont été trouvées',
@@ -476,7 +459,6 @@ private function canManageProjet(Projet $projet): bool
                 'success' => true,
                 'message' => 'Tâche modifiée avec succès'
             ], 200);
-
         } catch (\Exception $e) {
             return $this->json([
                 'success' => false,
@@ -490,7 +472,7 @@ private function canManageProjet(Projet $projet): bool
     {
         try {
             $tache = $this->entityManager->getRepository(Tache::class)->find($numTache);
-            
+
             if (!$tache) {
                 return $this->json([
                     'success' => false,
@@ -520,7 +502,6 @@ private function canManageProjet(Projet $projet): bool
                 'success' => true,
                 'message' => 'Tâche supprimée avec succès'
             ], 200);
-
         } catch (\Exception $e) {
             return $this->json([
                 'success' => false,
@@ -529,119 +510,116 @@ private function canManageProjet(Projet $projet): bool
         }
     }
 
-    // Dans TacheController.php, ajoutez/modifiez ces méthodes :
 
-#[Route('/api/{numTache}/terminer', name: 'api_tache_terminer', methods: ['POST'])]
-public function apiTerminer(string $numTache): JsonResponse
-{
-    try {
-        $tache = $this->entityManager->getRepository(Tache::class)->find($numTache);
-        
-        if (!$tache) {
-            return $this->json([
-                'success' => false,
-                'message' => 'Tâche non trouvée'
-            ], 404);
-        }
+    #[Route('/api/{numTache}/terminer', name: 'api_tache_terminer', methods: ['POST'])]
+    public function apiTerminer(string $numTache): JsonResponse
+    {
+        try {
+            $tache = $this->entityManager->getRepository(Tache::class)->find($numTache);
 
-        $projet = $tache->getProjet();
+            if (!$tache) {
+                return $this->json([
+                    'success' => false,
+                    'message' => 'Tâche non trouvée'
+                ], 404);
+            }
 
-        // Vérifier les permissions de gestion
-        if (!$this->canManageProjet($projet)) {
-            return $this->json([
-                'success' => false,
-                'message' => 'Vous n\'êtes pas autorisé à terminer cette tâche'
-            ], 403);
-        }
+            $projet = $tache->getProjet();
 
-        // Vérifier si terminer cette tâche va mener le projet à 100%
-        $taches = $projet->getTaches();
-        $allTachesCount = $taches->count();
-        $completedTachesCount = $taches->filter(function($t) use ($numTache) {
-            // Compter cette tâche comme terminée
-            return $t->getavancementTache() === 100 || $t->getNumTache() == $numTache;
-        })->count();
-        
-        $willCompleteProject = ($completedTachesCount === $allTachesCount && $allTachesCount > 0);
+            // Vérifier les permissions de gestion
+            if (!$this->canManageProjet($projet)) {
+                return $this->json([
+                    'success' => false,
+                    'message' => 'Vous n\'êtes pas autorisé à terminer cette tâche'
+                ], 403);
+            }
 
-        // Terminer la tâche
-        $tache->setavancementTache(100);
-        $tache->setStatutTache('Terminé');
+            // Vérifier si terminer cette tâche va mener le projet à 100%
+            $taches = $projet->getTaches();
+            $allTachesCount = $taches->count();
+            $completedTachesCount = $taches->filter(function ($t) use ($numTache) {
+                // Compter cette tâche comme terminée
+                return $t->getavancementTache() === 100 || $t->getNumTache() == $numTache;
+            })->count();
 
-        $this->entityManager->flush();
+            $willCompleteProject = ($completedTachesCount === $allTachesCount && $allTachesCount > 0);
 
-        // Mettre à jour le projet
-        $projet->updateAvancementAndStatut();
-        $this->entityManager->flush();
-
-        return $this->json([
-            'success' => true,
-            'message' => $willCompleteProject 
-                ? 'Tâche terminée - Le projet est maintenant terminé à 100%' 
-                : 'Tâche terminée avec succès',
-            'projetTermine' => $willCompleteProject
-        ], 200);
-
-    } catch (\Exception $e) {
-        return $this->json([
-            'success' => false,
-            'message' => 'Erreur lors de la mise à jour: ' . $e->getMessage()
-        ], 500);
-    }
-}
-
-#[Route('/api/projet/{numProjet}/terminer-projet', name: 'api_projet_terminer', methods: ['POST'])]
-public function apiTerminerProjet(string $numProjet): JsonResponse
-{
-    try {
-        $projet = $this->entityManager->getRepository(Projet::class)->find($numProjet);
-        
-        if (!$projet) {
-            return $this->json([
-                'success' => false,
-                'message' => 'Projet non trouvé'
-            ], 404);
-        }
-
-        // Vérifier les permissions
-        if (!$this->canManageProjet($projet)) {
-            return $this->json([
-                'success' => false,
-                'message' => 'Vous n\'êtes pas autorisé à terminer ce projet'
-            ], 403);
-        }
-
-        // Marquer le projet comme terminé
-        $projet->setStatutPro('Terminé');
-        $projet->setavancementPro(100);
-
-        // Marquer toutes les tâches comme terminées
-        foreach ($projet->getTaches() as $tache) {
+            // Terminer la tâche
             $tache->setavancementTache(100);
             $tache->setStatutTache('Terminé');
+
+            $this->entityManager->flush();
+
+            // Mettre à jour le projet
+            $projet->updateAvancementAndStatut();
+            $this->entityManager->flush();
+
+            return $this->json([
+                'success' => true,
+                'message' => $willCompleteProject
+                    ? 'Tâche terminée - Le projet est maintenant terminé à 100%'
+                    : 'Tâche terminée avec succès',
+                'projetTermine' => $willCompleteProject
+            ], 200);
+        } catch (\Exception $e) {
+            return $this->json([
+                'success' => false,
+                'message' => 'Erreur lors de la mise à jour: ' . $e->getMessage()
+            ], 500);
         }
-
-        $this->entityManager->flush();
-
-        return $this->json([
-            'success' => true,
-            'message' => 'Projet marqué comme terminé'
-        ], 200);
-
-    } catch (\Exception $e) {
-        return $this->json([
-            'success' => false,
-            'message' => 'Erreur lors de la terminaison: ' . $e->getMessage()
-        ], 500);
     }
-}
+
+    #[Route('/api/projet/{numProjet}/terminer-projet', name: 'api_projet_terminer', methods: ['POST'])]
+    public function apiTerminerProjet(string $numProjet): JsonResponse
+    {
+        try {
+            $projet = $this->entityManager->getRepository(Projet::class)->find($numProjet);
+
+            if (!$projet) {
+                return $this->json([
+                    'success' => false,
+                    'message' => 'Projet non trouvé'
+                ], 404);
+            }
+
+            // Vérifier les permissions
+            if (!$this->canManageProjet($projet)) {
+                return $this->json([
+                    'success' => false,
+                    'message' => 'Vous n\'êtes pas autorisé à terminer ce projet'
+                ], 403);
+            }
+
+            // Marquer le projet comme terminé
+            $projet->setStatutPro('Terminé');
+            $projet->setavancementPro(100);
+
+            // Marquer toutes les tâches comme terminées
+            foreach ($projet->getTaches() as $tache) {
+                $tache->setavancementTache(100);
+                $tache->setStatutTache('Terminé');
+            }
+
+            $this->entityManager->flush();
+
+            return $this->json([
+                'success' => true,
+                'message' => 'Projet marqué comme terminé'
+            ], 200);
+        } catch (\Exception $e) {
+            return $this->json([
+                'success' => false,
+                'message' => 'Erreur lors de la terminaison: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 
     #[Route('/api/{numTache}/reprendre', name: 'api_tache_reprendre', methods: ['POST'])]
     public function apiReprendre(string $numTache): JsonResponse
     {
         try {
             $tache = $this->entityManager->getRepository(Tache::class)->find($numTache);
-            
+
             if (!$tache) {
                 return $this->json([
                     'success' => false,
@@ -674,7 +652,6 @@ public function apiTerminerProjet(string $numProjet): JsonResponse
                 'success' => true,
                 'message' => 'Tâche reprise avec succès'
             ], 200);
-
         } catch (\Exception $e) {
             return $this->json([
                 'success' => false,
@@ -688,7 +665,7 @@ public function apiTerminerProjet(string $numProjet): JsonResponse
     {
         try {
             $tache = $this->entityManager->getRepository(Tache::class)->find($numTache);
-            
+
             if (!$tache) {
                 return $this->json([
                     'success' => false,
@@ -721,7 +698,6 @@ public function apiTerminerProjet(string $numProjet): JsonResponse
                 'success' => true,
                 'message' => 'Tâche suspendue avec succès'
             ]);
-
         } catch (\Exception $e) {
             return $this->json([
                 'success' => false,
@@ -735,7 +711,7 @@ public function apiTerminerProjet(string $numProjet): JsonResponse
     {
         try {
             $projet = $this->entityManager->getRepository(Projet::class)->find($numProjet);
-            
+
             if (!$projet) {
                 return $this->json([
                     'success' => false,
@@ -753,13 +729,13 @@ public function apiTerminerProjet(string $numProjet): JsonResponse
 
             $taches = $this->entityManager->getRepository(Tache::class)
                 ->findBy(['numProjet' => $numProjet, 'statutTache' => 'Suspendu']);
-            
+
             $tachesReprises = 0;
-            
+
             foreach ($taches as $tache) {
                 // Remettre le statut précédent basé sur l'avancement
                 $avancement = $tache->getavancementTache();
-                
+
                 if ($avancement === 100) {
                     $tache->setStatutTache('Terminé');
                 } elseif ($avancement > 0 && $avancement < 100) {
@@ -767,10 +743,10 @@ public function apiTerminerProjet(string $numProjet): JsonResponse
                 } else {
                     $tache->setStatutTache('Débuté');
                 }
-                
+
                 $tachesReprises++;
             }
-            
+
             $this->entityManager->flush();
 
             return $this->json([
@@ -778,7 +754,6 @@ public function apiTerminerProjet(string $numProjet): JsonResponse
                 'message' => $tachesReprises . ' tâche(s) reprise(s) avec succès',
                 'tachesReprises' => $tachesReprises
             ]);
-
         } catch (\Exception $e) {
             return $this->json([
                 'success' => false,
@@ -792,7 +767,7 @@ public function apiTerminerProjet(string $numProjet): JsonResponse
     {
         try {
             $projet = $this->entityManager->getRepository(Projet::class)->find($numProjet);
-            
+
             if (!$projet) {
                 return $this->json([
                     'success' => false,
@@ -810,16 +785,16 @@ public function apiTerminerProjet(string $numProjet): JsonResponse
 
             $taches = $this->entityManager->getRepository(Tache::class)
                 ->findBy(['numProjet' => $numProjet]);
-            
+
             $tachesSuspendues = 0;
-            
+
             foreach ($taches as $tache) {
                 if ($tache->getStatutTache() !== 'Suspendu') {
                     $tache->setStatutTache('Suspendu');
                     $tachesSuspendues++;
                 }
             }
-            
+
             $this->entityManager->flush();
 
             return $this->json([
@@ -827,7 +802,6 @@ public function apiTerminerProjet(string $numProjet): JsonResponse
                 'message' => $tachesSuspendues . ' tâche(s) suspendue(s) avec succès',
                 'tachesSuspendues' => $tachesSuspendues
             ]);
-
         } catch (\Exception $e) {
             return $this->json([
                 'success' => false,
@@ -836,84 +810,78 @@ public function apiTerminerProjet(string $numProjet): JsonResponse
         }
     }
 
-#[Route('/api/{numTache}/verifier-cloture', name: 'api_tache_verifier_cloture', methods: ['GET'])]
-public function apiVerifierCloture(string $numTache): JsonResponse
-{
-    try {
-        $tache = $this->entityManager->getRepository(Tache::class)->find($numTache);
-        
-        if (!$tache) {
-            return $this->json([
-                'success' => false,
-                'message' => 'Tâche non trouvée'
-            ], 404);
-        }
+    #[Route('/api/{numTache}/verifier-cloture', name: 'api_tache_verifier_cloture', methods: ['GET'])]
+    public function apiVerifierCloture(string $numTache): JsonResponse
+    {
+        try {
+            $tache = $this->entityManager->getRepository(Tache::class)->find($numTache);
 
-        $projet = $tache->getProjet();
-        
-        if (!$projet) {
-            return $this->json([
-                'success' => false,
-                'message' => 'Projet non trouvé'
-            ], 404);
-        }
+            if (!$tache) {
+                return $this->json([
+                    'success' => false,
+                    'message' => 'Tâche non trouvée'
+                ], 404);
+            }
 
-        // Récupérer toutes les tâches du projet
-        $taches = $projet->getTaches();
-        $totalTaches = $taches->count();
-        
-        if ($totalTaches === 0) {
+            $projet = $tache->getProjet();
+
+            if (!$projet) {
+                return $this->json([
+                    'success' => false,
+                    'message' => 'Projet non trouvé'
+                ], 404);
+            }
+
+            // Récupérer toutes les tâches du projet
+            $taches = $projet->getTaches();
+            $totalTaches = $taches->count();
+
+            if ($totalTaches === 0) {
+                return $this->json([
+                    'success' => true,
+                    'vaCloturer' => false,
+                    'message' => 'Aucune tâche dans le projet'
+                ], 200);
+            }
+
+            // Compter les tâches déjà terminées (avancement = 100%)
+            $tachesTerminees = 0;
+            foreach ($taches as $t) {
+                if ($t->getavancementTache() === 100) {
+                    $tachesTerminees++;
+                }
+            }
+
+            // Vérifier si cette tâche est déjà terminée
+            $tacheEstDejaTerminee = $tache->getavancementTache() === 100;
+
+            // Si la tâche est déjà terminée, alors elle n'ajoutera pas de nouvelle tâche terminée
+            $nouvellesTachesTerminees = $tacheEstDejaTerminee ? 0 : 1;
+
+            $totalApresAction = $tachesTerminees + $nouvellesTachesTerminees;
+
+            $vaCloturer = ($totalApresAction === $totalTaches);
+
             return $this->json([
                 'success' => true,
-                'vaCloturer' => false,
-                'message' => 'Aucune tâche dans le projet'
+                'vaCloturer' => $vaCloturer,
+                'totalTaches' => $totalTaches,
+                'tachesTerminees' => $tachesTerminees,
+                'tacheEstDejaTerminee' => $tacheEstDejaTerminee,
+                'tachesInfo' => $taches->map(function ($t) {
+                    return [
+                        'numTache' => $t->getNumTache(),
+                        'titre' => $t->getTitreTache(),
+                        'avancement' => $t->getavancementTache(),
+                        'statut' => $t->getStatutTache()
+                    ];
+                })->toArray()
             ], 200);
+        } catch (\Exception $e) {
+            return $this->json([
+                'success' => false,
+                'message' => 'Erreur lors de la vérification: ' . $e->getMessage()
+            ], 500);
         }
-
-        // Compter les tâches déjà terminées (avancement = 100%)
-        $tachesTerminees = 0;
-        foreach ($taches as $t) {
-            if ($t->getavancementTache() === 100) {
-                $tachesTerminees++;
-            }
-        }
-
-        // Vérifier si cette tâche est déjà terminée
-        $tacheEstDejaTerminee = $tache->getavancementTache() === 100;
-        
-        // Si la tâche est déjà terminée, alors elle n'ajoutera pas de nouvelle tâche terminée
-        $nouvellesTachesTerminees = $tacheEstDejaTerminee ? 0 : 1;
-        
-        // Calculer le total après l'action
-        $totalApresAction = $tachesTerminees + $nouvellesTachesTerminees;
-        
-        // Vérifier si toutes les tâches seront terminées après cette action
-        $vaCloturer = ($totalApresAction === $totalTaches);
-        
-        return $this->json([
-            'success' => true,
-            'vaCloturer' => $vaCloturer,
-            'totalTaches' => $totalTaches,
-            'tachesTerminees' => $tachesTerminees,
-            'tacheEstDejaTerminee' => $tacheEstDejaTerminee,
-            'tachesInfo' => $taches->map(function($t) {
-                return [
-                    'numTache' => $t->getNumTache(),
-                    'titre' => $t->getTitreTache(),
-                    'avancement' => $t->getavancementTache(),
-                    'statut' => $t->getStatutTache()
-                ];
-            })->toArray()
-        ], 200);
-
-    } catch (\Exception $e) {
-        return $this->json([
-            'success' => false,
-            'message' => 'Erreur lors de la vérification: ' . $e->getMessage()
-        ], 500);
     }
-}
-
-
-    
 }

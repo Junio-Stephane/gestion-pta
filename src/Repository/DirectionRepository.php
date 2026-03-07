@@ -24,7 +24,7 @@ class DirectionRepository extends ServiceEntityRepository
         return $this->createQueryBuilder('d')
             ->leftJoin('d.personnel', 'p')
             ->addSelect('p')
-            ->orderBy('d.statutDirection', 'ASC') // ACTIVE d'abord
+            ->orderBy('d.statutDirection', 'ASC') 
             ->addOrderBy('d.nomDirection', 'ASC')
             ->getQuery()
             ->getResult();
@@ -46,25 +46,25 @@ class DirectionRepository extends ServiceEntityRepository
     }
 
 
-     /**
+    /**
      * Vérifie si un nom de direction existe déjà (en excluant une direction spécifique pour la modification)
      */
     public function isNomDirectionUnique(string $nomDirection, ?string $excludeCodeDirection = null): bool
-{
-    $qb = $this->createQueryBuilder('d')
-        ->where('d.nomDirection = :nomDirection')
-        ->setParameter('nomDirection', $nomDirection);
+    {
+        $qb = $this->createQueryBuilder('d')
+            ->where('d.nomDirection = :nomDirection')
+            ->setParameter('nomDirection', $nomDirection);
 
-    if ($excludeCodeDirection) {
-        $qb->andWhere('d.CodeDirection != :codeDirection')
-           ->setParameter('codeDirection', $excludeCodeDirection);
+        if ($excludeCodeDirection) {
+            $qb->andWhere('d.CodeDirection != :codeDirection')
+                ->setParameter('codeDirection', $excludeCodeDirection);
+        }
+
+        $result = $qb->getQuery()
+            ->getOneOrNullResult();
+
+        return $result === null;
     }
-
-    $result = $qb->getQuery()
-        ->getOneOrNullResult();
-
-    return $result === null;
-}
 
 
 
@@ -81,7 +81,7 @@ class DirectionRepository extends ServiceEntityRepository
     //         ->getResult();
     // }
 
-       
+
 
     // /**
     //  * Trouve une direction par son nom

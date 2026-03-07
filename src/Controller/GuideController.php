@@ -11,7 +11,6 @@ class GuideController extends AbstractController
     #[Route('/guide-utilisation', name: 'app_guide_utilisation')]
     public function index(): Response
     {
-        // Récupérer le rôle de l'utilisateur connecté
         $userRole = 'utilisateur';
         
         if ($this->isGranted('ROLE_ADMIN')) {

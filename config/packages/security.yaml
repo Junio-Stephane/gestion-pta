@@ -39,8 +39,7 @@
 #                 memory_cost: 10 # Lowest possible value for argon
 
 #----------------------------------------------------------------------------------------------------------------------------------
-# config/packages/security.yaml
-# config/packages/security.yaml
+
 security:
     password_hashers:
         Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'auto'

@@ -1,5 +1,4 @@
 <?php
-// src/EventListener/ResponseListener.php
 
 namespace App\EventListener;
 

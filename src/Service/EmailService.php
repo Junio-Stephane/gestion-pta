@@ -23,7 +23,7 @@ class EmailService
         try {
             $loginUrl = 'http://127.0.0.1:8000/login';
             
-            // Récupérer l'admin connecté
+
             $admin = $this->security->getUser();
             
             // Vérifier si c'est un objet Personnel et récupérer les informations

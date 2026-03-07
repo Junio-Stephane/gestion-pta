@@ -78,7 +78,7 @@ class Projet
     #[ORM\JoinColumn(name: 'im_per_createur', referencedColumnName: 'im_per', nullable: false)]
     #[Groups(['projet:read'])]
     private ?Personnel $createur = null;
-    
+
 
     #[ORM\ManyToOne(targetEntity: Service::class, inversedBy: 'projets')]
     #[ORM\JoinColumn(name: 'code_service', referencedColumnName: 'code_service', nullable: true)]
@@ -188,7 +188,7 @@ class Projet
     public function setavancementPro(?int $avancementPro): static // Accepte null
     {
         $this->avancementPro = $avancementPro === null ? null : max(0, min(100, $avancementPro));
-        
+
         if ($this->avancementPro === null) {
             $this->StatutPro = 'Débuté';
         } elseif ($this->avancementPro === 0) {
@@ -198,7 +198,7 @@ class Projet
         } elseif ($this->avancementPro === 100) {
             $this->StatutPro = 'Terminé';
         }
-        
+
         return $this;
     }
 
@@ -263,20 +263,17 @@ class Projet
         return $this;
     }
 
-    /**
- * Désactive le projet et toutes ses tâches
- */
-public function desactiverAvecCascade(): static
-{
-    $this->StatutPro = 'Suspendu'; // Ou créer un statut 'DESACTIVE' si nécessaire
-    
-    // Suspendre toutes les tâches du projet
-    foreach ($this->taches as $tache) {
-        $tache->setStatutTache('Suspendu');
+
+    public function desactiverAvecCascade(): static
+    {
+        $this->StatutPro = 'Suspendu'; 
+
+        foreach ($this->taches as $tache) {
+            $tache->setStatutTache('Suspendu');
+        }
+
+        return $this;
     }
-    
-    return $this;
-}
 
     /**
      * @return Collection<int, Tache>
@@ -299,7 +296,6 @@ public function desactiverAvecCascade(): static
     public function removeTache(Tache $tache): static
     {
         if ($this->taches->removeElement($tache)) {
-            // set the owning side to null (unless already changed)
             if ($tache->getProjet() === $this) {
                 $tache->setProjet(null);
             }
@@ -308,7 +304,7 @@ public function desactiverAvecCascade(): static
         return $this;
     }
 
-    // Méthode pour calculer la durée estimée
+
     #[Groups(['projet:read'])]
     public function getDureeEstimee(): ?string
     {
@@ -327,7 +323,6 @@ public function desactiverAvecCascade(): static
         }
     }
 
-    // Méthode pour vérifier la cohérence des dates
     public function isDateRangeValid(): bool
     {
         if (!$this->dateDebutPro || !$this->dateFinPro) {
@@ -337,14 +332,10 @@ public function desactiverAvecCascade(): static
         return $this->dateFinPro > $this->dateDebutPro;
     }
 
-
-/**
- * Met à jour le statut basé sur les tâches selon les règles spécifiées
- */
-public function updateStatutFromTaches(): void
+    public function updateStatutFromTaches(): void
     {
         $taches = $this->taches;
-        
+
         if ($taches->isEmpty()) {
             $this->StatutPro = 'Débuté';
             return;
@@ -357,12 +348,12 @@ public function updateStatutFromTaches(): void
         foreach ($taches as $tache) {
             $avancement = $tache->getavancementTache() ?? 0;
             $statutTache = $tache->getStatutTache();
-            
+
             if (($avancement > 0 && $avancement < 100) || $statutTache === 'En cours') {
                 $hasActiveTask = true;
                 $allTerminated = false;
             }
-            
+
             if ($avancement < 100) {
                 $allTerminated = false;
             }
@@ -377,13 +368,10 @@ public function updateStatutFromTaches(): void
         }
     }
 
-/**
- * Calcule l'avancement automatique basé sur la moyenne des avancements des tâches
- */
-public function calculateAvancementAuto(): void
+    public function calculateAvancementAuto(): void
     {
         $taches = $this->taches;
-        
+
         if ($taches->isEmpty()) {
             $this->avancementPro = 0;
             return;
@@ -406,16 +394,13 @@ public function calculateAvancementAuto(): void
         }
     }
 
-/**
- * Met à jour à la fois l'avancement et le statut
- */
-public function updateAvancementAndStatut(): void
-{
-    $this->calculateAvancementAuto();
-    $this->updateStatutFromTaches();
-}
+ 
+    public function updateAvancementAndStatut(): void
+    {
+        $this->calculateAvancementAuto();
+        $this->updateStatutFromTaches();
+    }
 
-    // Alias pour les responsables (personnels)
     public function getResponsables(): Collection
     {
         return $this->personnels;

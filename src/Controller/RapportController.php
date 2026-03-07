@@ -24,25 +24,21 @@ class RapportController extends AbstractController
         $this->entityManager = $entityManager;
     }
 
-    /**
-     * Route pour afficher la page des rapports
-     */
+
     #[Route('/rapports/projets', name: 'app_rapport_projets')]
     public function index(): Response
     {
         return $this->render('rapport/index.html.twig');
     }
 
-    /**
-     * API pour récupérer les directions actives
-     */
+
     #[Route('/api/rapport-directions-actives', name: 'api_rapport_directions_actives', methods: ['GET'])]
     public function getActiveDirections(): JsonResponse
     {
         try {
             $directions = $this->entityManager->getRepository(Direction::class)
                 ->findBy(['statutDirection' => 'ACTIVE']);
-            
+
             $data = [];
             foreach ($directions as $direction) {
                 $data[] = [
@@ -50,7 +46,7 @@ class RapportController extends AbstractController
                     'nomDirection' => $direction->getNomDirection()
                 ];
             }
-            
+
             return $this->json([
                 'success' => true,
                 'directions' => $data
@@ -63,25 +59,23 @@ class RapportController extends AbstractController
         }
     }
 
-    /**
-     * API pour récupérer les données d'une direction pour le rapport
-     */
+
     #[Route('/api/rapport/direction/{codeDirection}', name: 'api_rapport_direction', methods: ['GET'])]
     public function getRapportDirection(string $codeDirection): JsonResponse
     {
         try {
             $direction = $this->entityManager->getRepository(Direction::class)
                 ->findOneBy(['CodeDirection' => $codeDirection]);
-            
+
             if (!$direction) {
                 return $this->json([
                     'success' => false,
                     'message' => 'Direction non trouvée'
                 ], 404);
             }
-            
+
             $data = $this->serializeDirectionForRapport($direction);
-            
+
             return $this->json([
                 'success' => true,
                 'direction' => $data
@@ -94,10 +88,7 @@ class RapportController extends AbstractController
         }
     }
 
-    /**
-     * Sérialise une direction avec tous ses services, projets et tâches pour le rapport
-     * Inclut maintenant les services désactivés et projets/tâches suspendus
-     */
+
     private function serializeDirectionForRapport(Direction $direction): array
     {
         $data = [
@@ -106,7 +97,7 @@ class RapportController extends AbstractController
             'statutDirection' => $direction->getStatutDirection(),
             'services' => []
         ];
-        
+
         foreach ($direction->getServices() as $service) {
             // INCLURE TOUS LES SERVICES, MÊME DÉSACTIVÉS
             $serviceData = [
@@ -115,7 +106,7 @@ class RapportController extends AbstractController
                 'statutService' => $service->getStatutService(),
                 'projets' => []
             ];
-            
+
             foreach ($service->getProjets() as $projet) {
                 // INCLURE TOUS LES PROJETS, MÊME SUSPENDUS/DÉSACTIVÉS
                 $projetData = [
@@ -138,7 +129,7 @@ class RapportController extends AbstractController
                     'personnels' => [],
                     'taches' => []
                 ];
-                
+
                 // Responsables du projet
                 foreach ($projet->getPersonnels() as $personnel) {
                     $projetData['personnels'][] = [
@@ -149,8 +140,8 @@ class RapportController extends AbstractController
                         'FonctionPer' => $personnel->getFonctionPer()
                     ];
                 }
-                
-                // Tâches du projet (avec commentaires) - INCLURE TOUTES LES TÂCHES
+
+                // Tâches du projet  - INCLURE TOUTES LES TÂCHES
                 foreach ($projet->getTaches() as $tache) {
                     $projetData['taches'][] = [
                         'numTache' => $tache->getNumTache(),
@@ -163,63 +154,61 @@ class RapportController extends AbstractController
                         'statutTache' => $tache->getStatutTache()
                     ];
                 }
-                
+
                 $serviceData['projets'][] = $projetData;
             }
-            
+
             $data['services'][] = $serviceData;
         }
-        
+
         return $data;
     }
 
-    /**
-     * API pour exporter le rapport en PDF
-     */
+
     #[Route('/api/rapport/export-pdf/{codeDirection}', name: 'api_rapport_export_pdf', methods: ['GET'])]
-public function exportPdf(string $codeDirection, PdfGeneratorService $pdfGenerator): Response
-{
-    try {
-        $direction = $this->entityManager->getRepository(Direction::class)
-            ->findOneBy(['CodeDirection' => $codeDirection]);
-        
-        if (!$direction) {
+    public function exportPdf(string $codeDirection, PdfGeneratorService $pdfGenerator): Response
+    {
+        try {
+            $direction = $this->entityManager->getRepository(Direction::class)
+                ->findOneBy(['CodeDirection' => $codeDirection]);
+
+            if (!$direction) {
+                return $this->json([
+                    'success' => false,
+                    'message' => 'Direction non trouvée'
+                ], 404);
+            }
+
+            $data = $this->serializeDirectionForRapport($direction);
+            $stats = $this->calculateStatistiques($direction);
+
+            $pdfContent = $pdfGenerator->generateRapportPdf([
+                'direction' => $data,
+                'stats' => $stats,
+                'dateRapport' => (new \DateTime())->format('d/m/Y')
+            ]);
+
+            // Retourner le PDF
+            $response = new Response($pdfContent);
+            $response->headers->set('Content-Type', 'application/pdf');
+            $response->headers->set(
+                'Content-Disposition',
+                sprintf(
+                    'attachment; filename="Rapport_%s_%s.pdf"',
+                    $direction->getNomDirection(),
+                    (new \DateTime())->format('Y-m-d')
+                )
+            );
+
+            return $response;
+        } catch (\Exception $e) {
             return $this->json([
                 'success' => false,
-                'message' => 'Direction non trouvée'
-            ], 404);
+                'message' => 'Erreur lors de la génération du PDF: ' . $e->getMessage()
+            ], 500);
         }
-        
-        $data = $this->serializeDirectionForRapport($direction);
-        $stats = $this->calculateStatistiques($direction);
-        
-        $pdfContent = $pdfGenerator->generateRapportPdf([
-            'direction' => $data,
-            'stats' => $stats,
-            'dateRapport' => (new \DateTime())->format('d/m/Y')
-        ]);
-        
-        // Retourner le PDF
-        $response = new Response($pdfContent);
-        $response->headers->set('Content-Type', 'application/pdf');
-        $response->headers->set('Content-Disposition', 
-            sprintf('attachment; filename="Rapport_%s_%s.pdf"', 
-                $direction->getNomDirection(), 
-                (new \DateTime())->format('Y-m-d')));
-        
-        return $response;
-        
-    } catch (\Exception $e) {
-        return $this->json([
-            'success' => false,
-            'message' => 'Erreur lors de la génération du PDF: ' . $e->getMessage()
-        ], 500);
     }
-}
 
-    /**
-     * API pour exporter le rapport en Excel
-     */
     #[Route('/api/rapport/export-excel/{codeDirection}', name: 'api_rapport_export_excel', methods: ['GET'])]
     public function exportExcel(string $codeDirection): JsonResponse
     {
@@ -238,25 +227,23 @@ public function exportPdf(string $codeDirection, PdfGeneratorService $pdfGenerat
         }
     }
 
-    /**
-     * API pour obtenir les statistiques d'une direction
-     */
+
     #[Route('/api/rapport/statistiques/{codeDirection}', name: 'api_rapport_statistiques', methods: ['GET'])]
     public function getStatistiques(string $codeDirection): JsonResponse
     {
         try {
             $direction = $this->entityManager->getRepository(Direction::class)
                 ->findOneBy(['CodeDirection' => $codeDirection, 'statutDirection' => 'ACTIVE']);
-            
+
             if (!$direction) {
                 return $this->json([
                     'success' => false,
                     'message' => 'Direction non trouvée'
                 ], 404);
             }
-            
+
             $statistiques = $this->calculateStatistiques($direction);
-            
+
             return $this->json([
                 'success' => true,
                 'statistiques' => $statistiques
@@ -269,9 +256,7 @@ public function exportPdf(string $codeDirection, PdfGeneratorService $pdfGenerat
         }
     }
 
-    /**
-     * Calcule les statistiques pour une direction
-     */
+
     private function calculateStatistiques(Direction $direction): array
     {
         $totalServices = 0;
@@ -297,22 +282,22 @@ public function exportPdf(string $codeDirection, PdfGeneratorService $pdfGenerat
             if ($service->getStatutService() !== 'ACTIF') {
                 continue;
             }
-            
+
             $totalServices++;
-            
+
             foreach ($service->getProjets() as $projet) {
                 $totalProjets++;
                 $budgetTotal += floatval($projet->getBudgetPro());
                 $projetsParStatut[$projet->getStatutPro()]++;
-                
+
                 if ($projet->getavancementPro() !== null) {
                     $totalAvancementProjets += $projet->getavancementPro();
                 }
-                
+
                 foreach ($projet->getTaches() as $tache) {
                     $totalTaches++;
                     $tachesParStatut[$tache->getStatutTache()]++;
-                    
+
                     if ($tache->getavancementTache() !== null) {
                         $totalAvancementTaches += $tache->getavancementTache();
                     }
